@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TFAZZIO | Consultoria Estratégica</title>
+  <meta name="description" content="Consultoria estratégica para empresas que querem crescer mas estão travadas. Destrave. Estruture. Escale." />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #0D1B2A;
+      --navy-mid: #132236;
+      --navy-light: #1B2F45;
+      --offwhite: #E8E0D0;
+      --gold: #C4A882;
+      --silver: #8A9BB0;
+      --white: #ffffff;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--navy);
+      color: var(--offwhite);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 24px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(to bottom, rgba(13,27,42,0.98), transparent);
+    }
+
+    .nav-logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      letter-spacing: 4px;
+      color: var(--offwhite);
+      text-decoration: none;
+    }
+
+    .nav-cta {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-decoration: none;
+      border-bottom: 1px solid var(--gold);
+      padding-bottom: 2px;
+      transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.7; }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 120px 60px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: 'TFAZZIO';
+      position: absolute;
+      right: -40px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: clamp(120px, 20vw, 280px);
+      color: rgba(255,255,255,0.02);
+      letter-spacing: -10px;
+      pointer-events: none;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.2s;
+    }
+
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(48px, 7vw, 100px);
+      line-height: 1.05;
+      color: var(--offwhite);
+      max-width: 900px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.4s;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-sub {
+      margin-top: 40px;
+      font-size: 16px;
+      font-weight: 300;
+      color: var(--silver);
+      max-width: 480px;
+      line-height: 1.8;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.6s;
+    }
+
+    .hero-actions {
+      margin-top: 56px;
+      display: flex;
+      gap: 32px;
+      align-items: center;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.8s;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      padding: 16px 40px;
+      background: var(--gold);
+      color: var(--navy);
+      font-family: 'Barlow', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.85; transform: translateY(-2px); }
+
+    .btn-ghost {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--offwhite);
+      text-decoration: none;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+    .btn-ghost:hover { opacity: 1; }
+
+    .hero-diamond {
+      position: absolute;
+      bottom: 48px;
+      right: 60px;
+      color: var(--gold);
+      font-size: 24px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 1s;
+    }
+
+    /* DIVIDER */
+    .divider {
+      width: 1px;
+      height: 80px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      margin: 0 auto;
+    }
+
+    /* SECTION BASE */
+    section {
+      padding: 100px 60px;
+    }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(36px, 5vw, 64px);
+      line-height: 1.1;
+      color: var(--offwhite);
+      max-width: 700px;
+    }
+
+    /* SOBRE */
+    .sobre {
+      background: var(--navy-mid);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .sobre-text p {
+      font-size: 16px;
+      color: var(--silver);
+      margin-top: 32px;
+      line-height: 1.9;
+    }
+
+    .sobre-text p strong {
+      color: var(--offwhite);
+      font-weight: 500;
+    }
+
+    .sobre-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+    }
+
+    .stat {
+      background: var(--navy);
+      padding: 40px 32px;
+    }
+
+    .stat-number {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 56px;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--silver);
+      margin-top: 8px;
+    }
+
+    /* PARA QUEM */
+    .para-quem {
+      position: relative;
+    }
+
+    .para-quem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      margin-top: 60px;
+    }
+
+    .para-quem-card {
+      background: var(--navy-mid);
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .para-quem-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 2px;
+      height: 100%;
+      background: var(--gold);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .para-quem-card:hover::before { opacity: 1; }
+
+    .para-quem-card h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 32px;
+    }
+
+    .para-quem-card ul {
+      list-style: none;
+    }
+
+    .para-quem-card ul li {
+      font-size: 15px;
+      color: var(--silver);
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(138,155,176,0.15);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .para-quem-card ul li:last-child { border-bottom: none; }
+
+    .para-quem-card ul li::before {
+      content: '✦';
+      color: var(--gold);
+      font-size: 8px;
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+
+    /* MÉTODO */
+    .metodo {
+      background: var(--navy-mid);
+    }
+
+    .metodo-steps {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 2px;
+      margin-top: 60px;
+    }
+
+    .step {
+      background: var(--navy);
+      padding: 56px 40px;
+      position: relative;
+      transition: transform 0.3s;
+    }
+    .step:hover { transform: translateY(-4px); }
+
+    .step-number {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 72px;
+      font-weight: 700;
+      color: rgba(196,168,130,0.35);
+      line-height: 1;
+      margin-bottom: 24px;
+    }
+
+    .step-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: var(--offwhite);
+      margin-bottom: 16px;
+    }
+
+    .step-desc {
+      font-size: 14px;
+      color: var(--silver);
+      line-height: 1.8;
+    }
+
+    .step-accent {
+      width: 32px;
+      height: 1px;
+      background: var(--gold);
+      margin-top: 32px;
+    }
+
+    /* PRODUTOS */
+    .produtos-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      margin-top: 60px;
+    }
+
+    .produto-card {
+      background: var(--navy-mid);
+      padding: 56px 48px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s;
+    }
+    .produto-card:hover { transform: translateY(-4px); }
+
+    .produto-card.destaque {
+      background: var(--navy-light);
+      border-top: 2px solid var(--gold);
+    }
+
+    .produto-tag {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 24px;
+    }
+
+    .produto-nome {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 36px;
+      font-weight: 300;
+      color: var(--offwhite);
+      margin-bottom: 8px;
+    }
+
+    .produto-preco {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 1px;
+      margin-bottom: 32px;
+    }
+
+    .produto-desc {
+      font-size: 14px;
+      color: var(--silver);
+      line-height: 1.9;
+      margin-bottom: 40px;
+    }
+
+    .produto-lista {
+      list-style: none;
+      margin-bottom: 48px;
+    }
+
+    .produto-lista li {
+      font-size: 13px;
+      color: var(--silver);
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(138,155,176,0.12);
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .produto-lista li::before {
+      content: '✦';
+      color: var(--gold);
+      font-size: 8px;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+
+    /* CTA */
+    .cta-section {
+      text-align: center;
+      padding: 120px 60px;
+      background: var(--navy-mid);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '✦';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 600px;
+      color: rgba(196,168,130,0.02);
+      pointer-events: none;
+    }
+
+    .cta-section .section-title {
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .cta-section p {
+      font-size: 16px;
+      color: var(--silver);
+      margin: 24px auto 48px;
+      max-width: 440px;
+      text-align: center;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 48px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(138,155,176,0.1);
+    }
+
+    .footer-logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: 4px;
+      color: var(--offwhite);
+    }
+
+    .footer-tagline {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--silver);
+    }
+
+    .footer-copy {
+      font-size: 12px;
+      color: rgba(138,155,176,0.4);
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      nav { padding: 20px 24px; }
+      .hero { padding: 100px 24px 60px; }
+      section { padding: 70px 24px; }
+      .sobre { grid-template-columns: 1fr; gap: 48px; }
+      .para-quem-grid { grid-template-columns: 1fr; }
+      .metodo-steps { grid-template-columns: 1fr; }
+      .produtos-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 16px; text-align: center; }
+      .hero::before { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">TFAZZIO</a>
+    <a href="#contato" class="nav-cta">Falar com consultor</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <p class="hero-eyebrow">Consultoria Estratégica Empresarial</p>
+    <h1 class="hero-title">
+      Sua empresa cresce.<br>
+      Mas você sente que está<br>
+      <em>correndo no lugar.</em>
+    </h1>
+    <p class="hero-sub">
+      A TFAZZIO entra no seu negócio, identifica o que está travando o crescimento e trabalha com você para mudar isso.
+    </p>
+    <div class="hero-actions">
+      <a href="#contato" class="btn-primary">Fazer diagnóstico</a>
+      <a href="#metodo" class="btn-ghost">Como funciona</a>
+    </div>
+    <div class="hero-diamond">✦</div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SOBRE -->
+  <section class="sobre">
+    <div class="sobre-text">
+      <p class="section-label">Quem somos</p>
+      <h2 class="section-title">Intervenção estratégica. <em style="font-style:italic; color:var(--gold)">Não é consultoria de gaveta.</em></h2>
+      <p>A TFAZZIO não é mentoria motivacional. Não é marketing digital. Não é contabilidade.</p>
+      <p>É <strong>intervenção estratégica prática</strong>. Entramos no seu negócio, identificamos o que está travando o crescimento e trabalhamos com você para destravar.</p>
+      <p>Fundada por Thiago Fazzio, economista com <strong>mais de 7 anos de mercado financeiro</strong> em grandes instituições financeiras e cooperativas de crédito, com experiência em empresas de todos os tamanhos e segmentos.</p>
+    </div>
+    <div class="sobre-stats">
+      <div class="stat">
+        <div class="stat-number">7+</div>
+        <div class="stat-label">Anos de mercado financeiro</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">3</div>
+        <div class="stat-label">Etapas do método</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">1h</div>
+        <div class="stat-label">Para o primeiro diagnóstico</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">✦</div>
+        <div class="stat-label">Resultado real</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PARA QUEM -->
+  <section class="para-quem">
+    <p class="section-label">Perfil ideal</p>
+    <h2 class="section-title">Para quem é a TFAZZIO</h2>
+    <div class="para-quem-grid">
+      <div class="para-quem-card">
+        <h3>É para você se</h3>
+        <ul>
+          <li>Seu negócio já tem clientes e fatura de forma consistente</li>
+          <li>Produto validado, operação rodando</li>
+          <li>Você sente que travou no próximo nível</li>
+          <li>Você quer estrutura, não palestra</li>
+          <li>Está disposto a mudar o que precisa ser mudado</li>
+        </ul>
+      </div>
+      <div class="para-quem-card">
+        <h3>Não é para você se</h3>
+        <ul>
+          <li>Você ainda está validando o produto</li>
+          <li>Você quer seguidores, não resultado</li>
+          <li>Você busca motivação, não estratégia</li>
+          <li>Você não está disposto a mudar nada</li>
+          <li>Você quer respostas genéricas e relatórios bonitos</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- MÉTODO -->
+  <section class="metodo" id="metodo">
+    <p class="section-label">Como trabalhamos</p>
+    <h2 class="section-title">O método TFAZZIO</h2>
+    <div class="metodo-steps">
+      <div class="step">
+        <div class="step-number">01</div>
+        <div class="step-title">DESTRAVE.</div>
+        <p class="step-desc">Diagnóstico profundo. Identificamos exatamente onde o negócio está bloqueado — processos, pessoas, decisões ou estratégia.</p>
+        <div class="step-accent"></div>
+      </div>
+      <div class="step">
+        <div class="step-number">02</div>
+        <div class="step-title">ESTRUTURE.</div>
+        <p class="step-desc">Clareza estratégica. Processos, papéis e decisões no lugar certo. Sem dependência excessiva do dono, sem improviso.</p>
+        <div class="step-accent"></div>
+      </div>
+      <div class="step">
+        <div class="step-number">03</div>
+        <div class="step-title">ESCALE.</div>
+        <p class="step-desc">Crescimento sustentável. Com base sólida e estrutura clara, o negócio cresce sem depender só de você.</p>
+        <div class="step-accent"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUTOS -->
+  <section id="produtos">
+    <p class="section-label">Como podemos trabalhar juntos</p>
+    <h2 class="section-title">Nossos serviços</h2>
+    <div class="produtos-grid">
+      <div class="produto-card">
+        <p class="produto-tag">Ponto de entrada</p>
+        <h3 class="produto-nome">Diagnóstico Estratégico</h3>
+        <p class="produto-preco">R$ 1.500 a R$ 3.000</p>
+        <p class="produto-desc">Em 1 hora você descobre onde seu negócio está travado e o que fazer para mudar isso. Sem enrolação. Sem genérico. Sem "depende".</p>
+        <ul class="produto-lista">
+          <li>Sessão online de 1 hora</li>
+          <li>Análise prévia do negócio via formulário</li>
+          <li>Mapa claro dos bloqueios identificados</li>
+          <li>Recomendações práticas e priorizadas</li>
+        </ul>
+        <a href="#contato" class="btn-primary">Agendar diagnóstico</a>
+      </div>
+      <div class="produto-card destaque">
+        <p class="produto-tag">Transformação contínua</p>
+        <h3 class="produto-nome">Consultoria Recorrente</h3>
+        <p class="produto-preco">A partir de R$ 3.500/mês</p>
+        <p class="produto-desc">Acompanhamento estratégico contínuo para empresas que querem avançar com consistência. Reunião semanal com foco total em resultado.</p>
+        <ul class="produto-lista">
+          <li>Reunião semanal de 1 hora</li>
+          <li>Acompanhamento entre sessões</li>
+          <li>Plano de ação atualizado semanalmente</li>
+          <li>Contrato mínimo de 3 meses</li>
+        </ul>
+        <a href="#contato" class="btn-primary">Quero saber mais</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section" id="contato">
+    <p class="section-label">Próximo passo</p>
+    <h2 class="section-title">Pronto para destravar seu negócio?</h2>
+    <p>Fale com a TFAZZIO. Sem compromisso. Em uma conversa já conseguimos identificar se faz sentido trabalharmos juntos.</p>
+    <a href="https://wa.me/5516992752758" target="_blank" class="btn-primary">Falar no WhatsApp</a>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">TFAZZIO</div>
+    <div class="footer-tagline">Destrave. Estruture. Escale.</div>
+    <div class="footer-copy">© 2026 TFAZZIO. Todos os direitos reservados.</div>
+  </footer>
+
+</body>
+</html>
