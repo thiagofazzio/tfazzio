@@ -622,6 +622,125 @@
       .hero::before { display: none; }
       .whatsapp-float { bottom: 20px; right: 20px; }
     }
+
+    /* EBOOK */
+    .ebook-section {
+      background: var(--navy-mid);
+      padding: 100px 60px;
+    }
+
+    .ebook-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .ebook-title {
+      font-family: "Cormorant Garamond", serif;
+      font-weight: 300;
+      font-size: clamp(32px, 4vw, 56px);
+      line-height: 1.1;
+      color: var(--offwhite);
+      margin-bottom: 20px;
+    }
+
+    .ebook-title em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .ebook-desc {
+      font-size: 15px;
+      color: var(--silver);
+      line-height: 1.9;
+      margin-bottom: 28px;
+    }
+
+    .ebook-lista {
+      list-style: none;
+    }
+
+    .ebook-lista li {
+      font-size: 14px;
+      color: var(--offwhite);
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(138,155,176,0.12);
+    }
+
+    .ebook-form-box {
+      background: var(--navy-dark);
+      padding: 48px 40px;
+      border-top: 2px solid var(--gold);
+    }
+
+    .ebook-form-title {
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 28px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(138,155,176,0.2);
+      color: var(--offwhite);
+      font-family: "Barlow", sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    .form-input::placeholder {
+      color: var(--silver);
+    }
+
+    .form-input:focus {
+      border-color: var(--gold);
+    }
+
+    .btn-ebook {
+      width: 100%;
+      padding: 16px;
+      background: var(--gold);
+      color: var(--navy-dark);
+      font-family: "Barlow", sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity 0.2s;
+    }
+
+    .btn-ebook:hover { opacity: 0.85; }
+
+    .form-aviso {
+      font-size: 11px;
+      color: var(--silver);
+      text-align: center;
+      margin-top: 12px;
+      opacity: 0.6;
+    }
+
+    @media (max-width: 768px) {
+      .ebook-container { grid-template-columns: 1fr; gap: 40px; }
+      .ebook-section { padding: 70px 24px; }
+    }
+
   </style>
 </head>
 <body>
@@ -823,6 +942,74 @@
       </div>
     </div>
   </section>
+
+
+  <!-- EBOOK -->
+  <section class="ebook-section" id="ebook">
+    <div class="ebook-container">
+      <div class="ebook-texto">
+        <p class="section-label">Material gratuito</p>
+        <h2 class="ebook-title">O Básico que Faz sua<br><em>Empresa Crescer</em></h2>
+        <p class="ebook-desc">Um guia prático para donos de empresa que querem sair do improviso e construir uma operação que funciona de verdade. Sem teoria. Sem enrolação.</p>
+        <ul class="ebook-lista">
+          <li>✦ Os pilares que toda empresa precisa ter no lugar</li>
+          <li>✦ Por que crescer sem estrutura gera mais problema</li>
+          <li>✦ O que fazer primeiro para destravar o crescimento</li>
+        </ul>
+      </div>
+      <div class="ebook-form-box">
+        <p class="ebook-form-title">Baixe gratuitamente</p>
+        <form
+          id="ebook-form"
+          action="https://formspree.io/f/xyklwdka"
+          method="POST"
+          onsubmit="handleEbookSubmit(event)"
+        >
+          <input type="hidden" name="_subject" value="Novo lead — Ebook TFAZZIO" />
+          <input type="hidden" name="_next" value="https://tfazzio.com.br/O%20B%C3%A1sico%20que%20Faz%20sua%20Empresa%20Crescer%20-%20Thiago%20Fazzio.pdf" />
+          <div class="form-group">
+            <input type="text" name="nome" placeholder="Seu nome" required class="form-input" />
+          </div>
+          <div class="form-group">
+            <input type="tel" name="telefone" placeholder="Seu WhatsApp" required class="form-input" />
+          </div>
+          <div class="form-group">
+            <input type="email" name="email" placeholder="Seu melhor email" required class="form-input" />
+          </div>
+          <button type="submit" class="btn-ebook">Quero o ebook grátis</button>
+          <p class="form-aviso">Seus dados não serão compartilhados.</p>
+        </form>
+        <div id="ebook-sucesso" style="display:none; text-align:center; padding: 20px 0;">
+          <p style="color: var(--gold); font-size: 18px; font-weight: 600; margin-bottom: 12px;">✦ Pronto!</p>
+          <p style="color: var(--offwhite); margin-bottom: 20px;">Seu ebook está pronto para download.</p>
+          <a href="O%20B%C3%A1sico%20que%20Faz%20sua%20Empresa%20Crescer%20-%20Thiago%20Fazzio.pdf" download class="btn-primary">Baixar agora</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+  function handleEbookSubmit(e) {
+    e.preventDefault();
+    const form = document.getElementById('ebook-form');
+    const sucesso = document.getElementById('ebook-sucesso');
+    const data = new FormData(form);
+
+    fetch('https://formspree.io/f/xyklwdka', {
+      method: 'POST',
+      body: data,
+      headers: { 'Accept': 'application/json' }
+    }).then(res => {
+      if (res.ok) {
+        form.style.display = 'none';
+        sucesso.style.display = 'block';
+      }
+    }).catch(() => {
+      form.style.display = 'none';
+      sucesso.style.display = 'block';
+    });
+  }
+  </script>
 
   <!-- CTA -->
   <section class="cta-section" id="contato">
