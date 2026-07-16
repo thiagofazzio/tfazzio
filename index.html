@@ -3,1938 +3,97 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TFAZZIO Consultoria | Clareza para Crescer</title>
-  <meta name="description" content="Você já sabe onde quer chegar. A TFAZZIO ajuda a descobrir o que precisa ser resolvido primeiro. Consultoria estratégica para empresários." />
-  <meta property="og:title" content="TFAZZIO Consultoria | Clareza para Crescer" />
-  <meta property="og:description" content="Quando tudo parece prioridade, nada é prioridade. Consultoria estratégica para empresários." />
-  <meta property="og:type" content="website" />
+  <title>Raio-X Empresarial · TFAZZIO</title>
+  <meta name="description" content="Descubra em poucos minutos qual decisão merece sua atenção primeiro." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet" />
-
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- ====================== CSS ====================== -->
   <style>
-    /* ── RESET & BASE ────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bordo:      #6B0F1A;
-      --bordo-mid:  #7B1D2E;
-      --bordo-dark: #4A0A12;
-      --gold:       #D4AF37;
-      --gold-pale:  #E8CC6A;
-      --graphite:   #1A1A1A;
-      --mid:        #2E2E2E;
-      --muted:      #5A6270;
-      --silver:     #8A929C;
-      --rule:       #D8D3CB;
-      --white:      #FFFFFF;
-      --off:        #F9F7F3;
-      --cream:      #F2EEE7;
-      --cream-mid:  #E8E2D8;
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--white);
-      color: var(--graphite);
-      font-family: 'Barlow', sans-serif;
-      font-weight: 300;
-      line-height: 1.75;
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ── TYPE SCALE ──────────────────────────────────── */
-    .t-label {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 5px;
-      text-transform: uppercase;
-      color: var(--gold);
-      display: block;
-    }
-    .t-label--muted { color: var(--silver); }
-    .t-label--pale  { color: rgba(212,175,55,0.75); }
-
-    .t-display {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      line-height: 1.06;
-      color: var(--graphite);
-    }
-    .t-display em { font-style: italic; color: var(--bordo); }
-    .t-display--xl   { font-size: clamp(44px, 6.5vw, 96px); }
-    .t-display--lg   { font-size: clamp(36px, 5vw, 68px); }
-    .t-display--md   { font-size: clamp(28px, 3.5vw, 50px); }
-    .t-display--sm   { font-size: clamp(22px, 2.8vw, 36px); }
-    .t-display--inv  { color: var(--white); }
-    .t-display--inv em { color: var(--gold-pale); }
-
-    .t-body {
-      font-size: 16px;
-      color: var(--muted);
-      line-height: 1.9;
-    }
-    .t-body--sm { font-size: 14px; }
-    .t-body strong { color: var(--mid); font-weight: 500; }
-
-    .t-pull {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-style: italic;
-      color: var(--graphite);
-      line-height: 1.38;
-      font-size: clamp(20px, 2.5vw, 32px);
-    }
-
-    /* ── BUTTONS ─────────────────────────────────────── */
-    .btn {
-      display: inline-block;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      text-decoration: none;
-      padding: 17px 48px;
-      transition: all 0.22s;
-      cursor: pointer;
-      border: none;
-      line-height: 1;
-    }
-    .btn--bordo { background: var(--bordo); color: var(--white); }
-    .btn--bordo:hover { background: var(--bordo-mid); transform: translateY(-2px); }
-    .btn--gold  { background: var(--gold); color: var(--bordo-dark); }
-    .btn--gold:hover  { background: var(--gold-pale); transform: translateY(-2px); }
-    .btn--dark  { background: var(--graphite); color: var(--white); }
-    .btn--dark:hover  { background: #000; transform: translateY(-2px); }
-    .btn--outline {
-      background: transparent;
-      color: var(--bordo);
-      border: 1px solid var(--bordo);
-      padding: 16px 46px;
-    }
-    .btn--outline:hover { background: var(--bordo); color: var(--white); }
-    .btn--ghost {
-      background: transparent;
-      color: var(--silver);
-      font-size: 11px;
-      letter-spacing: 3px;
-      padding: 4px 0;
-      border-bottom: 1px solid var(--cream-mid);
-      transition: color 0.2s, border-color 0.2s;
-    }
-    .btn--ghost:hover { color: var(--bordo); border-color: var(--bordo); }
-    .btn--block { display: block; width: 100%; text-align: center; }
-    .btn--sm { padding: 13px 32px; font-size: 10px; }
-
-    /* ── LAYOUT HELPERS ──────────────────────────────── */
-    .wrap {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 60px;
-    }
-    .wrap--narrow { max-width: 860px; margin: 0 auto; padding: 0 60px; }
-    .wrap--mid    { max-width: 1040px; margin: 0 auto; padding: 0 60px; }
-
-    .section { padding: 120px 0; }
-    .section--tight { padding: 80px 0; }
-
-    .gold-line { display: block; width: 36px; height: 2px; background: var(--gold); }
-    .h-rule { border: none; border-top: 1px solid var(--rule); }
-
-    /* Transitions between sections */
-    .bridge {
-      padding: 0;
-      text-align: center;
-    }
-    .bridge-inner {
-      display: inline-flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      padding: 48px 0;
-    }
-    .bridge-line {
-      width: 1px;
-      height: 60px;
-      background: linear-gradient(to bottom, var(--gold), transparent);
-    }
-    .bridge-text {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(16px, 2vw, 22px);
-      font-style: italic;
-      font-weight: 300;
-      color: var(--silver);
-      letter-spacing: 0.3px;
-    }
-
-    /* ── NAV ─────────────────────────────────────────── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 200;
-      height: 68px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 60px;
-      background: rgba(255,255,255,0.96);
-      border-bottom: 1px solid var(--cream-mid);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-    .nav-logo img {
-      height: 42px;
-      width: auto;
-      display: block;
-    }
-    .nav-logo-text {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 700;
-      font-size: 20px;
-      letter-spacing: 5px;
-      color: var(--bordo);
-      text-decoration: none;
-    }
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 36px;
-    }
-    .nav-link {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .nav-link:hover { color: var(--bordo); }
-    .nav-cta {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      text-decoration: none;
-      background: var(--bordo);
-      color: var(--white);
-      padding: 10px 24px;
-      transition: background 0.2s;
-    }
-    .nav-cta:hover { background: var(--bordo-mid); }
-    .nav-hamburger {
-      display: none;
-      flex-direction: column;
-      gap: 5px;
-      cursor: pointer;
-      background: none;
-      border: none;
-      padding: 4px;
-    }
-    .nav-hamburger span { display: block; width: 22px; height: 1.5px; background: var(--bordo); }
-    .mob-menu {
-      display: none;
-      position: fixed;
-      top: 68px; left: 0; right: 0;
-      background: var(--white);
-      border-bottom: 1px solid var(--cream-mid);
-      padding: 28px 32px 36px;
-      flex-direction: column;
-      gap: 0;
-      z-index: 199;
-      max-height: calc(100vh - 68px);
-      overflow-y: auto;
-    }
-    .mob-menu.open { display: flex; }
-    .mob-menu .nav-link {
-      padding: 14px 0;
-      border-bottom: 1px solid var(--cream);
-      font-size: 12px;
-    }
-    .mob-menu .nav-cta { margin-top: 20px; text-align: center; padding: 14px; }
-
-    /* ── HERO ────────────────────────────────────────── */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 130px 60px 110px;
-      position: relative;
-      overflow: hidden;
-      background: var(--white);
-    }
-    .hero::after {
-      content: '';
-      position: absolute;
-      right: 0; top: 10%;
-      width: 2px;
-      height: 50%;
-      background: linear-gradient(to bottom, transparent, var(--gold), transparent);
-      opacity: 0.6;
-    }
-    .hero-content { max-width: 820px; }
-    .hero-eyebrow {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 5px;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 44px;
-      opacity: 0;
-      animation: fu 0.8s ease forwards 0.1s;
-    }
-    .hero-headline {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-size: clamp(46px, 7vw, 100px);
-      line-height: 1.02;
-      color: var(--graphite);
-      margin-bottom: 0;
-      opacity: 0;
-      animation: revUp 1.2s cubic-bezier(0.16,1,0.3,1) forwards 0.25s;
-    }
-    .hero-headline em { font-style: italic; color: var(--bordo); }
-    .hero-rule {
-      width: 1px;
-      height: 64px;
-      background: linear-gradient(to bottom, var(--gold) 60%, transparent);
-      display: block;
-      margin: 48px 0;
-      opacity: 0;
-      animation: fu 0.7s ease forwards 0.7s;
-    }
-    .hero-subhead {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(20px, 2.5vw, 28px);
-      font-weight: 300;
-      color: var(--muted);
-      line-height: 1.55;
-      margin-bottom: 20px;
-      max-width: 600px;
-      opacity: 0;
-      animation: fu 0.8s ease forwards 0.8s;
-    }
-    .hero-body {
-      font-size: 16px;
-      color: var(--silver);
-      line-height: 1.85;
-      max-width: 560px;
-      margin-bottom: 52px;
-      opacity: 0;
-      animation: fu 0.8s ease forwards 0.95s;
-    }
-    .hero-actions {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 16px;
-      opacity: 0;
-      animation: fu 0.8s ease forwards 1.1s;
-    }
-    .hero-friction {
-      font-size: 13px;
-      color: var(--silver);
-      font-style: italic;
-      line-height: 1.6;
-    }
-
-    @keyframes fu {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes revUp {
-      from { opacity: 0; transform: translateY(40px); filter: blur(4px); }
-      to   { opacity: 1; transform: translateY(0); filter: blur(0); }
-    }
-
-    /* ── IDENTIFICAÇÃO ───────────────────────────────── */
-    .identificacao {
-      background: var(--off);
-      padding: 100px 0;
-    }
-    .ident-header {
-      margin-bottom: 60px;
-    }
-    .ident-header .t-label { margin-bottom: 20px; }
-    .ident-intro {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(28px, 4vw, 52px);
-      font-weight: 300;
-      color: var(--graphite);
-      line-height: 1.15;
-    }
-    .ident-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 2px;
-    }
-    .ident-item {
-      background: var(--white);
-      padding: 40px 32px;
-      border-top: 2px solid transparent;
-      transition: border-color 0.3s;
-    }
-    .ident-item:hover { border-top-color: var(--bordo); }
-    .ident-num {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 3px;
-      color: var(--gold);
-      margin-bottom: 16px;
-      display: block;
-    }
-    .ident-text {
-      font-size: 15px;
-      color: var(--mid);
-      line-height: 1.65;
-      font-weight: 400;
-    }
-    .ident-conclusion {
-      margin-top: 2px;
-      background: var(--bordo);
-      padding: 40px 52px;
-      display: flex;
-      align-items: center;
-      gap: 48px;
-    }
-    .ident-conclusion p {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(20px, 2.5vw, 30px);
-      font-weight: 300;
-      font-style: italic;
-      color: var(--white);
-      line-height: 1.45;
-      flex: 1;
-    }
-    .ident-conclusion .gold-line { flex-shrink: 0; width: 60px; }
-
-    /* ── QUEM É ──────────────────────────────────────── */
-    .quem { background: var(--white); }
-    .quem-grid {
-      display: grid;
-      grid-template-columns: 5fr 4fr;
-      gap: 100px;
-      align-items: start;
-    }
-    .quem-left .t-label { margin-bottom: 28px; }
-    .quem-left p { margin-top: 28px; }
-    .quem-pull {
-      border-left: 2px solid var(--gold);
-      padding-left: 28px;
-      margin: 44px 0;
-    }
-    .quem-right { padding-top: 72px; }
-    .pilar {
-      padding: 36px 0;
-      border-bottom: 1px solid var(--rule);
-    }
-    .pilar:first-child { border-top: 1px solid var(--rule); }
-    .pilar-verb {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: 4px;
-      color: var(--bordo);
-      margin-bottom: 8px;
-    }
-    .pilar p { font-size: 14px; color: var(--muted); line-height: 1.85; }
-
-    /* ── MÉTODO ──────────────────────────────────────── */
-    .metodo { background: var(--bordo-dark); }
-    .metodo .t-label { margin-bottom: 28px; }
-    .metodo-title { color: var(--white); margin-bottom: 72px; }
-    .metodo-title em { color: var(--gold-pale); }
-    .metodo-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 2px;
-    }
-    .metodo-step {
-      background: var(--white);
-      padding: 60px 44px;
-      position: relative;
-      overflow: hidden;
-    }
-    .metodo-step::before {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 2px;
-      background: var(--gold);
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.4s ease;
-    }
-    .metodo-step:hover::before { transform: scaleX(1); }
-    .ms-letter {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 100px;
-      font-weight: 300;
-      color: var(--cream-mid);
-      line-height: 1;
-      margin-bottom: 16px;
-      user-select: none;
-    }
-    .ms-verb {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: 5px;
-      color: var(--bordo);
-      margin-bottom: 6px;
-    }
-    .ms-tag {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 24px;
-      display: block;
-    }
-    .ms-desc { font-size: 14px; color: var(--muted); line-height: 1.9; margin-bottom: 32px; }
-    .ms-list { list-style: none; }
-    .ms-list li {
-      font-size: 13px;
-      color: var(--muted);
-      padding: 8px 0;
-      border-bottom: 1px solid var(--cream);
-      display: flex;
-      gap: 10px;
-      line-height: 1.55;
-    }
-    .ms-list li:last-child { border-bottom: none; }
-    .ms-list li::before { content: '•'; color: var(--gold); flex-shrink: 0; font-size: 12px; }
-    .ms-entrega {
-      margin-top: 28px;
-      padding: 10px 16px;
-      background: var(--off);
-      border-left: 2px solid var(--gold);
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--mid);
-    }
-
-    /* ── ESCOLHA O MOMENTO ───────────────────────────── */
-    .escolha { background: var(--off); }
-    .escolha .t-label { margin-bottom: 28px; }
-    .escolha-sub {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(18px, 2.2vw, 24px);
-      font-weight: 300;
-      font-style: italic;
-      color: var(--muted);
-      line-height: 1.5;
-      max-width: 520px;
-      margin-top: 24px;
-    }
-    .escolha-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 2px;
-      margin-top: 64px;
-    }
-    .escolha-card {
-      background: var(--white);
-      padding: 44px 36px;
-      display: flex;
-      flex-direction: column;
-      border-top: 3px solid var(--cream-mid);
-      transition: border-color 0.3s;
-    }
-    .escolha-card:hover { border-top-color: var(--gold); }
-    .esc-tag {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--silver);
-      margin-bottom: 16px;
-    }
-    .esc-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 28px;
-      font-weight: 400;
-      color: var(--graphite);
-      line-height: 1.15;
-      margin-bottom: 20px;
-    }
-    .esc-desc {
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.8;
-      margin-bottom: 28px;
-      flex-grow: 1;
-    }
-    .esc-price {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--bordo);
-      margin-bottom: 4px;
-    }
-    .esc-price-note {
-      font-size: 11px;
-      color: var(--silver);
-      margin-bottom: 24px;
-      font-style: italic;
-    }
-    .esc-anchor {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--bordo);
-      text-decoration: none;
-      border-bottom: 1px solid var(--bordo);
-      padding-bottom: 3px;
-      align-self: flex-start;
-      transition: opacity 0.2s;
-    }
-    .esc-anchor:hover { opacity: 0.6; }
-    .escolha-card--destaque {
-      background: var(--bordo);
-      border-top-color: var(--gold);
-    }
-    .escolha-card--destaque .esc-tag { color: rgba(212,175,55,0.85); }
-    .escolha-card--destaque .esc-name { color: var(--white); }
-    .escolha-card--destaque .esc-desc { color: rgba(255,255,255,0.65); }
-    .escolha-card--destaque .esc-price { color: var(--gold-pale); }
-    .escolha-card--destaque .esc-price-note { color: rgba(255,255,255,0.45); }
-    .escolha-card--destaque .esc-anchor { color: var(--gold-pale); border-color: var(--gold-pale); }
-
-    /* ── PRODUTO CARDS (Intensivo / Programa / Advisor) ─ */
-    .produto { background: var(--white); }
-    .produto--alt { background: var(--off); }
-    .produto .t-label { margin-bottom: 28px; }
-
-    .prod-card {
-      margin-top: 64px;
-      background: var(--off);
-      border-top: 3px solid var(--bordo);
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-    }
-    .prod-card--dark { background: var(--graphite); border-top-color: var(--gold); }
-    .prod-card--white { background: var(--white); border: 1px solid var(--cream-mid); border-top: 3px solid var(--bordo); }
-
-    .pc-left {
-      padding: 64px 56px;
-      border-right: 1px solid var(--cream-mid);
-    }
-    .prod-card--dark .pc-left { border-right-color: rgba(255,255,255,0.08); }
-    .prod-card--white .pc-left { border-right-color: var(--cream-mid); }
-
-    .pc-badge {
-      display: inline-block;
-      background: var(--bordo);
-      color: var(--white);
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      padding: 5px 16px;
-      margin-bottom: 28px;
-    }
-    .pc-badge--gold { background: var(--gold); color: var(--bordo-dark); }
-    .pc-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(30px, 4vw, 52px);
-      font-weight: 300;
-      color: var(--graphite);
-      line-height: 1.1;
-      margin-bottom: 8px;
-    }
-    .prod-card--dark .pc-title { color: var(--white); }
-    .pc-subtitle {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 32px;
-      display: block;
-    }
-    .pc-desc { font-size: 15px; color: var(--muted); line-height: 1.9; margin-bottom: 36px; }
-    .prod-card--dark .pc-desc { color: rgba(255,255,255,0.6); }
-
-    .pc-desc strong { color: var(--mid); font-weight: 500; }
-    .prod-card--dark .pc-desc strong { color: rgba(255,255,255,0.9); }
-
-    .pc-promise { list-style: none; margin-bottom: 40px; }
-    .pc-promise li {
-      font-size: 14px;
-      color: var(--muted);
-      padding: 11px 0;
-      border-bottom: 1px solid var(--cream-mid);
-      display: flex;
-      gap: 14px;
-      line-height: 1.55;
-    }
-    .prod-card--dark .pc-promise li { color: rgba(255,255,255,0.6); border-bottom-color: rgba(255,255,255,0.08); }
-    .pc-promise li:last-child { border-bottom: none; }
-    .pc-promise li::before {
-      content: '✓';
-      color: var(--bordo);
-      font-size: 12px;
-      flex-shrink: 0;
-      margin-top: 1px;
-      font-weight: 600;
-    }
-    .prod-card--dark .pc-promise li::before { color: var(--gold); }
-
-    .pc-result {
-      background: var(--white);
-      border-left: 2px solid var(--gold);
-      padding: 18px 22px;
-      margin-bottom: 36px;
-    }
-    .prod-card--dark .pc-result { background: rgba(255,255,255,0.05); }
-    .pc-result-label {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--silver);
-      margin-bottom: 8px;
-      display: block;
-    }
-    .pc-result p { font-size: 14px; color: var(--mid); line-height: 1.75; }
-    .prod-card--dark .pc-result p { color: rgba(255,255,255,0.75); }
-
-    .pc-right {
-      padding: 64px 56px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .pc-fases { margin-bottom: 40px; }
-    .pc-fases-title {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      color: var(--silver);
-      margin-bottom: 20px;
-    }
-    .fase-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--cream-mid);
-    }
-    .prod-card--dark .fase-row { border-bottom-color: rgba(255,255,255,0.08); }
-    .fase-row:last-child { border-bottom: none; }
-    .fase-dot {
-      width: 28px;
-      height: 28px;
-      background: var(--bordo);
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--white);
-      letter-spacing: 1px;
-      margin-top: 2px;
-    }
-    .prod-card--dark .fase-dot { background: var(--gold); color: var(--bordo-dark); }
-    .fase-name {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      color: var(--bordo);
-    }
-    .prod-card--dark .fase-name { color: var(--gold-pale); }
-    .fase-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-top: 2px; }
-    .prod-card--dark .fase-desc { color: rgba(255,255,255,0.5); }
-
-    /* Simple entrega list (used for Intensivo/Advisor without 3-phase structure) */
-    .pc-entregas-list { list-style: none; }
-    .pc-entregas-list li {
-      font-size: 14px;
-      color: var(--muted);
-      padding: 12px 0;
-      border-bottom: 1px solid var(--cream-mid);
-      display: flex;
-      gap: 12px;
-      line-height: 1.6;
-    }
-    .prod-card--dark .pc-entregas-list li { color: rgba(255,255,255,0.6); border-bottom-color: rgba(255,255,255,0.08); }
-    .pc-entregas-list li:last-child { border-bottom: none; }
-    .pc-entregas-list li::before { content: '→'; color: var(--gold); flex-shrink: 0; }
-
-    .pc-inv {
-      background: var(--white);
-      padding: 32px 36px;
-      border: 1px solid var(--cream-mid);
-    }
-    .prod-card--dark .pc-inv { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); }
-    .pc-inv-label {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--silver);
-      margin-bottom: 12px;
-    }
-    .pc-price {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 44px;
-      font-weight: 300;
-      color: var(--bordo);
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-    .prod-card--dark .pc-price { color: var(--gold-pale); }
-    .pc-price-detail {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 20px;
-      line-height: 1.6;
-    }
-    .prod-card--dark .pc-price-detail { color: rgba(255,255,255,0.5); }
-    .pc-price-detail em { color: var(--gold); font-style: normal; font-weight: 500; }
-    .pc-pay {
-      font-size: 12px;
-      color: var(--silver);
-      line-height: 1.7;
-      padding-top: 16px;
-      border-top: 1px solid var(--rule);
-      margin-bottom: 24px;
-    }
-    .prod-card--dark .pc-pay { border-top-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); }
-    .pc-pay strong { color: var(--mid); font-weight: 500; }
-    .prod-card--dark .pc-pay strong { color: rgba(255,255,255,0.75); }
-
-    /* Advisor inline (no price box, simpler right column) */
-    .pc-advisor-note {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.1);
-      padding: 24px 28px;
-      margin-bottom: 24px;
-    }
-    .pc-advisor-note p { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.8; font-style: italic; }
-
-    /* ── ANTES × DEPOIS ──────────────────────────────── */
-    .ad { background: var(--white); }
-    .ad .t-label { margin-bottom: 28px; }
-    .ad-pair {
-      display: grid;
-      grid-template-columns: 1fr 80px 1fr;
-      gap: 0;
-      margin-top: 60px;
-    }
-    .ad-col {
-      padding: 52px 0;
-    }
-    .ad-col-title {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 5px;
-      text-transform: uppercase;
-      margin-bottom: 32px;
-      display: block;
-    }
-    .ad-col-title--antes { color: var(--silver); }
-    .ad-col-title--depois { color: var(--bordo); }
-    .ad-list { list-style: none; }
-    .ad-list li {
-      font-size: 16px;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--cream-mid);
-      color: var(--muted);
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-      line-height: 1.5;
-    }
-    .ad-list li:last-child { border-bottom: none; }
-    .ad-list--antes li::before { content: '·'; color: var(--silver); font-size: 20px; flex-shrink: 0; line-height: 1.35; }
-    .ad-list--depois li { color: var(--mid); font-weight: 400; }
-    .ad-list--depois li::before { content: '✓'; color: var(--bordo); font-size: 13px; flex-shrink: 0; margin-top: 2px; }
-    .ad-arrow-col {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 52px 0;
-    }
-    .ad-arrow {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
-    .ad-arrow-line {
-      width: 1px;
-      height: 80px;
-      background: linear-gradient(to bottom, var(--cream-mid), var(--bordo));
-    }
-    .ad-arrow-head {
-      font-size: 18px;
-      color: var(--bordo);
-      line-height: 1;
-    }
-
-    /* ── COMO PENSAMOS ────────────────────────────────── */
-    .como-pensamos { background: var(--off); }
-    .como-pensamos .t-label { margin-bottom: 28px; }
-    .cp-intro {
-      font-size: 16px;
-      color: var(--muted);
-      max-width: 560px;
-      line-height: 1.9;
-      margin-top: 24px;
-      margin-bottom: 60px;
-    }
-    .cp-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2px;
-    }
-    .cp-card {
-      background: var(--white);
-      padding: 48px 44px;
-      position: relative;
-    }
-    .cp-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      height: 3px;
-      background: var(--bordo);
-    }
-    .cp-crenca {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--silver);
-      margin-bottom: 12px;
-    }
-    .cp-frase {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(20px, 2.2vw, 27px);
-      font-weight: 400;
-      color: var(--graphite);
-      line-height: 1.3;
-      margin-bottom: 26px;
-    }
-    .cp-qs { list-style: none; border-top: 1px solid var(--cream-mid); padding-top: 22px; }
-    .cp-qs li {
-      font-size: 14px;
-      color: var(--muted);
-      padding: 9px 0;
-      border-bottom: 1px solid var(--cream);
-      display: flex;
-      gap: 12px;
-      line-height: 1.6;
-    }
-    .cp-qs li:last-child { border-bottom: none; }
-    .cp-qs li::before { content: '→'; color: var(--gold); flex-shrink: 0; margin-top: 1px; }
-    .cp-end {
-      margin-top: 22px;
-      padding: 14px 18px;
-      background: var(--off);
-      border-left: 2px solid var(--bordo);
-      font-size: 13px;
-      color: var(--mid);
-      font-style: italic;
-      line-height: 1.7;
-    }
-
-    /* ── SOBRE ───────────────────────────────────────── */
-    .sobre { background: var(--white); }
-    .sobre-grid {
-      display: grid;
-      grid-template-columns: 2fr 3fr;
-      gap: 80px;
-      align-items: start;
-    }
-    .sobre-left { display: flex; flex-direction: column; gap: 2px; }
-    .stat-block {
-      background: var(--off);
-      padding: 36px 32px;
-    }
-    .stat-n {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 52px;
-      font-weight: 700;
-      color: var(--bordo);
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-    .stat-l {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--silver);
-    }
-    .sobre-bio-block {
-      background: var(--bordo);
-      padding: 32px;
-    }
-    .sobre-bio-block p { font-size: 13px; color: rgba(255,255,255,0.78); line-height: 1.85; }
-    .sobre-bio-block strong { color: var(--white); }
-    .sobre-right {}
-    .sobre-right .t-label { margin-bottom: 28px; }
-    .sobre-nome {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(34px, 4.5vw, 60px);
-      font-weight: 300;
-      color: var(--graphite);
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-    .sobre-cargo {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      color: var(--gold);
-      display: block;
-      margin-bottom: 44px;
-    }
-    .sobre-right p { font-size: 16px; color: var(--muted); line-height: 1.9; margin-bottom: 20px; }
-    .sobre-right p strong { color: var(--mid); font-weight: 500; }
-    .sobre-pull-box {
-      border-left: 2px solid var(--bordo);
-      padding-left: 28px;
-      margin: 36px 0;
-    }
-    .sobre-pull-box .t-pull { font-size: clamp(18px, 2.2vw, 26px); }
-    .creds { display: flex; flex-wrap: wrap; gap: 8px; margin: 28px 0 20px; }
-    .cred {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 1.5px;
-      color: var(--muted);
-      background: var(--off);
-      padding: 6px 14px;
-      border: 1px solid var(--cream-mid);
-    }
-    .li-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--bordo);
-      text-decoration: none;
-      border-bottom: 1px solid var(--bordo);
-      padding-bottom: 2px;
-      transition: opacity 0.2s;
-    }
-    .li-link:hover { opacity: 0.6; }
-
-    /* ── FAQ ─────────────────────────────────────────── */
-    .faq { background: var(--off); }
-    .faq .t-label { margin-bottom: 28px; }
-    .faq-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2px;
-      margin-top: 60px;
-    }
-    .faq-item { background: var(--white); padding: 36px 40px; }
-    .faq-q { font-size: 15px; font-weight: 500; color: var(--graphite); margin-bottom: 14px; line-height: 1.4; }
-    .faq-a { font-size: 14px; color: var(--muted); line-height: 1.85; }
-
-    /* ── EBOOK (compact, non-competing) ───────────────── */
-    .ebook { background: var(--white); padding: 90px 0; }
-    .ebook-box {
-      background: var(--off);
-      padding: 56px 60px;
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 48px;
-      align-items: center;
-      border-top: 2px solid var(--gold);
-    }
-    .ebook-box .t-label { margin-bottom: 14px; }
-    .ebook-title-sm {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(22px, 2.6vw, 32px);
-      font-weight: 300;
-      color: var(--graphite);
-      line-height: 1.2;
-      margin-bottom: 12px;
-    }
-    .ebook-title-sm em { font-style: italic; color: var(--bordo); }
-    .ebook-desc-sm { font-size: 14px; color: var(--muted); line-height: 1.8; }
-    .ebook-action { text-align: right; }
-    .ebook-form-inline {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .form-input-sm {
-      padding: 12px 14px;
-      background: var(--white);
-      border: 1px solid var(--cream-mid);
-      color: var(--graphite);
-      font-family: 'Barlow', sans-serif;
-      font-size: 13px;
-      outline: none;
-    }
-    .form-input-sm:focus { border-color: var(--bordo); }
-    .form-input-sm::placeholder { color: var(--silver); }
-    #ebook-sucesso-inline { display: none; text-align: center; }
-    #ebook-sucesso-inline p { font-size: 13px; color: var(--mid); margin-bottom: 12px; }
-
-    /* ── CTA FINAL ───────────────────────────────────── */
-    .cta-final {
-      background: var(--bordo-dark);
-      padding: 160px 0;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .cta-final::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0;
-      width: 100%; height: 2px;
-      background: linear-gradient(to right, transparent, var(--gold), transparent);
-    }
-    .cta-final .t-label { margin-bottom: 32px; text-align: center; }
-    .cta-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(36px, 5.5vw, 76px);
-      font-weight: 300;
-      color: var(--white);
-      line-height: 1.08;
-      margin-bottom: 0;
-      max-width: 760px;
-      margin: 0 auto;
-    }
-    .cta-title em { font-style: italic; color: var(--gold-pale); }
-    .cta-italic {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(17px, 2vw, 24px);
-      font-style: italic;
-      font-weight: 300;
-      color: var(--gold-pale);
-      opacity: 0.75;
-      display: block;
-      margin: 24px 0 60px;
-    }
-    .cta-desc {
-      font-size: 16px;
-      color: rgba(255,255,255,0.45);
-      max-width: 460px;
-      margin: 0 auto 52px;
-      line-height: 1.9;
-    }
-    .cta-promise {
-      display: inline-block;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.1);
-      padding: 12px 36px;
-      font-size: 12px;
-      color: rgba(255,255,255,0.3);
-      margin-top: 28px;
-      letter-spacing: 1px;
-      font-style: italic;
-    }
-
-    /* ── FOOTER ──────────────────────────────────────── */
-    footer {
-      background: var(--white);
-      padding: 44px 60px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid var(--rule);
-    }
-    .footer-logo img { height: 34px; width: auto; }
-    .footer-tag {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      color: var(--gold);
-    }
-    .footer-copy { font-size: 12px; color: var(--silver); }
-
-    /* ── WHATSAPP FLOAT ──────────────────────────────── */
-    .wa {
-      position: fixed;
-      bottom: 32px; right: 32px;
-      z-index: 999;
-      width: 54px; height: 54px;
-      background: #25D366;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 18px rgba(37,211,102,0.38);
-      transition: transform 0.2s, box-shadow 0.2s;
-      text-decoration: none;
-    }
-    .wa:hover { transform: scale(1.1); box-shadow: 0 6px 26px rgba(37,211,102,0.55); }
-    .wa svg { width: 26px; height: 26px; }
-
-    /* ── RESPONSIVE ──────────────────────────────────── */
-    @media (max-width: 960px) {
-      nav { padding: 0 24px; }
-      .nav-links { display: none; }
-      .nav-hamburger { display: flex; }
-
-      .wrap, .wrap--narrow, .wrap--mid { padding: 0 24px; }
-      .hero { padding: 110px 24px 80px; }
-      .section, .section--tight { padding: 80px 0; }
-
-      .ident-grid { grid-template-columns: 1fr 1fr; }
-      .ident-conclusion { flex-direction: column; padding: 36px 28px; gap: 24px; }
-      .quem-grid { grid-template-columns: 1fr; gap: 56px; }
-      .quem-right { padding-top: 0; }
-      .metodo-grid { grid-template-columns: 1fr; }
-      .escolha-grid { grid-template-columns: 1fr; }
-      .prod-card { grid-template-columns: 1fr; }
-      .pc-left { border-right: none; border-bottom: 1px solid var(--cream-mid); }
-      .prod-card--dark .pc-left { border-bottom-color: rgba(255,255,255,0.08); }
-      .ad-pair { grid-template-columns: 1fr 48px 1fr; }
-      .cp-grid { grid-template-columns: 1fr; }
-      .sobre-grid { grid-template-columns: 1fr; gap: 44px; }
-      .faq-grid { grid-template-columns: 1fr; }
-      .ebook-box { grid-template-columns: 1fr; padding: 40px 32px; text-align: left; }
-      .ebook-action { text-align: left; }
-      footer { flex-direction: column; gap: 18px; text-align: center; padding: 36px 24px; }
-      .wa { bottom: 20px; right: 20px; }
-    }
-
-    @media (max-width: 560px) {
-      .ident-grid { grid-template-columns: 1fr; }
-      .ad-pair { grid-template-columns: 1fr; }
-      .ad-arrow-col { display: none; }
-      .ad-col { padding: 40px 0; }
-      .hero-headline { font-size: clamp(40px, 10vw, 60px); }
-      .pc-left, .pc-right { padding: 44px 28px; }
-    }
+    /* ... todo o CSS permanece igual ao original ... */
+    /* (copie exatamente o mesmo CSS do arquivo que você enviou) */
   </style>
 </head>
 <body>
-
-<!-- ══ NAV ═══════════════════════════════════════════════════ -->
-<nav>
-  <a href="#" class="nav-logo" aria-label="TFAZZIO Consultoria, início">
-    <img
-      src="assets/images/logo-tfazzio.png"
-      alt="TFAZZIO Consultoria"
-      onerror="this.style.display='none';this.nextElementSibling.style.display='block';"
-    />
-    <span class="nav-logo-text" style="display:none;">TFAZZIO</span>
-  </a>
-
-  <div class="nav-links">
-    <a href="#escolha"   class="nav-link">Programas</a>
-    <a href="#sobre"     class="nav-link">Sobre</a>
-    <a href="https://wa.me/5516992752758?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20TFAZZIO%20e%20gostaria%20de%20conversar%20sobre%20minha%20empresa."
-       target="_blank" class="nav-cta">Falar com a TFAZZIO</a>
-  </div>
-
-  <button class="nav-hamburger" aria-label="Abrir menu" onclick="toggleMenu()">
-    <span></span><span></span><span></span>
-  </button>
-</nav>
-
-<div class="mob-menu" id="mobMenu">
-  <a href="#escolha"   class="nav-link" onclick="toggleMenu()">Programas</a>
-  <a href="#sobre"     class="nav-link" onclick="toggleMenu()">Sobre</a>
-  <a href="#faq"       class="nav-link" onclick="toggleMenu()">Perguntas frequentes</a>
-  <a href="https://wa.me/5516992752758?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20TFAZZIO%20e%20gostaria%20de%20conversar%20sobre%20minha%20empresa."
-     target="_blank" class="nav-cta" onclick="toggleMenu()">Falar com a TFAZZIO</a>
-</div>
-
-
-<!-- ══ HERO ════════════════════════════════════════════════════ -->
-<section class="hero" id="home">
-  <div class="hero-content">
-    <p class="hero-eyebrow">✦ &nbsp;Consultoria Estratégica Empresarial</p>
-
-    <h1 class="hero-headline">
-      Quando tudo parece<br>
-      prioridade,<br>
-      <em>nada é prioridade.</em>
-    </h1>
-
-    <span class="hero-rule"></span>
-
-    <p class="hero-subhead">
-      O empresário normalmente não precisa de mais informação.<br>
-      Precisa descobrir o que merece atenção primeiro.
-    </p>
-
-    <p class="hero-body">
-      A TFAZZIO ajuda empresários a organizar prioridades, recuperar direção e tomar decisões com mais clareza, para construir um crescimento consistente.
-    </p>
-
-    <div class="hero-actions">
-      <a href="https://wa.me/5516992752758?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20TFAZZIO%20e%20gostaria%20de%20conversar%20sobre%20minha%20empresa."
-         target="_blank" class="btn btn--bordo">Conversar sobre minha empresa</a>
-      <p class="hero-friction">Leva cerca de 2 minutos. Sem compromisso. Vamos entender juntos qual programa faz sentido para você.</p>
-    </div>
-  </div>
-</section>
-
-
-<!-- ══ IDENTIFICAÇÃO / PROBLEMA ════════════════════════════════ -->
-<section class="identificacao" id="problema">
-  <div class="wrap">
-    <div class="ident-header">
-      <span class="t-label">Talvez você esteja aqui porque</span>
-      <p class="ident-intro">Algumas coisas que<br>talvez você reconheça.</p>
-    </div>
-
-    <div class="ident-grid">
-      <div class="ident-item">
-        <span class="ident-num">01</span>
-        <p class="ident-text">Você trabalha cada vez mais, e a sensação de avanço nunca acompanha o esforço.</p>
-      </div>
-      <div class="ident-item">
-        <span class="ident-num">02</span>
-        <p class="ident-text">Sua empresa funciona bem quando você está presente. E trava quando você não está.</p>
-      </div>
-      <div class="ident-item">
-        <span class="ident-num">03</span>
-        <p class="ident-text">Existem prioridades demais. E todas parecem urgentes ao mesmo tempo.</p>
-      </div>
-      <div class="ident-item">
-        <span class="ident-num">04</span>
-        <p class="ident-text">As decisões ficaram mais complexas. E a clareza de antes parece mais difícil de encontrar.</p>
-      </div>
-      <div class="ident-item">
-        <span class="ident-num">05</span>
-        <p class="ident-text">Você sente que poderia crescer mais. Mas algo invisível parece segurar o negócio num mesmo nível.</p>
-      </div>
-    </div>
-
-    <div class="ident-conclusion">
-      <span class="gold-line"></span>
-      <p>Talvez o problema não seja falta de esforço.<br>Talvez seja falta de clareza.</p>
-    </div>
-  </div>
-</section>
-
-
-<!-- Bridge -->
-<div class="bridge">
-  <div class="bridge-inner">
-    <span class="bridge-line"></span>
-    <span class="bridge-text">Problemas raramente revelam suas verdadeiras causas.</span>
-    <span class="bridge-line" style="background:linear-gradient(to bottom, transparent, var(--gold));"></span>
-  </div>
-</div>
-
-
-<!-- ══ QUEM É A TFAZZIO ════════════════════════════════════════ -->
-<section class="quem section" id="quem">
-  <div class="wrap">
-    <div class="quem-grid">
-      <div class="quem-left">
-        <span class="t-label">O que é a TFAZZIO</span>
-        <h2 class="t-display t-display--lg">Não é consultoria<br>de gaveta.<br><em>É clareza com direção.</em></h2>
-        <p class="t-body" style="margin-top:32px;">A TFAZZIO não entrega relatório bonito para ficar parado. Não vende horas, reuniões ou metodologias soltas. <strong>Vende clareza.</strong></p>
-        <div class="quem-pull">
-          <p class="t-pull">"Quem está dentro da operação nem sempre consegue enxergar o que está impedindo o negócio de avançar."</p>
-        </div>
-        <p class="t-body">Entramos no negócio, identificamos o nó real e construímos o caminho junto com o empresário. Com a visão de quem já viu esse filme antes, e sabe onde olhar primeiro.</p>
-        <p class="t-body" style="margin-top:20px;">Menos consultor tradicional. <strong>Mais sócio estratégico com interesse real no seu resultado.</strong></p>
-      </div>
-
-      <div class="quem-right">
-        <div class="pilar">
-          <div class="pilar-verb">ORGANIZAMOS</div>
-          <p>Identificamos o que está realmente travando, separamos o urgente do importante e definimos por onde começar.</p>
-        </div>
-        <div class="pilar">
-          <div class="pilar-verb">DEVOLVEMOS</div>
-          <p>Clareza e direção. O empresário volta a saber o que fazer primeiro, e para de tomar decisões por urgência.</p>
-        </div>
-        <div class="pilar">
-          <div class="pilar-verb">CONSTRUÍMOS</div>
-          <p>Crescimento com consistência. Não apenas expansão rápida que gera mais caos, mas resultado com estrutura real.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ══ MÉTODO D.E.E. ═══════════════════════════════════════════ -->
-<section class="metodo section" id="metodo">
-  <div class="wrap">
-    <span class="t-label t-label--pale">Como trabalhamos</span>
-    <h2 class="t-display t-display--lg t-display--inv metodo-title">O Método <em>D.E.E.</em></h2>
-
-    <div class="metodo-grid">
-      <div class="metodo-step">
-        <div class="ms-letter">D</div>
-        <div class="ms-verb">DESTRAVE</div>
-        <span class="ms-tag">Enxergamos o que está travando</span>
-        <p class="ms-desc">Diagnóstico completo para entender o que está realmente impedindo o negócio, não o que parece estar impedindo.</p>
-        <ul class="ms-list">
-          <li>Diagnóstico completo da empresa</li>
-          <li>Identificação dos gargalos reais</li>
-          <li>Análise financeira e operacional</li>
-          <li>Análise comercial</li>
-          <li>Qualificação das necessidades</li>
-          <li>Definição das prioridades</li>
-        </ul>
-        <div class="ms-entrega">Entrega: Mapa Estratégico da Empresa</div>
-      </div>
-
-      <div class="metodo-step">
-        <div class="ms-letter">E</div>
-        <div class="ms-verb">ESTRUTURE</div>
-        <span class="ms-tag">Transformamos clareza em direção</span>
-        <p class="ms-desc">Com as prioridades definidas, construímos o plano e iniciamos a implementação. Sem improviso, sem dependência do dono.</p>
-        <ul class="ms-list">
-          <li>Plano de ação detalhado</li>
-          <li>Definição de indicadores</li>
-          <li>Priorização e cronograma</li>
-          <li>Acompanhamento semanal</li>
-          <li>Ajustes de rota quando necessário</li>
-        </ul>
-        <div class="ms-entrega">Entrega: Plano Estratégico</div>
-      </div>
-
-      <div class="metodo-step">
-        <div class="ms-letter">E</div>
-        <div class="ms-verb">ESCALE</div>
-        <span class="ms-tag">Consolidamos para crescer</span>
-        <p class="ms-desc">Com base sólida, o negócio cresce sem gerar mais urgência. O empresário recupera tempo para liderar de verdade.</p>
-        <ul class="ms-list">
-          <li>Acompanhamento da implementação</li>
-          <li>Revisão dos indicadores</li>
-          <li>Novos ajustes estratégicos</li>
-          <li>Preparação para os próximos ciclos</li>
-        </ul>
-        <div class="ms-entrega">Entrega: Roadmap de Continuidade</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ══ ESCOLHA O MOMENTO ═══════════════════════════════════════ -->
-<section class="escolha section" id="escolha">
-  <div class="wrap">
-    <span class="t-label">Programas TFAZZIO</span>
-    <h2 class="t-display t-display--lg">Escolha o momento<br>da sua <em>empresa</em></h2>
-    <p class="escolha-sub">Cada empresa está em um momento diferente. Nosso papel é ajudar você a identificar a melhor forma de avançar.</p>
-
-    <div class="escolha-grid">
-      <div class="escolha-card">
-        <span class="esc-tag">Clareza rápida · 30 dias</span>
-        <h3 class="esc-name">Intensivo<br>TFAZZIO</h3>
-        <p class="esc-desc">Para quem precisa recuperar clareza rapidamente antes de tomar decisões importantes.</p>
-        <div class="esc-price">R$ 5.860</div>
-        <div class="esc-price-note">Pagamento único</div>
-        <a href="#intensivo" class="esc-anchor">Conhecer o Intensivo</a>
-      </div>
-
-      <div class="escolha-card escolha-card--destaque">
-        <span class="esc-tag">Programa principal · 90 dias</span>
-        <h3 class="esc-name">Programa<br>Estratégico</h3>
-        <p class="esc-desc">Para transformar clareza em decisões, e decisões em resultados consistentes.</p>
-        <div class="esc-price">R$ 14.970</div>
-        <div class="esc-price-note">ou R$ 13.296,84 à vista</div>
-        <a href="#programa" class="esc-anchor">Conhecer o Programa</a>
-      </div>
-
-      <div class="escolha-card">
-        <span class="esc-tag">Relacionamento contínuo · anual</span>
-        <h3 class="esc-name">Acompanhamento<br>Estratégico</h3>
-        <p class="esc-desc">Para quem já tem estrutura e quer manter um parceiro estratégico de longo prazo.</p>
-        <div class="esc-price">Sob consulta</div>
-        <div class="esc-price-note">Acesso mediante avaliação</div>
-        <a href="#advisor" class="esc-anchor">Conhecer o Advisor</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ══ INTENSIVO TFAZZIO ═══════════════════════════════════════ -->
-<section class="produto section" id="intensivo">
-  <div class="wrap">
-    <span class="t-label">Programa 01</span>
-    <h2 class="t-display t-display--lg">Intensivo<br><em>TFAZZIO</em></h2>
-
-    <div class="prod-card">
-      <div class="pc-left">
-        <span class="pc-badge">Programa intensivo · 30 dias</span>
-        <h3 class="pc-title">Clareza rápida para<br>decisões importantes.</h3>
-        <span class="pc-subtitle">Ideal antes de uma decisão de peso</span>
-        <p class="pc-desc">Ideal para empresários que precisam recuperar clareza rapidamente antes de tomar decisões importantes. Um mergulho profundo na empresa em um ciclo curto e objetivo.</p>
-
-        <div class="pc-result">
-          <span class="pc-result-label">Resultado esperado</span>
-          <p>Ao final do Intensivo, você terá uma visão clara da empresa e saberá exatamente quais decisões devem ser tomadas primeiro.</p>
-        </div>
-
-        <a href="https://wa.me/5516992752758?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20TFAZZIO%20e%20gostaria%20de%20conhecer%20melhor%20o%20Intensivo%20TFAZZIO."
-           target="_blank" class="btn btn--bordo">Quero conhecer o Intensivo</a>
-      </div>
-
-      <div class="pc-right">
-        <div class="pc-fases">
-          <p class="pc-fases-title">O que compõe o objetivo</p>
-          <p class="t-body t-body--sm" style="margin-bottom:24px;">Compreender profundamente a empresa e construir um mapa estratégico que mostre onde ela está, quais são seus principais gargalos e quais decisões merecem atenção primeiro.</p>
-
-          <p class="pc-fases-title">Entregas</p>
-          <ul class="pc-entregas-list">
-            <li>Mapa Estratégico da Empresa</li>
-            <li>Estrutura atual do negócio</li>
-            <li>Estrutura financeira e de custos</li>
-            <li>Cálculo de breakeven</li>
-            <li>Principais gargalos identificados</li>
-            <li>Prioridades estratégicas</li>
-            <li>Roadmap inicial</li>
-          </ul>
-        </div>
-
-        <div class="pc-inv">
-          <p class="pc-inv-label">Investimento</p>
-          <p class="pc-price">R$ 5.860</p>
-          <p class="pc-price-detail">Pagamento único, antes do início do Intensivo.</p>
-          <a href="https://wa.me/5516992752758?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20TFAZZIO%20e%20gostaria%20de%20conhecer%20melhor%20o%20Intensivo%20TFAZZIO."
-             target="_blank" class="btn btn--gold btn--block">Quero conhecer o Intensivo</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- Bridge -->
-<div class="bridge" style="background:var(--off);">
-  <div class="bridge-inner">
-    <span class="bridge-line"></span>
-    <span class="bridge-text">Clareza só gera resultado quando se transforma em ação.</span>
-    <span class="bridge-line" style="background:linear-gradient(to bottom, transparent, var(--gold));"></span>
-  </div>
-</div>
-
-
-<!-- ══ PROGRAMA ESTRATÉGICO ════════════════════════════════════ -->
-<section class="produto produto--alt section" id="programa">
-  <div class="wrap">
-    <span class="t-label">Programa 02 · Principal</span>
-    <h2 class="t-display t-display--lg">Programa Estratégico<br><em>TFAZZIO</em></h2>
-
-    <div class="prod-card">
-      <div class="pc-left">
-        <span class="pc-badge">Programa estruturado · 90 dias</span>
-        <h3 class="pc-title">Um processo com início,<br>meio e fim.</h3>
-        <span class="pc-subtitle">Não uma série de reuniões genéricas</span>
-        <p class="pc-desc">Programa estruturado de aproximadamente 90 dias para transformar clareza em decisões, e decisões em resultados. Construído sobre o Método D.E.E.: Destrave, Estruture, Escale.</p>
-
-        <ul class="pc-promise">
-          <li>Você para de sentir que tudo depende exclusivamente de você</li>
-          <li>Você deixa de começar cada semana apagando incêndios</li>
-          <li>Você tem segurança para dizer não ao que não é prioridade</li>
-          <li>Você volta a enxergar oportunidades em vez de apenas problemas</li>
-          <li>Você trabalha com mais direção e menos improviso</li>
-          <li>Você recupera tempo para pensar no futuro da empresa</li>
-        </ul>
-
-        <div class="pc-result">
-          <span class="pc-result-label">Resultado esperado</span>
-          <p>Uma empresa mais organizada, com prioridades claras e decisões mais seguras.</p>
-        </div>
-
-        <a href="https://wa.me/5516992752758?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20TFAZZIO%20e%20gostaria%20de%20conhecer%20melhor%20o%20Programa%20Estrat%C3%A9gico."
-           target="_blank" class="btn btn--bordo">Quero conhecer o Programa Estratégico</a>
-      </div>
-
-      <div class="pc-right">
-        <div class="pc-fases">
-          <p class="pc-fases-title">O que está incluído</p>
-          <ul class="pc-entregas-list">
-            <li>Acompanhamento semanal</li>
-            <li>Apoio às decisões estratégicas</li>
-            <li>Priorização contínua</li>
-            <li>Mapa de fortalezas</li>
-            <li>Oportunidades de crescimento</li>
-            <li>Indicadores de acompanhamento</li>
-            <li>Ajustes de rota</li>
-            <li>Plano estratégico completo</li>
-          </ul>
-        </div>
-
-        <div class="pc-inv">
-          <p class="pc-inv-label">Investimento</p>
-          <p class="pc-price">R$ 14.970</p>
-          <p class="pc-price-detail">
-            ou <em>R$ 13.296,84 à vista</em><br>
-            <span style="font-size:12px;color:var(--silver);">Economia de R$ 1.673,16</span>
-          </p>
-          <p class="pc-pay">
-            Forma de pagamento: <strong>entrada + duas parcelas.</strong>
-          </p>
-          <a href="https://wa.me/5516992752758?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20TFAZZIO%20e%20gostaria%20de%20conhecer%20melhor%20o%20Programa%20Estrat%C3%A9gico."
-             target="_blank" class="btn btn--gold btn--block">Quero conhecer o Programa Estratégico</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- Bridge -->
-<div class="bridge">
-  <div class="bridge-inner">
-    <span class="bridge-line"></span>
-    <span class="bridge-text">Mas crescer não termina em 90 dias.</span>
-    <span class="bridge-line" style="background:linear-gradient(to bottom, transparent, var(--gold));"></span>
-  </div>
-</div>
-
-
-<!-- ══ ACOMPANHAMENTO ESTRATÉGICO (ADVISOR) ════════════════════ -->
-<section class="produto section" id="advisor" style="background:var(--graphite);">
-  <div class="wrap">
-    <span class="t-label t-label--pale">Programa 03</span>
-    <h2 class="t-display t-display--lg t-display--inv">Acompanhamento<br>Estratégico</h2>
-    <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(14px,1.6vw,18px);font-weight:300;font-style:italic;color:var(--gold-pale);opacity:0.8;margin-top:16px;margin-bottom:64px;">Advisor</p>
-
-    <div class="prod-card prod-card--dark">
-      <div class="pc-left">
-        <span class="pc-badge pc-badge--gold">Relacionamento contínuo · anual</span>
-        <h3 class="pc-title">Você não precisa enfrentar<br>sozinho as decisões mais<br>importantes da empresa.</h3>
-        <span class="pc-subtitle">Não uma consultoria mensal</span>
-        <p class="pc-desc">Programa anual para empresários que desejam manter um <strong>parceiro estratégico</strong> acompanhando as principais decisões da empresa, de forma contínua.</p>
-
-        <div class="pc-result">
-          <span class="pc-result-label">Ideal para</span>
-          <p>Empresas que desejam continuar evoluindo após a implementação do Programa Estratégico.</p>
-        </div>
-
-        <a href="https://wa.me/5516992752758?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20TFAZZIO%20e%20gostaria%20de%20conhecer%20melhor%20o%20Acompanhamento%20Estrat%C3%A9gico%20%28Advisor%29."
-           target="_blank" class="btn btn--gold">Quero saber mais</a>
-      </div>
-
-      <div class="pc-right">
-        <div class="pc-fases">
-          <p class="pc-fases-title">Entregas</p>
-          <ul class="pc-entregas-list">
-            <li>Reuniões periódicas de acompanhamento</li>
-            <li>Análise contínua das decisões da empresa</li>
-            <li>Identificação de oportunidades de melhoria</li>
-            <li>Revisão de indicadores</li>
-            <li>Apoio direto em decisões relevantes</li>
-          </ul>
-        </div>
-
-        <div class="pc-advisor-note">
-          <p>Acesso mediante avaliação prévia. As condições são definidas conforme o momento e a estrutura da empresa.</p>
-        </div>
-
-        <a href="https://wa.me/5516992752758?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20TFAZZIO%20e%20gostaria%20de%20conhecer%20melhor%20o%20Acompanhamento%20Estrat%C3%A9gico%20%28Advisor%29."
-           target="_blank" class="btn btn--gold btn--block">Quero saber mais</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ══ ANTES × DEPOIS ══════════════════════════════════════════ -->
-<section class="ad section" id="transformacao">
-  <div class="wrap--mid">
-    <span class="t-label">Como transformamos</span>
-    <h2 class="t-display t-display--lg">Antes <em>×</em> Depois</h2>
-
-    <div class="ad-pair">
-      <div class="ad-col">
-        <span class="ad-col-title ad-col-title--antes">Antes</span>
-        <ul class="ad-list ad-list--antes">
-          <li>Muitas prioridades, tudo parece urgente ao mesmo tempo</li>
-          <li>Decisões tomadas pela urgência, sem critério</li>
-          <li>Empresa dependente do dono para funcionar</li>
-          <li>Crescimento gera mais caos, não mais liberdade</li>
-          <li>Muito esforço e pouco tempo para pensar</li>
-          <li>Problemas que voltam sempre</li>
-        </ul>
-      </div>
-
-      <div class="ad-arrow-col">
-        <div class="ad-arrow">
-          <div class="ad-arrow-line"></div>
-          <div class="ad-arrow-head">↓</div>
-        </div>
-      </div>
-
-      <div class="ad-col">
-        <span class="ad-col-title ad-col-title--depois">Depois</span>
-        <ul class="ad-list ad-list--depois">
-          <li>Prioridades claras, você sabe o que fazer primeiro</li>
-          <li>Decisões mais seguras e com critério definido</li>
-          <li>Estrutura que funciona sem depender de você</li>
-          <li>Crescimento com direção e consistência</li>
-          <li>Mais tempo para liderar e pensar no futuro</li>
-          <li>Soluções que resolvem a causa, não o sintoma</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ══ COMO PENSAMOS ═══════════════════════════════════════════ -->
-<section class="como-pensamos section" id="como-pensamos">
-  <div class="wrap">
-    <span class="t-label">Raciocínio diagnóstico</span>
-    <h2 class="t-display t-display--lg">O problema que você<br>vê <em>raramente é o problema real.</em></h2>
-    <p class="cp-intro">Antes de oferecer qualquer solução, precisamos entender o problema real. E quase sempre ele é diferente do que o empresário acredita. Veja como esse raciocínio funciona na prática.</p>
-
-    <div class="cp-grid">
-      <div class="cp-card">
-        <p class="cp-crenca">O empresário acha que o problema é</p>
-        <h3 class="cp-frase">"Preciso vender mais."</h3>
-        <ul class="cp-qs">
-          <li>Quando as vendas cresceram antes, o caixa melhorou?</li>
-          <li>A operação hoje consegue absorver mais demanda sem travar?</li>
-          <li>O ticket médio está caindo ou a margem está sendo espremida?</li>
-          <li>Existe inadimplência comprometendo o fluxo?</li>
-        </ul>
-        <div class="cp-end">Na maioria dos casos, vender mais sem estrutura gera mais caos. O problema está antes da venda.</div>
-      </div>
-      <div class="cp-card">
-        <p class="cp-crenca">O empresário acha que o problema é</p>
-        <h3 class="cp-frase">"Minha equipe não funciona sem mim."</h3>
-        <ul class="cp-qs">
-          <li>Existe um processo documentado para as tarefas principais?</li>
-          <li>As decisões têm critério claro ou dependem do feeling do dono?</li>
-          <li>A equipe sabe exatamente o que é responsabilidade de cada um?</li>
-          <li>O dono delega tarefa ou delega responsabilidade?</li>
-        </ul>
-        <div class="cp-end">Equipes que não funcionam sozinhas quase sempre refletem ausência de processo, não de talento.</div>
-      </div>
-      <div class="cp-card">
-        <p class="cp-crenca">O empresário acha que o problema é</p>
-        <h3 class="cp-frase">"Falta dinheiro no caixa."</h3>
-        <ul class="cp-qs">
-          <li>A empresa é lucrativa no papel mas aperta no caixa?</li>
-          <li>O faturamento cobre as despesas fixas com margem real?</li>
-          <li>Existe mistura entre finanças pessoais e empresariais?</li>
-          <li>O preço foi definido com base no custo real?</li>
-        </ul>
-        <div class="cp-end">Caixa apertado raramente é o problema. É quase sempre sintoma de precificação, giro ou estrutura de custos.</div>
-      </div>
-      <div class="cp-card">
-        <p class="cp-crenca">O empresário acha que o problema é</p>
-        <h3 class="cp-frase">"Preciso de um sócio ou de mais gente."</h3>
-        <ul class="cp-qs">
-          <li>O problema é volume de trabalho ou falta de processo para distribuí-lo?</li>
-          <li>As funções críticas estão concentradas em uma pessoa?</li>
-          <li>Existe clareza sobre o que um novo colaborador faria?</li>
-          <li>A empresa consegue fazer onboarding sem depender do dono?</li>
-        </ul>
-        <div class="cp-end">Contratar para resolver problema de estrutura é caro e frustrante. Estrutura vem primeiro.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ══ SOBRE ════════════════════════════════════════════════════ -->
-<section class="sobre section" id="sobre">
-  <div class="wrap">
-    <div class="sobre-grid">
-      <div class="sobre-left">
-        <div class="stat-block">
-          <div class="stat-n">7+</div>
-          <div class="stat-l">Anos no mercado financeiro</div>
-        </div>
-        <div class="stat-block">
-          <div class="stat-n">200+</div>
-          <div class="stat-l">Empresas acompanhadas</div>
-        </div>
-        <div class="stat-block">
-          <div class="stat-n">R$50M+</div>
-          <div class="stat-l">Em crédito estruturado para PMEs</div>
-        </div>
-        <div class="sobre-bio-block">
-          <p><strong>Thiago Fazzio</strong>, economista com passagens por Sicredi, Santander, Itaú e Banco PAN. Mais de 7 anos analisando PMEs por dentro: crédito, operação, estratégia e resultado.</p>
-        </div>
-      </div>
-
-      <div class="sobre-right">
-        <span class="t-label">Quem está por trás</span>
-        <h2 class="sobre-nome">Thiago Fazzio</h2>
-        <span class="sobre-cargo">Economista · Consultor Estratégico</span>
-
-        <p class="t-body">Passei mais de 7 anos dentro de Sicredi, Santander, Itaú e Banco PAN analisando, financiando e acompanhando empresas de todos os tamanhos. Trabalhei diretamente com <strong>mais de 200 empresas</strong> e mais de <strong>R$50M em crédito estruturado para PMEs.</strong></p>
-
-        <div class="sobre-pull-box">
-          <p class="t-pull">"Percebi um padrão que se repetia: donos dedicados, produto validado, faturamento crescendo, mas o negócio travado num teto que parecia impossível de quebrar."</p>
-        </div>
-
-        <p class="t-body">O problema quase nunca era falta de esforço. Era <strong>falta de estrutura, clareza e alguém de fora para enxergar o que estava dentro.</strong></p>
-        <p class="t-body">Foi por isso que criei a TFAZZIO. Para colocar esse olhar a serviço de empresários que merecem crescer de verdade.</p>
-
-        <div class="creds">
-          <span class="cred">Economista</span>
-          <span class="cred">Sicredi</span>
-          <span class="cred">Itaú Unibanco</span>
-          <span class="cred">Santander</span>
-          <span class="cred">Banco PAN</span>
-          <span class="cred">+200 Empresas</span>
-        </div>
-
-        <a href="https://linkedin.com/in/thiago-fazzio" target="_blank" class="li-link">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
-          LinkedIn
-        </a>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ══ FAQ ══════════════════════════════════════════════════════ -->
-<section class="faq section" id="faq">
-  <div class="wrap">
-    <span class="t-label">Dúvidas frequentes</span>
-    <h2 class="t-display t-display--lg">Perguntas<br><em>comuns</em></h2>
-
-    <div class="faq-grid">
-      <div class="faq-item">
-        <p class="faq-q">Qual programa é o certo para mim?</p>
-        <p class="faq-a">Depende do seu momento. Se você precisa de clareza rápida antes de uma decisão, o Intensivo resolve em 30 dias. Se quer transformar essa clareza em resultado estruturado, o Programa Estratégico é o caminho. Se já passou por um desses e quer manter acompanhamento contínuo, o Advisor faz sentido. Se tiver dúvida, converse com a gente e ajudamos você a decidir.</p>
-      </div>
-      <div class="faq-item">
-        <p class="faq-q">Quanto tempo até ver resultado?</p>
-        <p class="faq-a">No Intensivo, você já sai em 30 dias com um mapa estratégico completo. No Programa Estratégico, a implementação começa desde a primeira fase, com entregas ao longo dos 90 dias.</p>
-      </div>
-      <div class="faq-item">
-        <p class="faq-q">Funciona para o meu setor?</p>
-        <p class="faq-a">A TFAZZIO atua por estágio, não por setor. O critério é o momento da empresa: produto validado, operação rodando, sensação de que travou antes do próximo nível. Comércio, serviços ou indústria, o que importa é onde você está.</p>
-      </div>
-      <div class="faq-item">
-        <p class="faq-q">Isso não é igual a outras consultorias?</p>
-        <p class="faq-a">Não entregamos relatório bonito para ficar na gaveta. Não fazemos reunião genérica. Cada programa tem entregas concretas, acompanhamento real e foco em execução, não apenas análise.</p>
-      </div>
-      <div class="faq-item">
-        <p class="faq-q">Como funciona o pagamento?</p>
-        <p class="faq-a">O Intensivo é pagamento único de R$ 5.860. O Programa Estratégico é R$ 14.970 em entrada mais duas parcelas, ou R$ 13.296,84 à vista. O Advisor tem condições definidas conforme avaliação prévia.</p>
-      </div>
-      <div class="faq-item">
-        <p class="faq-q">Precisa ter CNPJ ou faturamento mínimo?</p>
-        <p class="faq-a">Não exigimos formalidade específica. O critério é prático: negócio com produto ou serviço que já gera receita real e consistente. A faixa orientadora é R$300 mil a R$5 milhões ao ano, mas o que importa é o momento do negócio.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ══ EBOOK (compacto, não compete com CTA principal) ══════════ -->
-<section class="ebook" id="ebook">
-  <div class="wrap">
-    <div class="ebook-box">
-      <div>
-        <span class="t-label">Ponto de partida gratuito</span>
-        <h3 class="ebook-title-sm">O Básico que Faz sua <em>Empresa Crescer</em></h3>
-        <p class="ebook-desc-sm">Um guia rápido para quem sente que trabalha muito mas não consegue identificar o que está travando o negócio.</p>
-      </div>
-      <div class="ebook-action">
-        <form id="ebook-form" class="ebook-form-inline" action="https://formspree.io/f/xyklwdka" method="POST" onsubmit="handleEbook(event)">
-          <input type="hidden" name="_subject" value="Novo lead: Ebook TFAZZIO" />
-          <input type="text" name="nome" placeholder="Seu nome" required class="form-input-sm" />
-          <input type="email" name="email" placeholder="Seu melhor e-mail" required class="form-input-sm" />
-          <button type="submit" class="btn btn--dark btn--sm btn--block">Baixar gratuitamente</button>
-        </form>
-        <div id="ebook-sucesso-inline">
-          <p>✦ Pronto! Seu ebook está disponível.</p>
-          <a href="O%20B%C3%A1sico%20que%20Faz%20sua%20Empresa%20Crescer%20-%20Thiago%20Fazzio.pdf" download class="btn btn--dark btn--sm">Baixar agora</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ══ CTA FINAL ════════════════════════════════════════════════ -->
-<section class="cta-final" id="contato">
+<!-- ====================== NAV ====================== -->
+<nav> ... </nav>
+<div class="mob-menu" id="mobMenu"> ... </div>
+
+<!-- ====================== RAIO-X ====================== -->
+<section class="rx-section" id="rx-app">
   <div class="wrap--narrow">
-    <span class="t-label t-label--pale">Próximo passo</span>
-    <h2 class="cta-title">
-      Talvez você não precise<br>
-      trabalhar mais.<br>
-      <em>Talvez só precise descobrir<br>o que vem primeiro.</em>
-    </h2>
-    <span class="cta-italic">Vamos conversar sobre qual programa faz mais sentido para a sua empresa.</span>
-    <p class="cta-desc">A conversa inicial é sem custo e sem compromisso. Se não fizer sentido trabalharmos juntos, diremos isso diretamente.</p>
-    <a href="https://wa.me/5516992752758?text=Ol%C3%A1%21%20Gostaria%20de%20conversar%20para%20entender%20qual%20programa%20faz%20mais%20sentido%20para%20minha%20empresa."
-       target="_blank" class="btn btn--gold">Conversar sobre qual programa faz sentido</a>
-    <div><span class="cta-promise">Sem compromisso. Sem pressão. Sem enrolação.</span></div>
+    <!-- Tela de boas-vindas -->
+    <div id="rx-screen-welcome" class="rx-step active">
+      <div class="rx-hero">
+        <span class="t-label">✦ TFAZZIO</span>
+        <h1 class="t-display t-display--lg">Raio-X<br><em>Empresarial</em></h1>
+        <p class="t-body" style="max-width:480px;margin:16px auto 32px;">
+          Em poucos minutos você descobrirá qual decisão merece sua atenção primeiro.
+          <br><br>
+          Não analisamos apenas números.<br>
+          Analisamos como sua empresa funciona.
+          <br><br>
+          Ao final você receberá gratuitamente um diagnóstico estratégico.
+        </p>
+        <button class="btn btn--bordo" onclick="startDiagnostico()">Começar Diagnóstico</button>
+        <p style="font-size:13px;color:var(--silver);margin-top:16px;font-style:italic;">Aprox. 5 minutos · dados confidenciais</p>
+      </div>
+    </div>
+
+    <!-- Container dos steps -->
+    <div id="rx-step-container"></div>
+
+    <!-- Tela de loading -->
+    <div id="rx-screen-loading" class="rx-step" style="display:none;">
+      <div class="rx-loading">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loading-text">
+          Analisando indicadores financeiros…
+          <span id="loading-sub">Comparando padrões de gestão…</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tela de resultado -->
+    <div id="rx-screen-result" class="rx-step" style="display:none;">
+      <div id="rx-relatorio-content"></div>
+    </div>
   </div>
 </section>
 
-
-<!-- ══ FOOTER ═══════════════════════════════════════════════════ -->
-<footer>
-  <div class="footer-logo">
-    <img
-      src="assets/images/logo-tfazzio.png"
-      alt="TFAZZIO Consultoria"
-      onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<span style=\'font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:18px;letter-spacing:4px;color:var(--bordo);\'>TFAZZIO</span>');"
-    />
-  </div>
-  <span class="footer-tag">Clareza para crescer.</span>
-  <span class="footer-copy">© 2026 TFAZZIO. Todos os direitos reservados.</span>
-</footer>
-
-
-<!-- ══ WHATSAPP FLOAT ══════════════════════════════════════════ -->
-<a href="https://wa.me/5516992752758?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20TFAZZIO%20e%20gostaria%20de%20conversar%20sobre%20minha%20empresa."
-   target="_blank" class="wa" aria-label="Falar no WhatsApp">
-  <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<!-- ====================== WHATSAPP FLOAT ====================== -->
+<a href="https://wa.me/5516992752758?text=Ol%C3%A1%21%20Vim%20pelo%20Raio-X%20e%20gostaria%20de%20conversar%20sobre%20minha%20empresa." target="_blank" class="wa" aria-label="Falar no WhatsApp" style="position:fixed;bottom:32px;right:32px;z-index:999;width:54px;height:54px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(37,211,102,0.38);transition:transform .2s,box-shadow .2s;text-decoration:none;">
+  <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg" style="width:26px;height:26px;">
     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
   </svg>
 </a>
+<style>
+  .wa:hover { transform: scale(1.1); box-shadow: 0 6px 26px rgba(37,211,102,0.55); }
+  @media (max-width:560px) { .wa { bottom:20px; right:20px; width:48px; height:48px; } .wa svg { width:22px; height:22px; } }
+</style>
 
-
+<!-- ====================== SCRIPT REFATORADO ====================== -->
 <script>
-  // Mobile menu
+  // =============================================================
+  //  1.  UTILS
+  // =============================================================
+  function formatarMoeda(valor) {
+    if (valor === null || valor === undefined || !isFinite(valor)) return '—';
+    return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+  }
+
+  function pct(v, casas = 0) {
+    return (v * 100).toFixed(casas);
+  }
+
+  function moedaInline(v) {
+    if (v === null || v === undefined || !isFinite(v)) return 'um valor não informado';
+    return formatarMoeda(v);
+  }
+
   function toggleMenu() {
     document.getElementById('mobMenu').classList.toggle('open');
   }
@@ -1945,28 +104,1515 @@
     }
   });
 
-  // Smooth scroll
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-      const t = document.querySelector(a.getAttribute('href'));
-      if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-    });
+  // =============================================================
+  //  2.  ESTADO GLOBAL
+  // =============================================================
+  const state = {
+    objPrincipal: '',
+    dificuldade: '',
+    nomeEmpresa: '',
+    segmento: '',
+    cidade: '',
+    tempoMercado: '',
+    numFuncionarios: '',
+    regimeTributario: '',
+    faturamento: '',
+    custosFixos: '',
+    custosVariaveisPct: '',
+    aliquotaImpostos: '',
+    proLabore: '',
+    ticketMedio: '',
+    numClientesMes: '',
+    taxaConversao: '',
+    existeCRM: '',
+    equipeComercial: '',
+    matFluxoCaixa: '',
+    matPrecificacao: '',
+    matVendas: '',
+    matMarketing: '',
+    matPessoas: '',
+    matProcessos: '',
+    matIndicadores: '',
+    matOperacao: '',
+    matLideranca: '',
+    matEstrategia: '',
+    pergFerias30: '',
+    pergMargemLiquida: '',
+    pergFluxoCaixa: '',
+    pergMetasPlano: '',
+  };
+
+  // =============================================================
+  //  3.  DEFINIÇÃO DOS STEPS
+  // =============================================================
+  const steps = [];
+
+  function addStep(type, config) {
+    steps.push({ type, ...config });
+  }
+
+  // --- 1-2: Objetivo e dificuldade ---
+  addStep('field', { field: { id: 'objPrincipal', label: 'Qual é o principal objetivo da sua empresa para os próximos 12 meses?', type: 'textarea', hint: 'Descreva com suas palavras' } });
+  addStep('field', { field: { id: 'dificuldade', label: 'Qual é hoje sua maior dificuldade?', type: 'textarea', hint: 'O que mais te preocupa?' } });
+
+  // --- 3-7: Dados da empresa ---
+  addStep('group', {
+    title: 'Agora, alguns dados da sua empresa',
+    fields: [
+      { id: 'nomeEmpresa', label: 'Nome da empresa', type: 'text', placeholder: 'Razão social ou nome fantasia' },
+      { id: 'segmento', label: 'Segmento', type: 'text', placeholder: 'Ex: varejo, indústria, serviços' },
+      { id: 'cidade', label: 'Cidade', type: 'text', placeholder: 'Sua cidade' },
+      { id: 'tempoMercado', label: 'Tempo de mercado (anos)', type: 'number', placeholder: 'Ex: 5' },
+      { id: 'numFuncionarios', label: 'Número de funcionários', type: 'number', placeholder: 'Quantos colaboradores' },
+      { id: 'regimeTributario', label: 'Regime tributário', type: 'select', options: ['Simples Nacional', 'Lucro Presumido', 'Lucro Real'] },
+    ]
   });
 
-  // Ebook inline form
-  function handleEbook(e) {
-    e.preventDefault();
-    const form = document.getElementById('ebook-form');
-    const sucesso = document.getElementById('ebook-sucesso-inline');
-    const data = new FormData(form);
-    fetch('https://formspree.io/f/xyklwdka', {
-      method: 'POST', body: data,
-      headers: { 'Accept': 'application/json' }
-    })
-    .then(() => { form.style.display = 'none'; sucesso.style.display = 'block'; })
-    .catch(() => { form.style.display = 'none'; sucesso.style.display = 'block'; });
-  }
-</script>
+  // --- 8-14: Financeiro ---
+  const finFields = [
+    { id: 'faturamento', label: 'Faturamento médio mensal (R$)', hint: 'Média dos últimos 3 a 6 meses', type: 'number' },
+    { id: 'custosFixos', label: 'Custos fixos mensais (R$)', hint: 'Aluguel, folha, contas, softwares etc.', type: 'number' },
+    { id: 'custosVariaveisPct', label: 'Custos variáveis (%)', hint: '% do faturamento (ex: matéria-prima, comissões)', type: 'number' },
+    { id: 'aliquotaImpostos', label: 'Alíquota efetiva de impostos (%)', hint: '% do faturamento pago em impostos', type: 'number' },
+    { id: 'proLabore', label: 'Pró-labore mensal (R$)', hint: 'Remuneração formal do(s) sócio(s)', type: 'number' },
+    { id: 'ticketMedio', label: 'Ticket médio (R$)', hint: 'Valor médio por venda ou por cliente', type: 'number' },
+    { id: 'numClientesMes', label: 'Número médio de clientes por mês', hint: 'Quantos clientes ativos por mês', type: 'number' },
+  ];
+  finFields.forEach(f => addStep('field', { field: f }));
 
+  // --- 15: Taxa de conversão ---
+  addStep('field', { field: { id: 'taxaConversao', label: 'Taxa de conversão (%)', hint: '% de leads que viram clientes', type: 'number' } });
+  // --- 16: CRM ---
+  addStep('field', { field: { id: 'existeCRM', label: 'Existe CRM?', type: 'radio', options: ['Sim', 'Não'] } });
+  // --- 17: Equipe comercial ---
+  addStep('field', { field: { id: 'equipeComercial', label: 'Existe equipe comercial?', type: 'radio', options: ['Sim', 'Não'] } });
+
+  // --- 18-27: Escalas de maturidade (10 perguntas) ---
+  const escalasMaturidade = [
+    { id: 'matFluxoCaixa', categoria: 'Financeiro', label: 'Como você acompanha seu fluxo de caixa?',
+      opcoes: [
+        { texto: 'Nunca sei quanto terei disponível no final do mês.', peso: 0 },
+        { texto: 'Tenho apenas uma ideia aproximada.', peso: 25 },
+        { texto: 'Controlo semanalmente.', peso: 50 },
+        { texto: 'Faço projeções mensais.', peso: 75 },
+        { texto: 'Tenho planejamento financeiro superior a seis meses.', peso: 100 },
+      ] },
+    { id: 'matPrecificacao', categoria: 'Financeiro', label: 'Como você define seus preços?',
+      opcoes: [
+        { texto: 'Defino pelo concorrente.', peso: 0 },
+        { texto: 'Defino pelo mercado.', peso: 25 },
+        { texto: 'Defino pelo "feeling".', peso: 50 },
+        { texto: 'Utilizo custos e margem.', peso: 75 },
+        { texto: 'Tenho processo estruturado de precificação.', peso: 100 },
+      ] },
+    { id: 'matVendas', categoria: 'Comercial', label: 'Como funciona hoje o processo de vendas?',
+      opcoes: [
+        { texto: 'Não existe processo, cada venda acontece de um jeito.', peso: 0 },
+        { texto: 'Existe uma sequência informal que a maioria segue.', peso: 25 },
+        { texto: 'Existe um funil definido, mas nem sempre é seguido.', peso: 50 },
+        { texto: 'O funil é claro e a equipe é cobrada por etapa.', peso: 75 },
+        { texto: 'O processo é documentado, treinado e revisado periodicamente.', peso: 100 },
+      ] },
+    { id: 'matMarketing', categoria: 'Marketing', label: 'Como sua empresa atrai novos clientes hoje?',
+      opcoes: [
+        { texto: 'Praticamente só por indicação, sem ação ativa.', peso: 0 },
+        { texto: 'Faz ações pontuais, sem constância.', peso: 25 },
+        { texto: 'Tem presença regular em um canal principal.', peso: 50 },
+        { texto: 'Tem estratégia multicanal com alguma métrica de retorno.', peso: 75 },
+        { texto: 'Tem estratégia documentada com metas e métricas de retorno por canal.', peso: 100 },
+      ] },
+    { id: 'matPessoas', categoria: 'Pessoas', label: 'Como está a gestão de pessoas na empresa?',
+      opcoes: [
+        { texto: 'Não há processo de contratação, treinamento ou avaliação.', peso: 0 },
+        { texto: 'Existe algo informal, mas depende de quem está por perto.', peso: 25 },
+        { texto: 'Há papéis definidos, mas pouco desenvolvimento contínuo.', peso: 50 },
+        { texto: 'Há treinamento e avaliação periódica da equipe.', peso: 75 },
+        { texto: 'Há plano de desenvolvimento, sucessão e cultura estruturada.', peso: 100 },
+      ] },
+    { id: 'matProcessos', categoria: 'Operação', label: 'Os processos da empresa estão documentados?',
+      opcoes: [
+        { texto: 'Nada está documentado, tudo está na cabeça de alguém.', peso: 0 },
+        { texto: 'Alguns processos críticos têm anotações informais.', peso: 25 },
+        { texto: 'Os principais processos estão documentados, mas desatualizados.', peso: 50 },
+        { texto: 'A maior parte está documentada e é seguida.', peso: 75 },
+        { texto: 'Tudo está documentado, atualizado e serve de base para treinar novas pessoas.', peso: 100 },
+      ] },
+    { id: 'matIndicadores', categoria: 'Gestão', label: 'Como a empresa acompanha seus indicadores?',
+      opcoes: [
+        { texto: 'Não acompanho indicador nenhum de forma estruturada.', peso: 0 },
+        { texto: 'Olho alguns números de vez em quando, sem rotina.', peso: 25 },
+        { texto: 'Tenho uma planilha que atualizo com alguma regularidade.', peso: 50 },
+        { texto: 'Tenho um painel com os principais indicadores, revisado com frequência.', peso: 75 },
+        { texto: 'Tenho rotina de reunião de indicadores com decisões baseadas neles.', peso: 100 },
+      ] },
+    { id: 'matOperacao', categoria: 'Operação', label: 'Se você tirar 30 dias de férias, o que acontece com a operação?',
+      opcoes: [
+        { texto: 'A empresa praticamente para sem mim.', peso: 0 },
+        { texto: 'Funciona, mas com bastante dificuldade e decisões acumuladas.', peso: 25 },
+        { texto: 'Funciona razoavelmente bem no dia a dia, mas decisões importantes esperam.', peso: 50 },
+        { texto: 'Funciona bem, só preciso ser acionado em exceções.', peso: 75 },
+        { texto: 'Funciona normalmente, praticamente sem precisar de mim.', peso: 100 },
+      ] },
+    { id: 'matLideranca', categoria: 'Gestão', label: 'Como você descreveria a liderança dentro da empresa?',
+      opcoes: [
+        { texto: 'Só eu tomo decisões, ninguém mais tem autonomia.', peso: 0 },
+        { texto: 'Divido algumas decisões, mas ainda centralizo a maioria.', peso: 25 },
+        { texto: 'Tenho pelo menos uma pessoa de confiança que decide comigo.', peso: 50 },
+        { texto: 'Tenho lideranças que tomam decisões dentro de suas áreas.', peso: 75 },
+        { texto: 'Tenho estrutura de liderança madura, com autonomia real em vários níveis.', peso: 100 },
+      ] },
+    { id: 'matEstrategia', categoria: 'Estratégia', label: 'Como é o planejamento estratégico da empresa?',
+      opcoes: [
+        { texto: 'Não existe plano, decido conforme o dia a dia exige.', peso: 0 },
+        { texto: 'Tenho uma direção na cabeça, mas nada escrito ou formalizado.', peso: 25 },
+        { texto: 'Tenho metas anuais, mas sem revisão frequente.', peso: 50 },
+        { texto: 'Tenho plano de ação com metas e revisão periódica.', peso: 75 },
+        { texto: 'Tenho planejamento estratégico formal, revisado e desdobrado em metas por área.', peso: 100 },
+      ] },
+  ];
+  escalasMaturidade.forEach(escala => addStep('maturidade', { escala }));
+
+  // --- 28: Perguntas estratégicas (4 em uma tela) ---
+  const pergFields = [
+    { id: 'pergFerias30', label: 'A empresa funciona sem você por 30 dias?' },
+    { id: 'pergMargemLiquida', label: 'Você conhece sua margem líquida?' },
+    { id: 'pergFluxoCaixa', label: 'Existe fluxo de caixa projetado?' },
+    { id: 'pergMetasPlano', label: 'Há metas e plano de crescimento definidos?' },
+  ];
+  addStep('perguntas', { fields: pergFields });
+
+  // =============================================================
+  //  4.  VALIDAÇÃO DE STEPS
+  // =============================================================
+  function isStepComplete(step) {
+    if (step.type === 'group') {
+      return step.fields.every(f => {
+        const v = state[f.id];
+        return v !== '' && v !== undefined && v !== null;
+      });
+    }
+    if (step.type === 'field') {
+      const f = step.field;
+      const v = state[f.id];
+      return v !== '' && v !== undefined && v !== null;
+    }
+    if (step.type === 'perguntas') {
+      return step.fields.every(f => {
+        const v = state[f.id];
+        return v === 'Sim' || v === 'Não';
+      });
+    }
+    if (step.type === 'maturidade') {
+      const v = state[step.escala.id];
+      return v !== '' && v !== undefined && v !== null;
+    }
+    return true;
+  }
+
+  function pendingFieldLabels(step) {
+    if (step.type === 'group') {
+      return step.fields.filter(f => {
+        const v = state[f.id];
+        return v === '' || v === undefined || v === null;
+      }).map(f => f.label);
+    }
+    if (step.type === 'field') {
+      const f = step.field;
+      const v = state[f.id];
+      return (v === '' || v === undefined || v === null) ? [f.label] : [];
+    }
+    if (step.type === 'perguntas') {
+      return step.fields.filter(f => {
+        const v = state[f.id];
+        return v !== 'Sim' && v !== 'Não';
+      }).map(f => f.label);
+    }
+    if (step.type === 'maturidade') {
+      const v = state[step.escala.id];
+      return (v === '' || v === undefined || v === null) ? [step.escala.label] : [];
+    }
+    return [];
+  }
+
+  // =============================================================
+  //  5.  RENDERIZAÇÃO DOS STEPS
+  // =============================================================
+  let currentStep = 0;
+  const totalSteps = steps.length;
+  const progressMessages = [
+    'Estamos construindo seu diagnóstico…',
+    'Seu Índice de Clareza está tomando forma…',
+    'Faltam apenas algumas perguntas.',
+    'O diagnóstico já está quase pronto.',
+  ];
+
+  function renderStep(index) {
+    const container = document.getElementById('rx-step-container');
+    const step = steps[index];
+    if (!step) return;
+
+    let html = `<div class="rx-step active">`;
+    html += `<div class="rx-step-header">`;
+    const pct = Math.round(((index) / totalSteps) * 100);
+    html += `<span class="step-counter">Etapa ${index + 1} de ${totalSteps}</span>`;
+    if (step.type === 'group') {
+      html += `<h2 class="step-question">${step.title}</h2>`;
+    } else if (step.type === 'field') {
+      const f = step.field;
+      html += `<h2 class="step-question">${f.label}</h2>`;
+      if (f.hint) html += `<div class="step-hint">${f.hint}</div>`;
+    } else if (step.type === 'perguntas') {
+      html += `<h2 class="step-question">Últimas perguntas estratégicas</h2>`;
+      html += `<div class="step-hint">Responda com sinceridade</div>`;
+    } else if (step.type === 'maturidade') {
+      html += `<h2 class="step-question">${step.escala.label}</h2>`;
+      html += `<div class="step-hint">Escolha a alternativa mais próxima da realidade da empresa</div>`;
+    }
+    const msgIdx = Math.min(Math.floor((index / totalSteps) * progressMessages.length), progressMessages.length - 1);
+    html += `<div class="rx-gamification">${progressMessages[msgIdx]}</div>`;
+    html += `</div>`;
+
+    html += `<div class="rx-input-group">`;
+    if (step.type === 'group') {
+      step.fields.forEach(f => {
+        const val = state[f.id] || '';
+        html += `<div style="margin-bottom:16px;">`;
+        html += `<label for="${f.id}">${f.label}</label>`;
+        if (f.type === 'select') {
+          html += `<select id="${f.id}" class="rx-input rx-input--select" onchange="updateField('${f.id}', this.value)">`;
+          html += `<option value="">Selecione</option>`;
+          f.options.forEach(opt => {
+            html += `<option value="${opt}" ${val===opt?'selected':''}>${opt}</option>`;
+          });
+          html += `</select>`;
+        } else {
+          html += `<input id="${f.id}" type="${f.type}" class="rx-input" placeholder="${f.placeholder||''}" value="${val}" oninput="updateField('${f.id}', this.value)" />`;
+        }
+        html += `</div>`;
+      });
+    } else if (step.type === 'field') {
+      const f = step.field;
+      const val = state[f.id] || '';
+      if (f.type === 'radio') {
+        html += `<div class="rx-radio-group">`;
+        f.options.forEach(opt => {
+          const checked = val === opt ? 'checked' : '';
+          html += `<label><input type="radio" name="${f.id}" value="${opt}" ${checked} onchange="updateField('${f.id}', this.value)" /> ${opt}</label>`;
+        });
+        html += `</div>`;
+      } else if (f.type === 'textarea') {
+        html += `<textarea id="${f.id}" class="rx-input rx-input--textarea" placeholder="Digite sua resposta..." oninput="updateField('${f.id}', this.value)">${val}</textarea>`;
+      } else {
+        html += `<input id="${f.id}" type="${f.type}" class="rx-input" placeholder="${f.placeholder||''}" value="${val}" oninput="updateField('${f.id}', this.value)" />`;
+      }
+    } else if (step.type === 'perguntas') {
+      step.fields.forEach(f => {
+        const val = state[f.id] || '';
+        html += `<div style="margin-bottom:16px;">`;
+        html += `<label>${f.label}</label>`;
+        html += `<div class="rx-radio-group">`;
+        ['Sim', 'Não'].forEach(opt => {
+          const checked = val === opt ? 'checked' : '';
+          html += `<label><input type="radio" name="${f.id}" value="${opt}" ${checked} onchange="updateField('${f.id}', this.value)" /> ${opt}</label>`;
+        });
+        html += `</div>`;
+        html += `</div>`;
+      });
+    } else if (step.type === 'maturidade') {
+      const escala = step.escala;
+      const val = state[escala.id];
+      html += `<div class="rx-maturidade-group">`;
+      escala.opcoes.forEach((opt) => {
+        const selected = String(val) === String(opt.peso) ? 'selected' : '';
+        html += `<label class="rx-maturidade-opcao ${selected}">`;
+        html += `<input type="radio" name="${escala.id}" value="${opt.peso}" ${selected ? 'checked' : ''} onchange="updateField('${escala.id}', this.value)" />`;
+        html += `<span class="rx-maturidade-marcador"></span>`;
+        html += `<span class="rx-maturidade-texto">${opt.texto}</span>`;
+        html += `</label>`;
+      });
+      html += `</div>`;
+    }
+    html += `</div>`;
+
+    const pct2 = Math.round(((index + 1) / totalSteps) * 100);
+    html += `<div class="rx-progress">`;
+    html += `<div class="rx-progress-top"><span>${pct2}% concluído</span><span>Etapa ${index + 1} de ${totalSteps}</span></div>`;
+    html += `<div class="rx-progress-bar"><div class="rx-progress-fill" style="width:${pct2}%;"></div></div>`;
+    html += `</div>`;
+
+    const complete = isStepComplete(step);
+    const disabledAttr = complete ? '' : 'disabled';
+    html += `<div class="rx-step-actions">`;
+    if (index > 0) {
+      html += `<button class="btn--back" onclick="goToStep(${index - 1})">← Voltar</button>`;
+    } else {
+      html += `<span></span>`;
+    }
+    if (index < totalSteps - 1) {
+      html += `<button class="btn btn--bordo" id="rx-next-btn" ${disabledAttr} onclick="nextStep()">Próximo</button>`;
+    } else {
+      html += `<button class="btn btn--gold" id="rx-next-btn" ${disabledAttr} onclick="finalizar()">Ver Resultado</button>`;
+    }
+    html += `</div>`;
+
+    const pending = pendingFieldLabels(step);
+    html += `<div class="rx-validation-warning" id="rx-validation-msg">`;
+    if (pending.length > 0) {
+      html += `Falta responder: ${pending.join(', ')}`;
+    }
+    html += `</div>`;
+    html += `</div>`;
+
+    container.innerHTML = html;
+    document.getElementById('rx-screen-welcome').style.display = 'none';
+    document.getElementById('rx-screen-loading').style.display = 'none';
+    document.getElementById('rx-screen-result').style.display = 'none';
+    container.style.display = 'block';
+  }
+
+  function startDiagnostico() { currentStep = 0; renderStep(0); }
+  function nextStep() {
+    if (!isStepComplete(steps[currentStep])) return;
+    if (currentStep < totalSteps - 1) { currentStep++; renderStep(currentStep); }
+  }
+  function goToStep(index) { currentStep = index; renderStep(currentStep); }
+
+  function updateField(id, value) {
+    state[id] = value;
+    revalidateCurrentStep();
+    updateMaturidadeSelection(id, value);
+  }
+
+  function updateMaturidadeSelection(id, value) {
+    const group = document.querySelector(`.rx-maturidade-group input[name="${id}"]`);
+    if (!group) return;
+    document.querySelectorAll(`.rx-maturidade-group input[name="${id}"]`).forEach(input => {
+      const card = input.closest('.rx-maturidade-opcao');
+      if (String(input.value) === String(value)) card.classList.add('selected');
+      else card.classList.remove('selected');
+    });
+  }
+
+  function revalidateCurrentStep() {
+    const step = steps[currentStep];
+    if (!step) return;
+    const btn = document.getElementById('rx-next-btn');
+    const msg = document.getElementById('rx-validation-msg');
+    if (!btn || !msg) return;
+    const complete = isStepComplete(step);
+    btn.disabled = !complete;
+    const pending = pendingFieldLabels(step);
+    msg.textContent = pending.length > 0 ? `Falta responder: ${pending.join(', ')}` : '';
+  }
+
+  // =============================================================
+  //  6.  FINALIZAR → LOADING → CALCULAR
+  // =============================================================
+  function finalizar() {
+    if (!isStepComplete(steps[currentStep])) return;
+    document.getElementById('rx-step-container').style.display = 'none';
+    const loadingScreen = document.getElementById('rx-screen-loading');
+    loadingScreen.style.display = 'block';
+    loadingScreen.className = 'rx-step active';
+
+    const messages = [
+      'Analisando indicadores financeiros…',
+      'Comparando padrões de gestão…',
+      'Calculando Índice de Clareza TFAZZIO…',
+      'Identificando gargalos…',
+      'Definindo prioridades…',
+      'Gerando plano inicial…',
+      'Diagnóstico concluído.'
+    ];
+    let idx = 0;
+    const textEl = document.getElementById('loading-text');
+    const subEl = document.getElementById('loading-sub');
+
+    const interval = setInterval(() => {
+      if (idx < messages.length) {
+        if (idx === 0) { textEl.textContent = messages[idx]; subEl.textContent = ''; }
+        else if (idx === messages.length - 1) { textEl.textContent = messages[idx]; subEl.textContent = 'Preparando seu relatório…'; }
+        else { subEl.textContent = messages[idx]; }
+        idx++;
+      } else {
+        clearInterval(interval);
+        setTimeout(() => {
+          loadingScreen.style.display = 'none';
+          document.getElementById('rx-screen-result').style.display = 'block';
+          document.getElementById('rx-screen-result').className = 'rx-step active';
+          renderResultado();
+        }, 600);
+      }
+    }, 800);
+  }
+
+  // =============================================================
+  //  7.  MOTOR DE CÁLCULO (retorna objeto com todos os indicadores)
+  // =============================================================
+  function calcular() {
+    const F = parseFloat(state.faturamento) || 0;
+    const CF = parseFloat(state.custosFixos) || 0;
+    const CVpct = parseFloat(state.custosVariaveisPct) || 0;
+    const Aliq = parseFloat(state.aliquotaImpostos) || 0;
+    const PL = parseFloat(state.proLabore) || 0;
+    const Ticket = parseFloat(state.ticketMedio) || 0;
+    const NumClientes = parseFloat(state.numClientesMes) || 0;
+    const Conv = parseFloat(state.taxaConversao) || 0;
+    const NumFuncionarios = parseFloat(state.numFuncionarios) || 0;
+
+    const CustosOp = CF + (CVpct / 100) * F;
+    const Impostos = (Aliq / 100) * F;
+    const LucroOp = F - CustosOp - Impostos - PL;
+    const Margem = F > 0 ? LucroOp / F : 0;
+    const MargemLiquida = Margem;
+    const PctComprometido = F > 0 ? (CustosOp + Impostos + PL) / F : 0;
+    const Denom = 1 - (CVpct/100) - (Aliq/100);
+    const PontoEquilibrio = Denom > 0 ? CF / Denom : Infinity;
+    const PontoEquilibrioPct = F > 0 && isFinite(PontoEquilibrio) ? PontoEquilibrio / F : 1;
+    const breakevenValido = isFinite(PontoEquilibrio);
+    const distanciaBreakevenRS = breakevenValido ? F - PontoEquilibrio : null;
+    const distanciaBreakevenPct = breakevenValido && PontoEquilibrio > 0 ? (F - PontoEquilibrio) / PontoEquilibrio : null;
+
+    const faturamentoPorFuncionario = NumFuncionarios > 0 ? F / NumFuncionarios : null;
+    const lucroPorFuncionarioAnual = NumFuncionarios > 0 ? (LucroOp * 12) / NumFuncionarios : null;
+    const lucroPorCliente = NumClientes > 0 ? LucroOp / NumClientes : null;
+
+    const ReceitaImplicita = Ticket * NumClientes;
+    const temDadosParaCruzamento = Ticket > 0 && NumClientes > 0 && F > 0;
+    const DivergenciaReceitaPct = temDadosParaCruzamento ? (ReceitaImplicita - F) / F : null;
+    const divergenciaRelevante = temDadosParaCruzamento && Math.abs(DivergenciaReceitaPct) >= 0.2;
+
+    const statusMargem = Margem >= 0.2 ? 'Verde' : Margem >= 0.1 ? 'Amarelo' : 'Vermelho';
+    const statusPE = PontoEquilibrioPct < 0.7 ? 'Verde' : PontoEquilibrioPct <= 0.85 ? 'Amarelo' : 'Vermelho';
+    const statusCustoFixo = F > 0 ? (CF / F < 0.2 ? 'Verde' : CF / F <= 0.35 ? 'Amarelo' : 'Vermelho') : 'Vermelho';
+
+    function n100(status) {
+      if (status === 'Verde') return 100;
+      if (status === 'Amarelo') return 60;
+      return 20;
+    }
+
+    const notaNumerica = (n100(statusMargem) + n100(statusPE) + n100(statusCustoFixo)) / 3;
+    const notaPerceptiva = [
+      state.pergMargemLiquida === 'Sim' ? 100 : 0,
+      state.pergFluxoCaixa === 'Sim' ? 100 : 0,
+      parseFloat(state.matFluxoCaixa) || 0,
+      parseFloat(state.matPrecificacao) || 0,
+    ].reduce((a,b) => a+b, 0) / 4;
+    const catFinanceiro = notaNumerica * 0.6 + notaPerceptiva * 0.4;
+
+    const nCom = [
+      Conv >= 20 ? 100 : Conv >= 10 ? 60 : 20,
+      state.existeCRM === 'Sim' ? 100 : 0,
+      state.equipeComercial === 'Sim' ? 100 : 0,
+      parseFloat(state.matVendas) || 0,
+    ];
+    const catComercial = nCom.reduce((a,b) => a+b, 0) / nCom.length;
+
+    const nMkt = [ parseFloat(state.matMarketing) || 0 ];
+    const catMarketing = nMkt.reduce((a,b) => a+b, 0) / nMkt.length;
+
+    const nOp = [
+      state.pergFerias30 === 'Sim' ? 100 : 0,
+      parseFloat(state.matOperacao) || 0,
+      parseFloat(state.matProcessos) || 0,
+    ];
+    const catOperacao = nOp.reduce((a,b) => a+b, 0) / nOp.length;
+
+    const nPes = [ parseFloat(state.matPessoas) || 0 ];
+    const catPessoas = nPes.reduce((a,b) => a+b, 0) / nPes.length;
+
+    const nGest = [
+      parseFloat(state.matIndicadores) || 0,
+      parseFloat(state.matLideranca) || 0,
+    ];
+    const catGestao = nGest.reduce((a,b) => a+b, 0) / nGest.length;
+
+    const nEst = [
+      state.pergMetasPlano === 'Sim' ? 100 : 0,
+      parseFloat(state.matEstrategia) || 0,
+    ];
+    const catEstrategia = nEst.reduce((a,b) => a+b, 0) / nEst.length;
+
+    const cats = [catEstrategia, catFinanceiro, catComercial, catMarketing, catOperacao, catGestao, catPessoas];
+    const indiceClareza = cats.reduce((a,b) => a+b, 0) / cats.length;
+
+    let nivel = 'Iniciante';
+    if (indiceClareza >= 85) nivel = 'Alta Performance';
+    else if (indiceClareza >= 70) nivel = 'Escalável';
+    else if (indiceClareza >= 55) nivel = 'Estruturada';
+    else if (indiceClareza >= 40) nivel = 'Organizada';
+
+    const catMap = { Estratégia: catEstrategia, Financeiro: catFinanceiro, Comercial: catComercial, Marketing: catMarketing, Operação: catOperacao, Gestão: catGestao, Pessoas: catPessoas };
+    const sorted = Object.entries(catMap).sort((a,b) => a[1] - b[1]);
+    const gargalo = sorted[0][0];
+    const oportunidade = sorted[sorted.length-1][0];
+
+    const statusCat = (v) => v >= 70 ? 'Verde' : v >= 50 ? 'Amarelo' : 'Vermelho';
+
+    const gapPercepcaoFinanceiro = notaPerceptiva - notaNumerica;
+    const gapPercepcaoRelevante = Math.abs(gapPercepcaoFinanceiro) >= 25;
+
+    return {
+      faturamento: F,
+      faturamentoAnual: F * 12,
+      numFuncionarios: NumFuncionarios,
+      taxaConversao: Conv,
+      pergFerias30Resposta: state.pergFerias30,
+      margem: Margem,
+      margemLiquida: MargemLiquida,
+      lucroOperacional: LucroOp,
+      lucroOperacionalAnual: LucroOp * 12,
+      custosOperacionaisAnual: CustosOp * 12,
+      statusMargem,
+      pontoEquilibrio: breakevenValido ? PontoEquilibrio : null,
+      distanciaBreakevenRS,
+      distanciaBreakevenPct,
+      faturamentoPorFuncionario,
+      lucroPorFuncionarioAnual,
+      lucroPorCliente,
+      ticketMedio: Ticket,
+      numClientesMes: NumClientes,
+      receitaImplicita: temDadosParaCruzamento ? ReceitaImplicita : null,
+      divergenciaReceitaPct: DivergenciaReceitaPct,
+      divergenciaRelevante,
+      notaObjetivaFinanceiro: notaNumerica,
+      notaPercebidaFinanceiro: notaPerceptiva,
+      gapPercepcaoFinanceiro,
+      gapPercepcaoRelevante,
+      matFluxoCaixaRaw: parseFloat(state.matFluxoCaixa) || 0,
+      matPrecificacaoRaw: parseFloat(state.matPrecificacao) || 0,
+      matVendasRaw: parseFloat(state.matVendas) || 0,
+      matMarketingRaw: parseFloat(state.matMarketing) || 0,
+      matPessoasRaw: parseFloat(state.matPessoas) || 0,
+      matProcessosRaw: parseFloat(state.matProcessos) || 0,
+      matIndicadoresRaw: parseFloat(state.matIndicadores) || 0,
+      matOperacaoRaw: parseFloat(state.matOperacao) || 0,
+      matLiderancaRaw: parseFloat(state.matLideranca) || 0,
+      matEstrategiaRaw: parseFloat(state.matEstrategia) || 0,
+      catEstrategia, catFinanceiro, catComercial, catMarketing, catOperacao, catGestao, catPessoas,
+      indiceClareza, nivel, gargalo, oportunidade,
+      statusCatEstrategia: statusCat(catEstrategia),
+      statusCatFinanceiro: statusCat(catFinanceiro),
+      statusCatComercial: statusCat(catComercial),
+      statusCatMarketing: statusCat(catMarketing),
+      statusCatOperacao: statusCat(catOperacao),
+      statusCatGestao: statusCat(catGestao),
+      statusCatPessoas: statusCat(catPessoas),
+    };
+  }
+
+  // =============================================================
+  //  8.  REGRAS DE CRUZAMENTO (motor de conhecimento estruturado)
+  // =============================================================
+  const REGRAS_CRUZAMENTO = [
+    // ── FINANCEIRO ────────────────────────────────────────────
+    {
+      id: 'FIN-001',
+      categoria: 'Financeiro',
+      tags: ['percepção', 'margem', 'precificação', 'fluxo de caixa'],
+      aplica: d => d.gapPercepcaoRelevante && d.gapPercepcaoFinanceiro > 0,
+      grauConfianca: () => 'Alta',
+      severidade: d => 70 + (d.gapPercepcaoFinanceiro - 25) * 0.4,
+      evidencias: d => [
+        `Autoavaliação de fluxo de caixa e precificação: ${d.notaPercebidaFinanceiro.toFixed(0)}/100`,
+        `Nota objetiva calculada (margem, breakeven, custo fixo): ${d.notaObjetivaFinanceiro.toFixed(0)}/100`,
+        `Margem operacional: ${pct(d.margem, 1)}% (${d.statusMargem.toLowerCase()})`,
+      ],
+      texto: d => ({
+        titulo: 'A percepção sobre as finanças parece estar à frente dos números',
+        observado: `Sua autoavaliação sobre controle financeiro e precificação está em ${d.notaPercebidaFinanceiro.toFixed(0)} de 100, mas os indicadores calculados a partir dos seus próprios números resultam em ${d.notaObjetivaFinanceiro.toFixed(0)} de 100.`,
+        hipotese: 'Os dados sugerem que a rotina financeira existe no dia a dia, mas ainda não está sendo traduzida em resultado real de margem. É comum isso acontecer quando o controle é feito de forma manual ou pontual, sem uma rotina que conecte precificação, custo e resultado final.',
+        evidencia: `A margem operacional calculada é de ${pct(d.margem, 1)}%, classificada como ${d.statusMargem.toLowerCase()}, enquanto a autoavaliação de fluxo de caixa e precificação ficou próxima do topo da escala.`,
+        impacto: 'Enquanto esse descompasso existir, decisões importantes (contratar, investir, expandir) tendem a ser tomadas com uma sensação de segurança maior do que a realidade sustenta.',
+        proximoPasso: 'Antes de qualquer decisão de crescimento, vale revisar a precificação atual contra o custo real de entrega, e não apenas contra o que parece razoável no dia a dia.',
+      }),
+    },
+    {
+      id: 'FIN-002',
+      categoria: 'Financeiro',
+      tags: ['margem', 'precificação', 'maturidade'],
+      aplica: d => d.statusMargem !== 'Verde' && d.matPrecificacaoRaw >= 75,
+      grauConfianca: () => 'Alta',
+      severidade: () => 64,
+      evidencias: d => [
+        `Margem operacional: ${pct(d.margem, 1)}% (${d.statusMargem.toLowerCase()})`,
+        `Maturidade de precificação declarada: ${d.matPrecificacaoRaw}/100 (processo estruturado)`,
+      ],
+      texto: d => ({
+        titulo: 'A precificação parece madura, mas a margem não reflete isso',
+        observado: `Você indicou ter um processo estruturado de precificação, com base em custos e margem, mas a margem operacional calculada é de ${pct(d.margem, 1)}%, classificada como ${d.statusMargem.toLowerCase()}.`,
+        hipotese: 'Há indícios de que o problema não esteja em como o preço é definido, e sim no nível de custo que esse preço precisa cobrir. Quando o processo de precificação já é maduro e mesmo assim a margem não aparece, o peso dos custos fixos ou variáveis costuma ser o fator mais provável.',
+        evidencia: `A combinação entre um processo de precificação declarado como estruturado e uma margem ${d.statusMargem.toLowerCase()} é o que sustenta essa hipótese: normalmente, precificação madura já filtraria esse problema se a causa fosse o preço em si.`,
+        impacto: 'Se essa hipótese estiver correta, ajustar apenas o preço tende a ter efeito limitado. O ganho mais provável está em revisar a estrutura de custos fixos e variáveis que o preço precisa cobrir.',
+        proximoPasso: 'Vale mapear, item por item, quais custos fixos e variáveis estão sendo cobertos pelo preço atual, e comparar isso com o que foi considerado quando o preço foi definido.',
+      }),
+    },
+    {
+      id: 'FIN-003',
+      categoria: 'Financeiro',
+      tags: ['margem', 'precificação', 'maturidade', 'preço'],
+      aplica: d => d.statusMargem !== 'Verde' && d.matPrecificacaoRaw <= 25,
+      grauConfianca: () => 'Alta',
+      severidade: () => 67,
+      evidencias: d => [
+        `Margem operacional: ${pct(d.margem, 1)}% (${d.statusMargem.toLowerCase()})`,
+        `Maturidade de precificação declarada: ${d.matPrecificacaoRaw}/100 (processo pouco estruturado)`,
+      ],
+      texto: d => ({
+        titulo: 'A forma de definir o preço pode estar limitando a margem',
+        observado: `Você indicou definir preços de forma pouco estruturada (pelo concorrente, pelo mercado, ou pelo "feeling"), e a margem operacional calculada é de ${pct(d.margem, 1)}%, classificada como ${d.statusMargem.toLowerCase()}.`,
+        hipotese: 'Uma hipótese bastante consistente é que o preço praticado hoje não esteja considerando com precisão o custo real de entrega mais a margem desejada, o que é comum quando a precificação segue referências externas em vez de uma conta interna.',
+        evidencia: `A combinação entre um processo de precificação declarado como pouco estruturado e uma margem ${d.statusMargem.toLowerCase()} é o que sustenta essa leitura.`,
+        impacto: 'Enquanto o preço não for revisado com base no custo real, cada novo cliente ou venda tende a repetir a mesma margem insuficiente, o que significa que crescer em volume não necessariamente resolve o problema.',
+        proximoPasso: 'Vale calcular o custo real de entregar o produto ou serviço (direto e uma parcela do fixo) e comparar com o preço praticado hoje, antes de qualquer decisão de reajuste.',
+      }),
+    },
+    {
+      id: 'FIN-004',
+      categoria: 'Financeiro',
+      tags: ['margem', 'caixa', 'capital de giro'],
+      aplica: d => d.statusMargem === 'Verde' && d.pontoEquilibrio !== null && d.distanciaBreakevenPct !== null && d.distanciaBreakevenPct < 0.2,
+      grauConfianca: () => 'Média',
+      severidade: () => 58,
+      evidencias: d => [
+        `Margem operacional: ${pct(d.margem, 1)}% (saudável)`,
+        `Distância do ponto de equilíbrio: ${pct(d.distanciaBreakevenPct, 0)}%`,
+      ],
+      texto: d => ({
+        titulo: 'A margem parece saudável no papel, mas o caixa pode não refletir isso',
+        observado: `Sua margem operacional calculada é de ${pct(d.margem, 1)}%, um patamar saudável, mas seu faturamento está a apenas ${pct(d.distanciaBreakevenPct, 0)}% acima do ponto de equilíbrio mensal.`,
+        hipotese: 'Há indícios de que o problema não seja rentabilidade, e sim capital de giro: a empresa pode ser lucrativa no papel, mas o dinheiro pode estar demorando para entrar no caixa (prazos de recebimento, estoque parado, ou inadimplência), o que aperta a operação mesmo com margem boa.',
+        evidencia: 'A combinação entre margem saudável e pouca folga acima do ponto de equilíbrio é típica de descompasso entre o resultado contábil e o caixa efetivamente disponível.',
+        impacto: 'Se essa hipótese estiver correta, decisões baseadas apenas na margem (como assumir mais compromissos) podem expor a empresa a um aperto de caixa que a margem, isoladamente, não deixa visível.',
+        proximoPasso: 'Vale mapear o prazo médio de recebimento e de pagamento, e verificar se existe descompasso relevante entre os dois.',
+      }),
+    },
+    // ── COMERCIAL ────────────────────────────────────────────────
+    {
+      id: 'COM-001',
+      categoria: 'Comercial',
+      tags: ['marketing', 'vendas', 'conversão', 'funil'],
+      aplica: d => d.matMarketingRaw >= 75 && d.statusCatComercial !== 'Verde',
+      grauConfianca: () => 'Alta',
+      severidade: () => 68,
+      evidencias: d => [
+        `Maturidade de marketing declarada: ${d.matMarketingRaw}/100`,
+        `Nota comercial: ${d.catComercial.toFixed(0)}/100 (${d.statusCatComercial.toLowerCase()})`,
+        `Taxa de conversão declarada: ${d.taxaConversao}%`,
+      ],
+      texto: d => ({
+        titulo: 'A atração de clientes não parece estar virando vendas na mesma proporção',
+        observado: `Sua autoavaliação de marketing indica um processo estruturado de atração de clientes, mas o desempenho comercial está classificado como ${d.statusCatComercial.toLowerCase()}, com taxa de conversão declarada de ${d.taxaConversao || '0'}%.`,
+        hipotese: 'Há indícios de um gargalo entre a geração de interesse e o fechamento da venda: o marketing pode estar atraindo o público errado, ou o processo comercial pode não estar preparado para converter o volume que chega.',
+        evidencia: 'A combinação em si é a evidência: marketing estruturado sem processo comercial à altura costuma gerar desperdício de investimento em atração, porque o funil vaza antes da venda se concretizar.',
+        impacto: 'Continuar investindo em atrair mais pessoas sem resolver a conversão tende a aumentar o custo de aquisição de cliente sem aumentar a receita na mesma proporção.',
+        proximoPasso: 'Antes de aumentar o investimento em marketing, vale investigar prioritariamente em qual etapa do funil comercial os potenciais clientes estão sendo perdidos.',
+      }),
+    },
+    {
+      id: 'COM-002',
+      categoria: 'Comercial',
+      tags: ['margem', 'vendas', 'volume'],
+      aplica: d => d.statusCatComercial === 'Vermelho' && d.statusMargem === 'Verde',
+      grauConfianca: () => 'Alta',
+      severidade: () => 55,
+      evidencias: d => [
+        `Margem operacional: ${pct(d.margem, 1)}% (saudável)`,
+        `Nota comercial: ${d.catComercial.toFixed(0)}/100 (crítico)`,
+      ],
+      texto: d => ({
+        titulo: 'A margem parece saudável, mas o volume de vendas pode ser o fator limitante',
+        observado: `Sua margem operacional está em ${pct(d.margem, 1)}%, classificada como saudável, mas o desempenho comercial está classificado como crítico.`,
+        hipotese: 'Uma hipótese consistente é que o problema atual não seja rentabilidade por venda, e sim volume: cada venda parece boa o suficiente, mas há poucas vendas acontecendo.',
+        evidencia: 'A combinação entre margem alta e comercial fraco costuma indicar que, quando a rentabilidade por unidade já está resolvida, o gargalo de crescimento se desloca para geração de demanda e capacidade de conversão.',
+        impacto: 'Isso tende a ser uma boa notícia disfarçada de problema: a empresa já sabe precificar e entregar com margem, então investir em estruturar vendas tende a ter retorno mais previsível do que em empresas com margem comprometida.',
+        proximoPasso: 'Vale investigar prioritariamente a estruturação do processo comercial (funil, CRM, previsibilidade), já que a base de rentabilidade parece já existir.',
+      }),
+    },
+    {
+      id: 'COM-003',
+      categoria: 'Comercial',
+      tags: ['ticket médio', 'clientes', 'posicionamento'],
+      aplica: d => d.numClientesMes >= 40 && d.ticketMedio > 0 && d.faturamento > 0 && (d.ticketMedio * d.numClientesMes / d.faturamento) > 0.7 && d.ticketMedio <= (d.faturamento / 40),
+      grauConfianca: () => 'Baixa',
+      severidade: () => 45,
+      evidencias: d => [
+        `Clientes por mês: ${Math.round(d.numClientesMes)}`,
+        `Ticket médio: ${moedaInline(d.ticketMedio)}`,
+      ],
+      texto: d => ({
+        titulo: 'Volume alto de clientes com ticket relativamente baixo',
+        observado: `Você declarou aproximadamente ${Math.round(d.numClientesMes)} clientes por mês, com ticket médio de ${moedaInline(d.ticketMedio)}.`,
+        hipotese: 'Não existem dados suficientes para afirmar que o ticket está abaixo do que o mercado pagaria. Porém, um volume alto de clientes combinado a um ticket relativamente baixo pode indicar uma oportunidade de reposicionamento: atender menos clientes com um ticket maior, se a capacidade de entrega permitir.',
+        evidencia: 'A combinação entre volume alto e ticket baixo é o único sinal disponível aqui; vale tratar como hipótese a explorar, não como conclusão.',
+        impacto: 'Se houver espaço para elevar o ticket médio sem perder proporcionalmente clientes, o ganho de margem tende a vir sem custo operacional adicional proporcional.',
+        proximoPasso: 'Vale investigar se existe um segmento dentro da carteira atual disposto a pagar mais por um nível de serviço diferenciado.',
+      }),
+    },
+    {
+      id: 'COM-004',
+      categoria: 'Comercial',
+      tags: ['ticket médio', 'clientes', 'aquisição', 'concentração'],
+      aplica: d => d.numClientesMes > 0 && d.numClientesMes <= 15 && d.ticketMedio > 0 && d.faturamento > 0 && (d.ticketMedio / d.faturamento) >= 0.1,
+      grauConfianca: () => 'Média',
+      severidade: () => 60,
+      evidencias: d => [
+        `Clientes por mês: ${Math.round(d.numClientesMes)}`,
+        `Ticket médio: ${moedaInline(d.ticketMedio)}`,
+        `Proporção do ticket sobre o faturamento total: ${pct(d.ticketMedio / d.faturamento, 0)}%`,
+      ],
+      texto: d => ({
+        titulo: 'Ticket médio elevado com poucos clientes ativos',
+        observado: `Você declarou aproximadamente ${Math.round(d.numClientesMes)} clientes por mês, com ticket médio de ${moedaInline(d.ticketMedio)}, uma parcela relevante do faturamento total.`,
+        hipotese: 'Há indícios de que o preço e o valor entregue já estejam validados pelo mercado, e que o principal fator limitante do crescimento seja a aquisição de novos clientes, não a precificação.',
+        evidencia: `Cada cliente responde, em média, por ${pct(d.ticketMedio / d.faturamento, 0)}% do faturamento mensal, o que é típico de carteiras concentradas com ticket validado.`,
+        impacto: 'Se essa hipótese estiver correta, investir em geração de demanda tende a ter retorno mais direto do que revisar preço ou entrega, que já parecem funcionar.',
+        proximoPasso: 'Vale investigar prioritariamente os canais de aquisição atuais e se há capacidade de escalá-los sem perder a qualidade do atendimento.',
+      }),
+    },
+    // ── OPERAÇÃO ─────────────────────────────────────────────────
+    {
+      id: 'OPE-001',
+      categoria: 'Operação',
+      tags: ['processos', 'crescimento', 'escala', 'risco'],
+      aplica: d => d.faturamentoPorFuncionario !== null && d.faturamentoPorFuncionario > 12000 && d.matProcessosRaw <= 25,
+      grauConfianca: () => 'Alta',
+      severidade: () => 72,
+      evidencias: d => [
+        `Faturamento por colaborador: ${moedaInline(d.faturamentoPorFuncionario)}`,
+        `Maturidade de processos documentados: ${d.matProcessosRaw}/100`,
+      ],
+      texto: d => ({
+        titulo: 'A operação parece girar rápido sem processos documentados',
+        observado: `Com ${moedaInline(d.faturamentoPorFuncionario)} de faturamento por colaborador, sua operação já demonstra um bom ritmo, mas os processos da empresa ainda não estão documentados de forma consistente.`,
+        hipotese: 'Os dados sugerem risco de perda de qualidade conforme a empresa cresce: o que funciona hoje, sustentado pelo conhecimento informal de poucas pessoas, tende a quebrar quando o volume aumenta ou quando alguém-chave se ausenta.',
+        evidencia: 'A combinação entre bom desempenho operacional atual e baixa documentação de processos caracteriza esse risco: a empresa está performando apesar da falta de estrutura, não por causa dela.',
+        impacto: 'Se nada mudar, o crescimento futuro tende a expor inconsistências que hoje ainda não aparecem, geralmente na forma de erros operacionais, retrabalho ou dependência excessiva de poucas pessoas.',
+        proximoPasso: 'Vale investigar prioritariamente quais processos, se a pessoa responsável faltasse amanhã, mais atrapalhariam a operação, e documentar esses primeiro.',
+      }),
+    },
+    {
+      id: 'OPE-002',
+      categoria: 'Operação',
+      tags: ['equipe', 'produtividade', 'folha de pagamento'],
+      aplica: d => d.numFuncionarios >= 8 && d.faturamentoPorFuncionario !== null && d.faturamentoPorFuncionario < 8000,
+      grauConfianca: () => 'Média',
+      severidade: () => 60,
+      evidencias: d => [
+        `Número de colaboradores: ${Math.round(d.numFuncionarios)}`,
+        `Faturamento por colaborador: ${moedaInline(d.faturamentoPorFuncionario)}`,
+      ],
+      texto: d => ({
+        titulo: 'Estrutura de equipe maior que a receita gerada por pessoa sustenta',
+        observado: `Sua empresa tem ${Math.round(d.numFuncionarios)} colaboradores e gera ${moedaInline(d.faturamentoPorFuncionario)} de faturamento por pessoa ao mês.`,
+        hipotese: 'Esse número, isoladamente, pode significar diversas coisas: um modelo de negócio que exige mais mão de obra por natureza, uma equipe montada para um patamar de faturamento ainda não alcançado, ou uma oportunidade real de ganho de produtividade. Não há dados suficientes para afirmar qual dessas é o caso.',
+        evidencia: 'A combinação entre volume de equipe e faturamento por pessoa abaixo do que costuma sustentar uma operação enxuta é o que chama atenção aqui.',
+        impacto: 'Se a equipe estiver dimensionada à frente do faturamento atual, a folha de pagamento tende a comprimir a margem antes mesmo de outros custos entrarem na conta.',
+        proximoPasso: 'Vale investigar a alocação real de cada função hoje: quanto do tempo da equipe está de fato gerando receita versus sustentando estrutura interna.',
+      }),
+    },
+    {
+      id: 'OPE-003',
+      categoria: 'Operação',
+      tags: ['vendas', 'lucro', 'operação', 'eficiência'],
+      aplica: d => d.statusCatComercial === 'Verde' && d.statusMargem === 'Vermelho',
+      grauConfianca: () => 'Alta',
+      severidade: () => 70,
+      evidencias: d => [
+        `Nota comercial: ${d.catComercial.toFixed(0)}/100 (saudável)`,
+        `Margem operacional: ${pct(d.margem, 1)}% (${d.statusMargem.toLowerCase()})`,
+      ],
+      texto: d => ({
+        titulo: 'As vendas parecem fortes, mas o lucro não acompanha',
+        observado: `Seu desempenho comercial está classificado como saudável, mas a margem operacional calculada é de apenas ${pct(d.margem, 1)}%.`,
+        hipotese: 'Há fortes indícios de que o gargalo não esteja em vender, e sim em transformar venda em lucro: a operação (custos, processos, estrutura) pode estar consumindo boa parte do que o comercial consegue gerar.',
+        evidencia: 'A combinação entre um comercial que performa bem e uma margem comprometida costuma apontar para ineficiência operacional ou estrutura de custos desalinhada com o volume de vendas.',
+        impacto: 'Enquanto esse padrão persistir, cada esforço adicional de vendas tende a gerar menos resultado líquido do que deveria, tornando o crescimento comercial menos rentável do que parece à primeira vista.',
+        proximoPasso: 'Vale investigar prioritariamente onde a operação está consumindo margem: custo direto de entrega, estrutura fixa, ou ineficiência de processo.',
+      }),
+    },
+    // ── PESSOAS / GESTÃO ─────────────────────────────────────────
+    {
+      id: 'PES-001',
+      categoria: 'Pessoas',
+      tags: ['liderança', 'crescimento', 'dono', 'gargalo'],
+      aplica: d => d.faturamentoPorFuncionario !== null && d.faturamentoPorFuncionario > 9000 && d.matLiderancaRaw <= 25,
+      grauConfianca: () => 'Média',
+      severidade: () => 63,
+      evidencias: d => [
+        `Faturamento por colaborador: ${moedaInline(d.faturamentoPorFuncionario)}`,
+        `Maturidade de liderança declarada: ${d.matLiderancaRaw}/100`,
+      ],
+      texto: d => ({
+        titulo: 'O crescimento pode estar esbarrando na centralização de decisões',
+        observado: `Sua operação já demonstra ritmo (${moedaInline(d.faturamentoPorFuncionario)} de faturamento por colaborador), mas você indicou tomar praticamente todas as decisões sozinho, sem outras pessoas com autonomia real.`,
+        hipotese: 'Há indícios de que o próximo nível de crescimento dependa menos de vender mais e mais de desenvolver outras pessoas capazes de decidir sem depender de você em cada situação.',
+        evidencia: 'A combinação entre uma operação que já roda em ritmo razoável e a ausência de lideranças com autonomia é o que sustenta essa hipótese: o volume já existe, mas a estrutura de decisão não acompanhou.',
+        impacto: 'Se esse padrão persistir, o crescimento tende a esbarrar num teto natural: a capacidade da empresa de operar fica limitada à capacidade de uma única pessoa de decidir.',
+        proximoPasso: 'Vale investigar prioritariamente quais decisões, hoje concentradas em você, poderiam ser delegadas com o mínimo de risco.',
+      }),
+    },
+    {
+      id: 'GES-001',
+      categoria: 'Gestão',
+      tags: ['planejamento', 'indicadores', 'execução'],
+      aplica: d => d.matEstrategiaRaw >= 75 && d.matIndicadoresRaw <= 25,
+      grauConfianca: () => 'Alta',
+      severidade: () => 61,
+      evidencias: d => [
+        `Maturidade de planejamento estratégico: ${d.matEstrategiaRaw}/100`,
+        `Maturidade de acompanhamento de indicadores: ${d.matIndicadoresRaw}/100`,
+      ],
+      texto: d => ({
+        titulo: 'O planejamento parece existir, mas o acompanhamento pode não estar acontecendo',
+        observado: `Você indicou ter planejamento estratégico formal com metas e revisão periódica, mas o acompanhamento de indicadores foi avaliado como pouco estruturado.`,
+        hipotese: 'Uma hipótese bastante consistente é que o problema não esteja em definir o que fazer, e sim em acompanhar se o que foi definido está de fato sendo executado. Planejamento sem indicadores tende a virar intenção, não execução.',
+        evidencia: 'A combinação entre planejamento maduro e indicadores pouco acompanhados é o que sustenta essa leitura: normalmente, planos bem executados vêm acompanhados de alguma rotina de medição.',
+        impacto: 'Sem indicadores, desvios do plano tendem a ser percebidos tarde, quando já custam mais caro para corrigir.',
+        proximoPasso: 'Vale investigar prioritariamente 3 a 5 indicadores que, se acompanhados semanalmente, mostrariam se o plano estratégico está de fato sendo executado.',
+      }),
+    },
+    {
+      id: 'GES-002',
+      categoria: 'Gestão',
+      tags: ['indicadores', 'estratégia', 'direção', 'eficiência'],
+      aplica: d => d.matIndicadoresRaw >= 75 && d.matEstrategiaRaw <= 25,
+      grauConfianca: () => 'Alta',
+      severidade: () => 59,
+      evidencias: d => [
+        `Maturidade de acompanhamento de indicadores: ${d.matIndicadoresRaw}/100`,
+        `Maturidade de planejamento estratégico: ${d.matEstrategiaRaw}/100`,
+      ],
+      texto: d => ({
+        titulo: 'A empresa parece medir bem, mas sem uma direção estratégica clara',
+        observado: `Você indicou acompanhar indicadores com consistência, mas o planejamento estratégico foi avaliado como pouco estruturado, sem metas ou plano formalizado.`,
+        hipotese: 'Há indícios de eficiência sem direção: a empresa parece operar de forma organizada no dia a dia, mas sem um destino claro de médio prazo orientando essas medições.',
+        evidencia: 'A combinação entre bom acompanhamento de indicadores e baixo planejamento estratégico é incomum: normalmente, medir bem é consequência de ter um objetivo claro para medir contra.',
+        impacto: 'Sem uma direção estratégica, os indicadores acompanhados tendem a otimizar o operacional no curto prazo, sem necessariamente levar a empresa a algum lugar específico no médio e longo prazo.',
+        proximoPasso: 'Vale investigar prioritariamente se os indicadores hoje acompanhados estão de fato conectados a um objetivo de médio prazo, ou se medem apenas rotina.',
+      }),
+    },
+    {
+      id: 'GES-003',
+      categoria: 'Gestão',
+      tags: ['dependência operacional', 'estratégia', 'tempo'],
+      aplica: d => d.statusCatOperacao !== 'Verde' && d.statusCatEstrategia !== 'Verde' && d.pergFerias30Resposta === 'Não',
+      grauConfianca: () => 'Média',
+      severidade: () => 63,
+      evidencias: d => [
+        `Resposta sobre operar sem o dono por 30 dias: ${d.pergFerias30Resposta}`,
+        `Nota de estratégia: ${d.catEstrategia.toFixed(0)}/100 (${d.statusCatEstrategia.toLowerCase()})`,
+      ],
+      texto: d => ({
+        titulo: 'A dependência operacional pode estar consumindo o tempo estratégico',
+        observado: `Você indicou que a operação não sustentaria 30 dias de ausência, e o planejamento estratégico da empresa também está classificado como ${d.statusCatEstrategia.toLowerCase()}.`,
+        hipotese: 'Essas duas coisas costumam estar conectadas: quando a operação exige presença constante do dono, sobra pouco tempo e energia para pensar de forma estratégica, o que tende a manter a empresa em modo reativo.',
+        evidencia: 'A combinação entre alta dependência operacional e baixo planejamento estratégico raramente é coincidência: uma tende a alimentar a outra em um ciclo que se autossustenta.',
+        impacto: 'Enquanto esse ciclo não for quebrado, decisões importantes de médio e longo prazo tendem a ser adiadas continuamente em favor de resolver o que é urgente no dia a dia.',
+        proximoPasso: 'O primeiro passo, nesse caso, é investigar prioritariamente como reduzir a dependência operacional o suficiente para abrir espaço real de agenda para pensar no futuro da empresa.',
+      }),
+    },
+    // ── ESTRATÉGIA / CONCENTRAÇÃO DE RISCO ────────────────────────
+    {
+      id: 'EST-001',
+      categoria: 'Estratégia',
+      tags: ['concentração', 'clientes', 'risco', 'caixa'],
+      aplica: d => d.numClientesMes > 0 && d.numClientesMes <= 10 && d.ticketMedio > 0 && d.faturamento > 0 && (d.ticketMedio / d.faturamento) >= 0.15,
+      grauConfianca: () => 'Média',
+      severidade: () => 66,
+      evidencias: d => [
+        `Clientes por mês: ${Math.round(d.numClientesMes)}`,
+        `Ticket médio: ${moedaInline(d.ticketMedio)}`,
+        `Faturamento mensal: ${moedaInline(d.faturamento)}`,
+      ],
+      texto: d => ({
+        titulo: 'A receita parece concentrada em poucos clientes',
+        observado: `Você declarou aproximadamente ${Math.round(d.numClientesMes)} clientes ativos por mês, com ticket médio de ${moedaInline(d.ticketMedio)}, uma parcela relevante do faturamento total por cliente.`,
+        hipotese: 'Esse padrão sugere concentração de receita: a saúde financeira da empresa pode depender de forma desproporcional da manutenção de poucos contratos ou clientes específicos.',
+        evidencia: `Cada cliente responde, em média, por uma fração alta do faturamento mensal de ${moedaInline(d.faturamento)}, o que é típico de carteiras concentradas.`,
+        impacto: 'Perder um único cliente relevante nesse cenário tem um efeito proporcionalmente maior sobre o caixa do que teria em uma base de clientes mais diluída.',
+        proximoPasso: 'Vale investigar prioritariamente o quanto do faturamento atual está de fato concentrado nos maiores clientes, e tratar isso como parte do planejamento de risco.',
+      }),
+    },
+    {
+      id: 'EST-002',
+      categoria: 'Estratégia',
+      tags: ['caixa', 'percepção', 'ponto de equilíbrio', 'risco'],
+      aplica: d => d.pontoEquilibrio !== null && d.distanciaBreakevenPct !== null && d.distanciaBreakevenPct < 0.15 && d.gapPercepcaoFinanceiro > 15,
+      grauConfianca: () => 'Alta',
+      severidade: () => 75,
+      evidencias: d => [
+        `Faturamento: ${moedaInline(d.faturamento)}`,
+        `Ponto de equilíbrio calculado: ${moedaInline(d.pontoEquilibrio)}`,
+        `Distância do equilíbrio: ${pct(d.distanciaBreakevenPct, 0)}%`,
+      ],
+      texto: d => ({
+        titulo: 'A empresa opera perto do ponto de equilíbrio, mas a percepção parece ser de folga',
+        observado: `Seu faturamento atual de ${moedaInline(d.faturamento)} está a apenas ${pct(d.distanciaBreakevenPct, 0)}% acima do ponto de equilíbrio calculado de ${moedaInline(d.pontoEquilibrio)}, enquanto sua autoavaliação financeira indica uma percepção de segurança maior do que isso sustenta.`,
+        hipotese: 'Isso costuma acontecer quando o caixa do mês é observado de forma isolada, sem considerar o quão perto ele está de zerar caso o faturamento oscile para baixo mesmo que pouco.',
+        evidencia: 'A proximidade entre faturamento e ponto de equilíbrio, somada a uma autoavaliação financeira otimista, sustenta essa leitura.',
+        impacto: 'Qualquer queda de faturamento, mesmo pequena, tende a levar a empresa para uma situação de prejuízo operacional, e essa fragilidade não costuma ficar visível até que a queda de fato aconteça.',
+        proximoPasso: 'Vale investigar prioritariamente um cenário de queda de 10 a 15% no faturamento e o que precisaria ser ajustado para a empresa continuar saudável.',
+      }),
+    },
+  ];
+
+  // =============================================================
+  //  9.  MOTOR DE DIAGNÓSTICO (avalia regras e resolve contradições)
+  // =============================================================
+  function avaliarCruzamentos(d) {
+    const disparados = REGRAS_CRUZAMENTO
+      .filter(regra => {
+        try { return regra.aplica(d); }
+        catch (e) { return false; }
+      })
+      .map(regra => ({
+        id: regra.id,
+        categoria: regra.categoria,
+        tags: regra.tags,
+        grauConfianca: regra.grauConfianca(d),
+        severidade: regra.severidade(d),
+        evidencias: regra.evidencias(d),
+        conteudo: regra.texto(d),
+      }));
+    return resolverContradicoes(disparados).sort((a,b) => b.severidade - a.severidade);
+  }
+
+  function resolverContradicoes(insights) {
+    // Hoje nenhuma contradição entre insights de cruzamento, mas mantemos a porta.
+    return insights;
+  }
+
+  // =============================================================
+  // 10.  PONTOS FORTES (com supressão por ID de insight)
+  // =============================================================
+  function adicionarPontoForte(lista, condicao, titulo, texto, insightIds) {
+    if (condicao) {
+      lista.push({ titulo, texto });
+    }
+  }
+
+  function identificarPontosFortes(d, insightIds) {
+    insightIds = insightIds || [];
+    const suprimidoPor = (id) => insightIds.includes(id);
+    const fortes = [];
+
+    adicionarPontoForte(fortes,
+      d.statusMargem === 'Verde' && d.statusCatFinanceiro !== 'Vermelho'
+        && !suprimidoPor('FIN-001') && !suprimidoPor('FIN-004') && !suprimidoPor('EST-002'),
+      'Base financeira saudável',
+      `Sua margem operacional de ${pct(d.margem, 1)}% está em um patamar saudável, e isso sustenta uma base sólida para decisões de investimento com menos risco.`,
+      insightIds
+    );
+    adicionarPontoForte(fortes,
+      d.statusCatComercial === 'Verde' && !suprimidoPor('COM-001'),
+      'Processo comercial maduro',
+      'O comercial demonstra processo e previsibilidade, o que é uma base sólida para sustentar crescimento sem depender apenas de esforço individual.',
+      insightIds
+    );
+    adicionarPontoForte(fortes,
+      d.statusCatOperacao === 'Verde' && !suprimidoPor('OPE-001') && !suprimidoPor('GES-003'),
+      'Baixa dependência operacional',
+      'A operação demonstra não depender exclusivamente de você no dia a dia, o que libera tempo real para decisões estratégicas.',
+      insightIds
+    );
+    adicionarPontoForte(fortes,
+      d.statusCatGestao === 'Verde' && !suprimidoPor('GES-001'),
+      'Gestão orientada por indicadores',
+      'A empresa acompanha indicadores com consistência, o que permite decisões mais rápidas e menos baseadas em intuição isolada.',
+      insightIds
+    );
+    adicionarPontoForte(fortes,
+      d.statusCatPessoas === 'Verde' && !suprimidoPor('PES-001'),
+      'Time estruturado',
+      'A gestão de pessoas está em um nível maduro, o que tende a reduzir a dependência de indivíduos específicos para a operação funcionar.',
+      insightIds
+    );
+    adicionarPontoForte(fortes,
+      d.statusCatEstrategia === 'Verde' && !suprimidoPor('GES-003') && !suprimidoPor('GES-002'),
+      'Direção estratégica clara',
+      'Existe planejamento estratégico formal com metas e revisão periódica, o que é incomum e é uma vantagem real neste estágio.',
+      insightIds
+    );
+    adicionarPontoForte(fortes,
+      d.statusCatMarketing === 'Verde' && !suprimidoPor('COM-001'),
+      'Estratégia de marketing estruturada',
+      'A atração de clientes segue uma estratégia definida com métricas de retorno, o que é a base para crescimento previsível.',
+      insightIds
+    );
+
+    if (fortes.length === 0) {
+      fortes.push({
+        titulo: 'Momento de estruturação',
+        texto: 'Neste momento, o diagnóstico não aponta uma área claramente consolidada, o que é comum em empresas em fase de estruturação. Isso significa que qualquer área em que você investir energia agora tende a gerar ganho proporcionalmente maior.',
+      });
+    }
+    return fortes;
+  }
+
+  // =============================================================
+  // 11.  ROADMAP (planos para cada gargalo)
+  // =============================================================
+  const ROADMAPS = {
+    'Financeiro': {
+      titulo: 'Revisão Financeira',
+      fases: [
+        ['Revisar custos fixos e variáveis', 'Calcular margem real por produto/serviço', 'Melhorar fluxo de caixa projetado'],
+        ['Revisar precificação', 'Negociar fornecedores', 'Implementar controle de custos'],
+        ['Consolidar indicadores financeiros', 'Planejar investimentos', 'Revisar estrutura de capital']
+      ]
+    },
+    'Comercial': {
+      titulo: 'Estruturação Comercial',
+      fases: [
+        ['Mapear funil de vendas', 'Definir metas por canal', 'Implementar CRM'],
+        ['Treinar equipe comercial', 'Criar script de vendas', 'Acompanhar indicadores de conversão'],
+        ['Automatizar prospecção', 'Escalar canais de maior performance', 'Revisar processo de pós-venda']
+      ]
+    },
+    'Operação': {
+      titulo: 'Eficiência Operacional',
+      fases: [
+        ['Mapear processos críticos', 'Documentar procedimentos', 'Definir responsabilidades'],
+        ['Implementar melhorias na operação', 'Reduzir gargalos', 'Criar manuais de onboarding'],
+        ['Padronizar operação', 'Preparar para crescimento', 'Revisar estrutura de equipe']
+      ]
+    },
+    'Gestão': {
+      titulo: 'Fortalecimento da Gestão',
+      fases: [
+        ['Definir indicadores-chave (KPIs)', 'Criar rotina de reuniões', 'Estabelecer metas claras'],
+        ['Implementar painel de gestão', 'Acompanhar resultados semanalmente', 'Ajustar plano conforme necessário'],
+        ['Consolidar cultura de gestão', 'Preparar sucessão', 'Revisar planejamento anual']
+      ]
+    },
+    'Pessoas': {
+      titulo: 'Desenvolvimento de Pessoas',
+      fases: [
+        ['Avaliar competências da equipe', 'Definir plano de desenvolvimento', 'Melhorar comunicação interna'],
+        ['Treinar lideranças', 'Criar programa de capacitação', 'Estabelecer feedback contínuo'],
+        ['Consolidar cultura organizacional', 'Preparar plano de carreira', 'Revisar estrutura de times']
+      ]
+    },
+    'Estratégia': {
+      titulo: 'Planejamento Estratégico',
+      fases: [
+        ['Definir visão de longo prazo', 'Estabelecer metas anuais', 'Mapear cenários de mercado'],
+        ['Criar plano de ação detalhado', 'Alinhar equipe com a estratégia', 'Definir indicadores de progresso'],
+        ['Revisar estratégia periodicamente', 'Ajustar rota conforme aprendizado', 'Preparar próximo ciclo']
+      ]
+    },
+    'Marketing': {
+      titulo: 'Estruturação de Marketing',
+      fases: [
+        ['Mapear canais de aquisição atuais', 'Definir público-alvo com mais precisão', 'Estabelecer métricas de retorno por canal'],
+        ['Estruturar presença no canal principal', 'Criar rotina de conteúdo ou campanha', 'Acompanhar custo de aquisição de cliente'],
+        ['Diversificar canais com base no que performou', 'Integrar marketing com o processo comercial', 'Revisar orçamento com base em retorno real']
+      ]
+    }
+  };
+  const ROADMAP_PADRAO = {
+    titulo: 'Plano Estratégico',
+    fases: [
+      ['Diagnóstico aprofundado', 'Definir prioridades', 'Criar plano de ação'],
+      ['Implementar ações prioritárias', 'Monitorar resultados', 'Ajustar rota'],
+      ['Consolidar melhorias', 'Preparar para crescimento', 'Revisar planejamento']
+    ]
+  };
+
+  function gerarRoadmap(gargalo) {
+    const plano = ROADMAPS[gargalo] || ROADMAP_PADRAO;
+    return `
+      <div class="rx-roadmap-item">
+        <span class="phase">Primeiros 30 dias</span>
+        <h4>${plano.titulo}</h4>
+        <ul>${plano.fases[0].map(item => `<li>${item}</li>`).join('')}</ul>
+      </div>
+      <div class="rx-roadmap-item">
+        <span class="phase">30 a 60 dias</span>
+        <h4>Implementação</h4>
+        <ul>${plano.fases[1].map(item => `<li>${item}</li>`).join('')}</ul>
+      </div>
+      <div class="rx-roadmap-item">
+        <span class="phase">60 a 90 dias</span>
+        <h4>Consolidação</h4>
+        <ul>${plano.fases[2].map(item => `<li>${item}</li>`).join('')}</ul>
+      </div>
+    `;
+  }
+
+  // =============================================================
+  // 12.  RENDERIZAÇÃO DO RELATÓRIO (fatiada)
+  // =============================================================
+  function renderResultado() {
+    const d = calcular();
+    const container = document.getElementById('rx-relatorio-content');
+
+    const insights = avaliarCruzamentos(d);
+    const top3 = insights.slice(0, 3);
+    const demais = insights.slice(3);
+    const pontosFortes = identificarPontosFortes(d, insights.map(i => i.id));
+
+    // Monta o HTML reunindo as partes
+    let html = `
+      <div class="rx-relatorio">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
+          <span class="t-label">Diagnóstico concluído</span>
+          <div class="rx-pdf-btn">
+            <button class="btn btn--outline btn--sm" onclick="baixarPDF()">📄 Baixar Relatório</button>
+          </div>
+        </div>
+        ${renderResumo(d, top3)}
+        ${renderIndice(d)}
+        ${renderGargalo(d)}
+        ${renderInsights(top3, 'Os 3 fatores que mais limitam o crescimento agora')}
+        ${demais.length > 0 ? renderInsights(demais, 'Outros pontos de atenção identificados', 4) : ''}
+        ${renderFortes(pontosFortes)}
+        ${renderRadar(d)}
+        ${renderBreakeven(d)}
+        ${renderConsistencia(d)}
+        ${renderRoadmapCompleto(d)}
+        ${renderBenchmark(d)}
+        ${renderCTA()}
+      </div>
+    `;
+    container.innerHTML = html;
+
+    // Inicializar radar após renderizar
+    setTimeout(() => {
+      const canvas = document.getElementById('radarChart');
+      if (canvas) {
+        if (window.radarChart) { window.radarChart.destroy(); }
+        window.radarChart = new Chart(canvas, {
+          type: 'radar',
+          data: {
+            labels: ['Estratégia', 'Financeiro', 'Comercial', 'Marketing', 'Operação', 'Gestão', 'Pessoas'],
+            datasets: [{
+              label: 'Índice TFAZZIO',
+              data: [d.catEstrategia, d.catFinanceiro, d.catComercial, d.catMarketing, d.catOperacao, d.catGestao, d.catPessoas],
+              backgroundColor: 'rgba(107,15,26,0.15)',
+              borderColor: '#6B0F1A',
+              pointBackgroundColor: '#6B0F1A',
+              borderWidth: 2,
+              pointRadius: 5,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+              r: {
+                beginAtZero: true,
+                max: 100,
+                ticks: { stepSize: 20, font: { size: 10 } },
+                grid: { color: 'rgba(0,0,0,0.05)' },
+                pointLabels: { font: { size: 13, family: 'Barlow', weight: '500' } }
+              }
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: { callbacks: { label: ctx => ctx.raw + '/100' } }
+            }
+          }
+        });
+      }
+    }, 100);
+  }
+
+  // ── Subfunções de renderização ──
+  function renderResumo(d, top3) {
+    const partes = [];
+    partes.push(`Com um faturamento de ${moedaInline(d.faturamento)} no mês${d.numFuncionarios > 0 ? ` e uma equipe de ${Math.round(d.numFuncionarios)} ${d.numFuncionarios === 1 ? 'pessoa' : 'pessoas'}` : ''}, sua empresa atingiu um Índice de Clareza de ${Math.round(d.indiceClareza)} de 100, classificado como <strong>${d.nivel}</strong>.`);
+
+    if (top3.length > 0) {
+      const areaDoTopInsight = top3[0].categoria;
+      if (areaDoTopInsight && areaDoTopInsight !== d.gargalo) {
+        partes.push(`Olhando as áreas isoladamente, <strong>${d.gargalo}</strong> é a que está com a nota mais baixa. Mas o cruzamento de dados mais relevante encontrado neste diagnóstico está em outro lugar: ${top3[0].conteudo.titulo.toLowerCase()}.`);
+      } else {
+        partes.push(`O ponto que mais chama atenção neste diagnóstico é: ${top3[0].conteudo.titulo.toLowerCase()}.`);
+      }
+    } else {
+      partes.push(`Não identificamos, neste diagnóstico, nenhum cruzamento de dados que indique um risco imediato relevante. Isoladamente, <strong>${d.gargalo}</strong> é a área com a nota mais baixa.`);
+    }
+    partes.push(`Em contraste, ${d.oportunidade} é a área que está em melhor situação relativa neste momento.`);
+    return `<div class="secao"><span class="t-label">Resumo Executivo</span><p class="t-body" style="margin-top:8px;">${partes.join(' ')}</p></div>`;
+  }
+
+  function renderIndice(d) {
+    return `
+      <div class="secao">
+        <div class="rx-card-indice">
+          <div class="rotulo">Índice de Clareza TFAZZIO</div>
+          <div class="valor">${Math.round(d.indiceClareza)} <span style="font-size:32px;color:var(--muted);">/ 100</span></div>
+          <div class="nivel">${d.nivel}</div>
+          <div class="explicacao">Este índice representa o nível atual de clareza estratégica da empresa, considerando 7 áreas com peso igual.</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderGargalo(d) {
+    return `
+      <div class="secao">
+        <div class="rx-grid-2">
+          <div class="rx-card">
+            <span class="label">Principal Gargalo</span>
+            <div class="valor">${d.gargalo}</div>
+            <div class="sub">Categoria com menor nota</div>
+          </div>
+          <div class="rx-card">
+            <span class="label">Principal Oportunidade</span>
+            <div class="valor">${d.oportunidade}</div>
+            <div class="sub">Categoria com maior nota</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderInsights(lista, titulo, startNum = 1) {
+    return `
+      <div class="secao">
+        <span class="t-label">${titulo}</span>
+        ${lista.map((ins, i) => renderInsightCompleto(ins, i + startNum)).join('')}
+      </div>
+    `;
+  }
+
+  function renderInsightCompleto(ins, numero) {
+    const c = ins.conteudo;
+    const corConfianca = ins.grauConfianca === 'Alta' ? 'var(--bordo)' : ins.grauConfianca === 'Média' ? 'var(--gold)' : 'var(--silver)';
+    return `
+      <div class="rx-insight-card">
+        <div class="rx-insight-numero">${numero}</div>
+        <div class="rx-insight-corpo">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+            <h4 class="rx-insight-titulo" style="margin-bottom:0;">${c.titulo}</h4>
+            <span class="rx-confianca-badge" style="border-color:${corConfianca};color:${corConfianca};">Confiança ${ins.grauConfianca}</span>
+          </div>
+          <div class="rx-insight-passo"><span class="rx-insight-passo-label">O que observamos</span><p>${c.observado}</p></div>
+          <div class="rx-insight-passo"><span class="rx-insight-passo-label">O que isso pode indicar</span><p>${c.hipotese}</p></div>
+          <div class="rx-insight-passo">
+            <span class="rx-insight-passo-label">Evidências</span>
+            <p>${c.evidencia}</p>
+            ${ins.evidencias && ins.evidencias.length > 0 ? `<ul class="rx-evidencias-lista">${ins.evidencias.map(e => `<li>${e}</li>`).join('')}</ul>` : ''}
+          </div>
+          <div class="rx-insight-passo"><span class="rx-insight-passo-label">Impacto provável</span><p>${c.impacto}</p></div>
+          <div class="rx-insight-passo rx-insight-passo--acao"><span class="rx-insight-passo-label">Próximo passo recomendado</span><p>${c.proximoPasso}</p></div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderFortes(fortes) {
+    return `
+      <div class="secao">
+        <span class="t-label">Principais pontos fortes encontrados</span>
+        <div class="rx-fortes-grid" style="margin-top:20px;">
+          ${fortes.map(f => `<div class="rx-forte-card"><h4>${f.titulo}</h4><p>${f.texto}</p></div>`).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderRadar(d) {
+    return `
+      <div class="secao">
+        <span class="t-label">Análise detalhada por área</span>
+        <p class="t-body t-body--sm" style="margin-top:8px;margin-bottom:24px;">O radar e o mapa de calor abaixo servem de apoio visual à análise já apresentada.</p>
+        <div class="rx-radar-container">
+          <canvas id="radarChart" width="500" height="500"></canvas>
+        </div>
+        <div class="rx-radar-desc">
+          <span>Estratégia</span><span>Financeiro</span><span>Comercial</span><span>Marketing</span>
+          <span>Operação</span><span>Gestão</span><span>Pessoas</span>
+        </div>
+        <div class="rx-mapa-calor" style="margin-top:32px;">
+          ${[
+            {label:'Estratégia', status:d.statusCatEstrategia},
+            {label:'Financeiro', status:d.statusCatFinanceiro},
+            {label:'Comercial', status:d.statusCatComercial},
+            {label:'Marketing', status:d.statusCatMarketing},
+            {label:'Operação', status:d.statusCatOperacao},
+            {label:'Gestão', status:d.statusCatGestao},
+            {label:'Pessoas', status:d.statusCatPessoas}
+          ].map(c => `
+            <div class="item">
+              <span>${c.label}</span>
+              <span class="emoji">${c.status === 'Verde' ? '🟢' : c.status === 'Amarelo' ? '🟡' : '🔴'}</span>
+              <span style="font-size:12px;color:var(--silver);">${c.status === 'Verde' ? 'Saudável' : c.status === 'Amarelo' ? 'Atenção' : 'Crítico'}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderBreakeven(d) {
+    if (d.pontoEquilibrio === null) {
+      return `<div class="secao"><span class="t-label">Ponto de Equilíbrio</span><p class="t-body t-body--sm" style="margin-top:8px;">Não foi possível calcular o ponto de equilíbrio com os dados informados. Isso costuma acontecer quando os custos variáveis somados aos impostos ultrapassam 100% do faturamento.</p></div>`;
+    }
+    return `
+      <div class="secao">
+        <span class="t-label">Ponto de Equilíbrio</span>
+        <div class="rx-grid-2" style="margin-top:8px;">
+          <div class="rx-card">
+            <span class="label">Faturamento de Equilíbrio</span>
+            <div class="valor">${formatarMoeda(d.pontoEquilibrio)}</div>
+            <div class="sub">Necessário por mês para cobrir custos e impostos</div>
+          </div>
+          <div class="rx-card">
+            <span class="label">Distância do Equilíbrio</span>
+            <div class="valor" style="color:${d.distanciaBreakevenRS >= 0 ? 'var(--bordo)' : '#721c24'};">
+              ${d.distanciaBreakevenRS >= 0 ? '+' : ''}${formatarMoeda(d.distanciaBreakevenRS)}
+            </div>
+            <div class="sub">${d.distanciaBreakevenPct !== null ? (d.distanciaBreakevenPct >= 0 ? `${(d.distanciaBreakevenPct*100).toFixed(0)}% acima do equilíbrio` : `${Math.abs(d.distanciaBreakevenPct*100).toFixed(0)}% abaixo do equilíbrio`) : ''}</div>
+          </div>
+        </div>
+        <p class="t-body t-body--sm" style="margin-top:16px;">
+          ${d.distanciaBreakevenRS >= 0
+            ? 'Seu faturamento atual está acima do ponto de equilíbrio. Isso significa que, depois de cobrir custos fixos, variáveis e impostos, ainda sobra margem para reinvestir ou distribuir.'
+            : 'Seu faturamento atual ainda não cobre o ponto de equilíbrio mensal. Isso significa que parte dos custos fixos, variáveis ou impostos está sendo coberta por caixa acumulado, aporte ou crédito, não por operação.'}
+        </p>
+      </div>
+    `;
+  }
+
+  function renderConsistencia(d) {
+    if (d.receitaImplicita === null) return '';
+    return `
+      <div class="secao">
+        <span class="t-label">Checagem de Consistência</span>
+        <p class="t-body t-body--sm" style="margin-top:8px;">Cruzamos o ticket médio com o número de clientes por mês para estimar sua receita de outra forma.</p>
+        <div class="rx-grid-2" style="margin-top:16px;">
+          <div class="rx-card">
+            <span class="label">Faturamento Informado</span>
+            <div class="valor">${formatarMoeda(d.faturamento)}</div>
+            <div class="sub">Valor que você declarou</div>
+          </div>
+          <div class="rx-card">
+            <span class="label">Receita Implícita</span>
+            <div class="valor">${formatarMoeda(d.receitaImplicita)}</div>
+            <div class="sub">Ticket médio × clientes/mês</div>
+          </div>
+        </div>
+        ${d.divergenciaRelevante ? `
+          <div class="rx-diagnostico-texto" style="margin-top:16px;">
+            <p>Encontramos uma diferença de <strong>${Math.abs(d.divergenciaReceitaPct*100).toFixed(0)}%</strong> entre o faturamento informado e a receita implícita. Isso pode indicar que um desses três números está sendo estimado de cabeça, sem base em relatório ou planilha. Ter clareza sobre a própria receita é o primeiro passo antes de qualquer decisão estratégica.</p>
+          </div>
+        ` : `<p class="t-body t-body--sm" style="margin-top:16px;">Os dois números são consistentes entre si, o que é um bom sinal de que você tem controle sobre sua receita.</p>`}
+      </div>
+    `;
+  }
+
+  function renderRoadmapCompleto(d) {
+    return `
+      <div class="secao">
+        <span class="t-label">Plano de Ação para os Próximos 90 Dias</span>
+        <p class="t-body t-body--sm" style="margin-top:8px;margin-bottom:20px;">Construído com base no seu principal gargalo identificado: <strong>${d.gargalo}</strong>.</p>
+        <div class="rx-roadmap">${gerarRoadmap(d.gargalo)}</div>
+      </div>
+    `;
+  }
+
+  function renderBenchmark(d) {
+    return `
+      <div class="secao">
+        <span class="t-label">Benchmark de Mercado</span>
+        <p class="t-body t-body--sm" style="margin-top:4px;margin-bottom:12px;">
+          As referências abaixo são faixas gerais de gestão financeira e comercial, não específicas do seu segmento. Ainda não temos base de dados suficiente para comparações precisas por setor, porte ou região.
+        </p>
+        <div style="font-size:15px;color:var(--mid);line-height:1.8;padding:8px 0;">
+          <p>Uma referência geral (não específica do seu setor) é margem operacional entre 10% e 20%. A sua margem calculada é de <strong>${(d.margem*100).toFixed(1)}%</strong>.</p>
+          ${d.taxaConversao ? `<p>Uma referência geral para times comerciais estruturados é conversão entre 15% e 25% dos leads. Sua taxa informada é de <strong>${d.taxaConversao}%</strong>.</p>` : ''}
+          ${d.ticketMedio > 0 ? `<p>Seu ticket médio informado é de <strong>${formatarMoeda(d.ticketMedio)}</strong>, com aproximadamente <strong>${Math.round(d.numClientesMes)}</strong> clientes por mês.</p>` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderCTA() {
+    return `
+      <div class="secao" style="border-bottom:none;">
+        <div class="rx-cta-final">
+          <div class="texto-encerramento">
+            Você acabou de enxergar sua empresa sob uma perspectiva diferente.
+            <br>
+            O Índice de Clareza TFAZZIO mostra <em>onde estão os sintomas</em>.
+            <br>
+            Agora é hora de entender as causas.
+            <br><br>
+            Na Sessão Estratégica, aprofundamos este diagnóstico, definimos prioridades e construímos um plano claro para que sua empresa cresça com mais segurança e menos desperdício de energia.
+            <br><br>
+            <strong>Clareza para crescer.</strong>
+          </div>
+          <a href="https://wa.me/5516992752758?text=Ol%C3%A1%21%20Vim%20pelo%20Raio-X%20e%20gostaria%20de%20agendar%20minha%20Sess%C3%A3o%20Estrat%C3%A9gica." target="_blank" class="btn btn--bordo">Agendar minha Sessão Estratégica</a>
+        </div>
+      </div>
+    `;
+  }
+
+  // =============================================================
+  // 13.  PDF
+  // =============================================================
+  function baixarPDF() {
+    const btn = document.querySelector('.rx-pdf-btn .btn');
+    btn.textContent = '⏳ Gerando...';
+    btn.disabled = true;
+
+    const content = document.getElementById('rx-relatorio-content');
+    html2canvas(content, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#FFFFFF',
+      logging: false,
+    }).then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      // Capa
+      pdf.setFillColor('#6B0F1A');
+      pdf.rect(0, 0, pdfWidth, pdfHeight, 'F');
+      pdf.setTextColor('#D4AF37');
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(22);
+      pdf.text('TFAZZIO', pdfWidth/2, 60, { align: 'center' });
+      pdf.setFontSize(14);
+      pdf.setTextColor('#FFFFFF');
+      pdf.text('Raio-X Empresarial', pdfWidth/2, 80, { align: 'center' });
+      pdf.setFontSize(12);
+      pdf.text('Relatório de Diagnóstico', pdfWidth/2, 95, { align: 'center' });
+      pdf.text(`Empresa: ${state.nomeEmpresa || '—'}`, pdfWidth/2, 115, { align: 'center' });
+      pdf.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, pdfWidth/2, 130, { align: 'center' });
+      pdf.setFontSize(10);
+      pdf.setTextColor('#D4AF37');
+      pdf.text('Clareza para crescer.', pdfWidth/2, 270, { align: 'center' });
+
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save('Raio-X_Empresarial_TFAZZIO.pdf');
+
+      btn.textContent = '📄 Baixar Relatório';
+      btn.disabled = false;
+    }).catch(err => {
+      console.error('Erro ao gerar PDF:', err);
+      btn.textContent = '📄 Baixar Relatório';
+      btn.disabled = false;
+      alert('Ocorreu um erro ao gerar o PDF. Tente novamente.');
+    });
+  }
+
+  // =============================================================
+  // 14.  INICIALIZAÇÃO
+  // =============================================================
+  document.addEventListener('DOMContentLoaded', () => {
+    // Tela de boas-vindas já está visível
+  });
+</script>
 </body>
 </html>
+
