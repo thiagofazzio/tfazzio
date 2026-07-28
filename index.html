@@ -1865,7 +1865,44 @@
   </div>
 </section>
 
+<!-- ══ DIAGNÓSTICO RÁPIDO (TESTE DO MOTOR) ════════════════════ -->
+<section class="section" style="background:var(--cream);" id="teste">
+  <div class="wrap">
+    <span class="t-label">Teste nosso motor</span>
+    <h2 class="t-display t-display--lg">Descubra os dados públicos<br>de uma empresa <em>em segundos</em></h2>
+    <p class="t-body" style="max-width:560px; margin-top:20px;">
+      Digite um CNPJ válido (apenas números) e veja como nosso motor consulta a BrasilAPI e retorna informações estruturadas.
+    </p>
 
+    <div style="max-width:600px; margin-top:48px; background:var(--white); padding:40px; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.04);">
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <input
+          type="text"
+          id="cnpjTest"
+          placeholder="Ex: 05789313000194"
+          style="flex:1; min-width:200px; padding:14px 18px; border:1px solid var(--cream-mid); border-radius:4px; font-family:'Barlow',sans-serif; font-size:15px;"
+        />
+        <button
+          id="btnTestar"
+          style="background:var(--bordo); color:white; border:none; padding:14px 32px; border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:600; letter-spacing:2px; cursor:pointer; transition:background 0.2s;"
+          onmouseover="this.style.background='var(--bordo-mid)'"
+          onmouseout="this.style.background='var(--bordo)'"
+        >
+          Analisar
+        </button>
+      </div>
+
+      <div id="resultadoTeste" style="margin-top:28px; background:var(--off); padding:20px; border-radius:4px; font-size:14px; color:var(--mid); line-height:1.7; max-height:400px; overflow-y:auto; white-space:pre-wrap; font-family:monospace; border:1px solid var(--cream-mid);">
+        Aguardando consulta...
+      </div>
+
+      <p style="font-size:12px; color:var(--silver); margin-top:16px;">
+        ⚡ Dados obtidos via BrasilAPI — <a href="https://brasilapi.com.br" target="_blank" style="color:var(--bordo);">brasilapi.com.br</a>
+      </p>
+    </div>
+  </div>
+</section>
+  
 <!-- ══ EBOOK (compacto, não compete com CTA principal) ══════════ -->
 <section class="ebook" id="ebook">
   <div class="wrap">
@@ -1966,6 +2003,39 @@
     .then(() => { form.style.display = 'none'; sucesso.style.display = 'block'; })
     .catch(() => { form.style.display = 'none'; sucesso.style.display = 'block'; });
   }
+  // Teste do motor CNPJ
+  document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('btnTestar');
+    const input = document.getElementById('cnpjTest');
+    const resultado = document.getElementById('resultadoTeste');
+
+    if (btn && input && resultado) {
+      btn.addEventListener('click', function() {
+        const cnpj = input.value.replace(/\D/g, '');
+        if (cnpj.length !== 14) {
+          resultado.innerText = '⚠️ CNPJ inválido. Digite 14 números.';
+          return;
+        }
+
+        resultado.innerText = '⏳ Buscando dados...';
+        const url = `https://motor-tfazzio.onrender.com/enrich?cnpj=${cnpj}`;
+
+        fetch(url)
+          .then(response => response.json())
+          .then(data => {
+            if (data.erro) {
+              resultado.innerText = '❌ Erro: ' + data.erro;
+            } else {
+              const formatado = JSON.stringify(data, null, 2);
+              resultado.innerText = formatado;
+            }
+          })
+          .catch(err => {
+            resultado.innerText = '❌ Falha na conexão: ' + err.message;
+          });
+      });
+    }
+  });
 </script>
 
 </body>
