@@ -1,37 +1,33 @@
+import os
+import sqlite3
+import re
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import re
-import sqlite3
-import os
-import json
-from datetime import datetime
-
-# Importa os módulos do motor
 from enriquecimento_automatico import enriquecer_cnpj
 
-# Importa o pipeline real (agora disponível)
-from engine import pipeline, db
+# Importa o pipeline real
+import engine.pipeline as pipeline
+from engine import db
 
 app = Flask(__name__)
 CORS(app)
 
-# Banco de dados SQLite (criado na pasta do app)
-DB_PATH = os.path.join(os.path.dirname(__file__), 'tfazzio.db')
+# Define o caminho do banco de dados (persistente no Render)
+DB_PATH = os.environ.get('DATABASE_URL', 'tfazzio.db')
+if DB_PATH.startswith('sqlite:///'):
+    DB_PATH = DB_PATH.replace('sqlite:///', '')
 
 def get_conn():
+    """Retorna uma conexão com o banco SQLite."""
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
+# --- Função que orquestra o pipeline completo ---
 def executar_pipeline_completo(dados_publicos, dados_usuario):
-    """
-    Executa todo o pipeline do início ao fim, com tratamento de cada módulo.
-    Retorna o diagnóstico estruturado ou um status com pendências.
-    """
     conn = get_conn()
-
-    # --- 1. Entrada ---
     try:
+        # 1. Entrada
         caso_id = pipeline.entrada(
             conn,
             cnpj=dados_publicos.get("cnpj"),
@@ -40,9 +36,9 @@ def executar_pipeline_completo(dados_publicos, dados_usuario):
         )
     except Exception as e:
         conn.close()
-        return {"erro": f"Entrada: {str(e)}"}
+        return {"erro": f"Erro na entrada: {str(e)}"}
 
-    # --- 1b. Verificar objetivo (gate) ---
+    # 1b. Verificar objetivo
     objetivo_claro = pipeline.verificar_objetivo(conn, caso_id)
     if not objetivo_claro:
         conn.close()
@@ -51,37 +47,37 @@ def executar_pipeline_completo(dados_publicos, dados_usuario):
             "mensagem": "O objetivo declarado é amplo demais. Por favor, refine-o."
         }
 
-    # --- 2. Enriquecimento (mockado – usa dados_publicos) ---
+    # 2. Enriquecimento
     try:
         resultado_enriquecimento = pipeline.enriquecimento(conn, caso_id, dados_publicos)
         if not resultado_enriquecimento.get("congruente", True):
             conn.close()
             return {
                 "status": "calibracao_necessaria",
-                "mensagem": "Divergência no modelo de receita. Responda a pergunta de calibração."
+                "mensagem": "Há divergência entre o modelo de receita informado e os dados públicos."
             }
     except Exception as e:
         conn.close()
-        return {"erro": f"Enriquecimento: {str(e)}"}
+        return {"erro": f"Erro no enriquecimento: {str(e)}"}
 
-    # --- 3. Normalização ---
+    # 3. Normalização
     try:
         pipeline.normalizacao(conn, caso_id)
     except Exception as e:
         conn.close()
-        return {"erro": f"Normalização: {str(e)}"}
+        return {"erro": f"Erro na normalização: {str(e)}"}
 
-    # --- 4. Contextualização ---
+    # 4. Contextualização
     try:
         pipeline.contextualizacao(conn, caso_id)
     except Exception as e:
         conn.close()
-        return {"erro": f"Contextualização: {str(e)}"}
+        return {"erro": f"Erro na contextualização: {str(e)}"}
 
-    # --- 5. Seleção de Hipóteses ---
+    # 5. Seleção de Hipóteses
     try:
-        hipoteses = pipeline.selecao_hipoteses(conn, caso_id)
-        if not hipoteses:
+        hipoteses_selecionadas = pipeline.selecao_hipoteses(conn, caso_id)
+        if not hipoteses_selecionadas:
             conn.close()
             return {
                 "status": "sem_hipotese_aplicavel",
@@ -89,14 +85,13 @@ def executar_pipeline_completo(dados_publicos, dados_usuario):
             }
     except Exception as e:
         conn.close()
-        return {"erro": f"Seleção de hipóteses: {str(e)}"}
+        return {"erro": f"Erro na seleção de hipóteses: {str(e)}"}
 
-    # --- 6. Investigação ---
+    # 6. Investigação (considera respostas do usuário)
     respostas = dados_usuario.get("respostas", {})
     try:
-        concluido, novas_hipoteses = pipeline.investigacao(conn, caso_id, respostas)
-        if not concluido:
-            # Há perguntas pendentes
+        investigacao_concluida, novas_hipoteses = pipeline.investigacao(conn, caso_id, respostas)
+        if not investigacao_concluida:
             pendentes = conn.execute(
                 "SELECT * FROM pergunta WHERE caso_id=? AND estado='pendente'", (caso_id,)
             ).fetchall()
@@ -107,22 +102,22 @@ def executar_pipeline_completo(dados_publicos, dados_usuario):
             }
     except Exception as e:
         conn.close()
-        return {"erro": f"Investigação: {str(e)}"}
+        return {"erro": f"Erro na investigação: {str(e)}"}
 
-    # --- 7. Cálculo de Certeza ---
+    # 7. Cálculo de Certeza
     try:
         certeza_suficiente = pipeline.calculo_certeza(conn, caso_id)
         if not certeza_suficiente:
             conn.close()
             return {
                 "status": "certeza_insuficiente",
-                "mensagem": "Nenhuma hipótese atingiu certeza suficiente."
+                "mensagem": "Nenhuma hipótese atingiu nível de certeza suficiente para decisão."
             }
     except Exception as e:
         conn.close()
-        return {"erro": f"Cálculo de certeza: {str(e)}"}
+        return {"erro": f"Erro no cálculo de certeza: {str(e)}"}
 
-    # --- 8. Priorização ---
+    # 8. Priorização
     try:
         pma_id = pipeline.priorizacao(conn, caso_id)
         if not pma_id:
@@ -133,34 +128,34 @@ def executar_pipeline_completo(dados_publicos, dados_usuario):
             }
     except Exception as e:
         conn.close()
-        return {"erro": f"Priorização: {str(e)}"}
+        return {"erro": f"Erro na priorização: {str(e)}"}
 
-    # --- 9. Decisão ---
+    # 9. Decisão
     try:
         dec_id = pipeline.decisao(conn, caso_id)
         if not dec_id:
             conn.close()
             return {
                 "status": "sem_padrao_de_decisao",
-                "mensagem": "A hipótese vencedora não possui padrão de decisão catalogado."
+                "mensagem": "A hipótese vencedora não possui um padrão de decisão catalogado."
             }
     except Exception as e:
         conn.close()
-        return {"erro": f"Decisão: {str(e)}"}
+        return {"erro": f"Erro na decisão: {str(e)}"}
 
-    # --- 10. Plano de Ação ---
+    # 10. Plano de Ação
     try:
-        plano_id = pipeline.plano_acao(conn, caso_id)
+        pipeline.plano_acao(conn, caso_id)
     except Exception as e:
         conn.close()
-        return {"erro": f"Plano de ação: {str(e)}"}
+        return {"erro": f"Erro no plano de ação: {str(e)}"}
 
-    # --- 11. Saída ---
+    # 11. Saída
     try:
         resultado = pipeline.saida(conn, caso_id)
     except Exception as e:
         conn.close()
-        return {"erro": f"Saída: {str(e)}"}
+        return {"erro": f"Erro na saída: {str(e)}"}
 
     conn.close()
     return resultado
@@ -171,9 +166,11 @@ def enrich():
     cnpj = request.args.get('cnpj')
     if not cnpj:
         return jsonify({"erro": "CNPJ não informado"}), 400
+
     cnpj_limpo = re.sub(r'\D', '', cnpj)
     if len(cnpj_limpo) != 14:
         return jsonify({"erro": "CNPJ deve ter 14 dígitos"}), 400
+
     try:
         resultado = enriquecer_cnpj(cnpj_limpo)
         return jsonify(resultado)
@@ -190,11 +187,12 @@ def diagnose():
     cnpj = data.get('cnpj')
     if not cnpj:
         return jsonify({"erro": "CNPJ é obrigatório"}), 400
+
     cnpj_limpo = re.sub(r'\D', '', cnpj)
     if len(cnpj_limpo) != 14:
         return jsonify({"erro": "CNPJ inválido"}), 400
 
-    # Busca dados públicos
+    # 1. Busca dados públicos
     try:
         dados_publicos = enriquecer_cnpj(cnpj_limpo)
         if "erro" in dados_publicos:
@@ -202,7 +200,7 @@ def diagnose():
     except Exception as e:
         return jsonify({"erro": f"Erro ao buscar CNPJ: {str(e)}"}), 500
 
-    # Monta dados do usuário
+    # 2. Dados do usuário
     dados_usuario = {
         "faturamento_anual": data.get('faturamento'),
         "numero_funcionarios": data.get('equipe'),
@@ -211,7 +209,7 @@ def diagnose():
         "respostas": data.get('respostas', {})
     }
 
-    # Executa o pipeline real
+    # 3. Executa o pipeline
     try:
         diagnostico = executar_pipeline_completo(dados_publicos, dados_usuario)
         return jsonify(diagnostico)
@@ -220,15 +218,16 @@ def diagnose():
 
 
 if __name__ == '__main__':
-    # Inicializa o banco de dados (se não existir)
-    if not os.path.exists(DB_PATH):
-        try:
-            # Tenta usar db.init_db se existir
-            init_func = getattr(db, 'init_db', None)
-            if callable(init_func):
-                conn = get_conn()
-                init_func(conn)
-                conn.close()
-        except Exception as e:
-            print("Erro ao inicializar banco:", e)
+    # Inicializa o banco de dados com as tabelas (CRÍTICO)
+    print("Inicializando banco de dados...")
+    try:
+        conn = get_conn()
+        db.init_db(conn)
+        conn.close()
+        print("Banco de dados inicializado com sucesso.")
+    except Exception as e:
+        print(f"ERRO ao inicializar banco: {e}")
+        # Mesmo com erro, tenta rodar o app – o erro será capturado nas rotas
+
+    # Roda o servidor
     app.run(host='0.0.0.0', port=5000, debug=True)
