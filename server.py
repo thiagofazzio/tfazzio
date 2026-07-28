@@ -1,19 +1,179 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import re
+import sqlite3
+import os
+import json
+from datetime import datetime
 
 # Importa os módulos do motor
 from enriquecimento_automatico import enriquecer_cnpj
 
-# Importa o pipeline (a "cabeça" do motor)
-try:
-    from engine.pipeline import executar_pipeline
-except ImportError:
-    # Fallback caso o pipeline ainda não esteja 100% integrado
-    executar_pipeline = None
+# Importa o pipeline real
+import engine.pipeline as pipeline
+from engine import db
 
 app = Flask(__name__)
 CORS(app)
+
+# Banco de dados (será criado na pasta /tmp no Render)
+DB_PATH = os.environ.get('DATABASE_URL', 'tfazzio.db')
+if DB_PATH.startswith('sqlite:///'):
+    DB_PATH = DB_PATH.replace('sqlite:///', '')
+
+def get_conn():
+    """Retorna uma conexão com o banco SQLite."""
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+# --- Função que orquestra o pipeline completo ---
+def executar_pipeline_completo(dados_publicos, dados_usuario):
+    """
+    Executa todo o pipeline (módulos 1 a 11) usando a lógica real.
+    Retorna o diagnóstico estruturado.
+    """
+    conn = get_conn()
+
+    # 1. Entrada
+    try:
+        caso_id = pipeline.entrada(
+            conn,
+            cnpj=dados_publicos.get("cnpj"),
+            modelo_receita_percebido=dados_usuario.get("modelo_receita_percebido", "indeterminado"),
+            objetivo_empresarial=dados_usuario.get("desafio_atual", "melhorar resultados")
+        )
+    except Exception as e:
+        conn.close()
+        return {"erro": f"Erro na entrada: {str(e)}"}
+
+    # 1b. Verificar objetivo (gate)
+    objetivo_claro = pipeline.verificar_objetivo(conn, caso_id)
+    if not objetivo_claro:
+        # Objetivo pouco claro – pede reconciliação (aqui poderíamos devolver pergunta)
+        conn.close()
+        return {
+            "status": "objetivo_pouco_claro",
+            "mensagem": "O objetivo declarado é amplo demais. Por favor, refine-o."
+        }
+
+    # 2. Enriquecimento (mockado – usa dados_publicos)
+    try:
+        resultado_enriquecimento = pipeline.enriquecimento(conn, caso_id, dados_publicos)
+        if not resultado_enriquecimento.get("congruente", True):
+            # Divergência no modelo de receita – pede calibração
+            conn.close()
+            return {
+                "status": "calibracao_necessaria",
+                "mensagem": "Há divergência entre o modelo de receita informado e os dados públicos."
+            }
+    except Exception as e:
+        conn.close()
+        return {"erro": f"Erro no enriquecimento: {str(e)}"}
+
+    # 3. Normalização
+    try:
+        pipeline.normalizacao(conn, caso_id)
+    except Exception as e:
+        conn.close()
+        return {"erro": f"Erro na normalização: {str(e)}"}
+
+    # 4. Contextualização
+    try:
+        pipeline.contextualizacao(conn, caso_id)
+    except Exception as e:
+        conn.close()
+        return {"erro": f"Erro na contextualização: {str(e)}"}
+
+    # 5. Seleção de Hipóteses
+    try:
+        hipoteses_selecionadas = pipeline.selecao_hipoteses(conn, caso_id)
+        if not hipoteses_selecionadas:
+            conn.close()
+            return {
+                "status": "sem_hipotese_aplicavel",
+                "mensagem": "Nenhuma hipótese aplicável foi encontrada para este caso."
+            }
+    except Exception as e:
+        conn.close()
+        return {"erro": f"Erro na seleção de hipóteses: {str(e)}"}
+
+    # 6. Investigação (considera respostas do usuário, se houver)
+    respostas = {}
+    if dados_usuario.get("respostas"):
+        respostas = dados_usuario["respostas"]
+    try:
+        investigacao_concluida, novas_hipoteses = pipeline.investigacao(conn, caso_id, respostas)
+        if not investigacao_concluida:
+            # Há perguntas pendentes
+            pendentes = conn.execute(
+                "SELECT * FROM pergunta WHERE caso_id=? AND estado='pendente'", (caso_id,)
+            ).fetchall()
+            conn.close()
+            return {
+                "status": "perguntas_pendentes",
+                "perguntas": [p["texto"] for p in pendentes]
+            }
+    except Exception as e:
+        conn.close()
+        return {"erro": f"Erro na investigação: {str(e)}"}
+
+    # 7. Cálculo de Certeza
+    try:
+        certeza_suficiente = pipeline.calculo_certeza(conn, caso_id)
+        if not certeza_suficiente:
+            conn.close()
+            return {
+                "status": "certeza_insuficiente",
+                "mensagem": "Nenhuma hipótese atingiu nível de certeza suficiente para decisão."
+            }
+    except Exception as e:
+        conn.close()
+        return {"erro": f"Erro no cálculo de certeza: {str(e)}"}
+
+    # 8. Priorização
+    try:
+        pma_id = pipeline.priorizacao(conn, caso_id)
+        if not pma_id:
+            conn.close()
+            return {
+                "status": "nenhuma_hipotese_priorizavel",
+                "mensagem": "Nenhuma hipótese com certeza suficiente sobreviveu à priorização."
+            }
+    except Exception as e:
+        conn.close()
+        return {"erro": f"Erro na priorização: {str(e)}"}
+
+    # 9. Decisão
+    try:
+        dec_id = pipeline.decisao(conn, caso_id)
+        if not dec_id:
+            conn.close()
+            return {
+                "status": "sem_padrao_de_decisao",
+                "mensagem": "A hipótese vencedora não possui um padrão de decisão catalogado."
+            }
+    except Exception as e:
+        conn.close()
+        return {"erro": f"Erro na decisão: {str(e)}"}
+
+    # 10. Plano de Ação
+    try:
+        plano_id = pipeline.plano_acao(conn, caso_id)
+    except Exception as e:
+        conn.close()
+        return {"erro": f"Erro no plano de ação: {str(e)}"}
+
+    # 11. Saída
+    try:
+        resultado = pipeline.saida(conn, caso_id)
+    except Exception as e:
+        conn.close()
+        return {"erro": f"Erro na saída: {str(e)}"}
+
+    conn.close()
+    return resultado
+
 
 @app.route('/enrich', methods=['GET'])
 def enrich():
@@ -21,11 +181,11 @@ def enrich():
     cnpj = request.args.get('cnpj')
     if not cnpj:
         return jsonify({"erro": "CNPJ não informado"}), 400
-    
+
     cnpj_limpo = re.sub(r'\D', '', cnpj)
     if len(cnpj_limpo) != 14:
         return jsonify({"erro": "CNPJ deve ter 14 dígitos"}), 400
-    
+
     try:
         resultado = enriquecer_cnpj(cnpj_limpo)
         return jsonify(resultado)
@@ -36,8 +196,8 @@ def enrich():
 @app.route('/diagnose', methods=['POST'])
 def diagnose():
     """
-    NOVO ENDPOINT: recebe CNPJ + dados do usuário, processa o pipeline 
-    e devolve um diagnóstico estratégico.
+    Endpoint principal: recebe CNPJ + dados do usuário, executa o pipeline real
+    e devolve o diagnóstico estratégico.
     """
     data = request.get_json()
     if not data:
@@ -46,7 +206,7 @@ def diagnose():
     cnpj = data.get('cnpj')
     if not cnpj:
         return jsonify({"erro": "CNPJ é obrigatório"}), 400
-    
+
     cnpj_limpo = re.sub(r'\D', '', cnpj)
     if len(cnpj_limpo) != 14:
         return jsonify({"erro": "CNPJ inválido"}), 400
@@ -64,75 +224,27 @@ def diagnose():
         "faturamento_anual": data.get('faturamento'),
         "numero_funcionarios": data.get('equipe'),
         "desafio_atual": data.get('desafio'),
-        "margem_liquida": data.get('margem'),  # opcional
-        "tempo_mercado": data.get('tempo_mercado')  # opcional
+        "modelo_receita_percebido": data.get('modelo_receita', 'indeterminado'),
+        "respostas": data.get('respostas', {})
     }
 
-    # 3. Se o pipeline estiver disponível, usa ele. Senão, gera um diagnóstico simulado
-    if executar_pipeline:
-        try:
-            diagnostico = executar_pipeline(dados_publicos, dados_usuario)
-            return jsonify(diagnostico)
-        except Exception as e:
-            return jsonify({"erro": f"Erro no pipeline: {str(e)}"}), 500
-    else:
-        # FALLBACK INTELIGENTE: gera uma análise básica com base nos dados
-        diagnostico = gerar_diagnostico_fallback(dados_publicos, dados_usuario)
+    # 3. Executa o pipeline real
+    try:
+        diagnostico = executar_pipeline_completo(dados_publicos, dados_usuario)
         return jsonify(diagnostico)
-
-
-def gerar_diagnostico_fallback(dados_publicos, dados_usuario):
-    """Gera um diagnóstico estruturado mesmo sem o pipeline completo."""
-    razao = dados_publicos.get("razao_social", "Empresa")
-    porte = dados_publicos.get("porte", "não informado")
-    cnae = dados_publicos.get("cnae_principal", "não informado")
-    capital = dados_publicos.get("capital_social", 0)
-    faturamento = dados_usuario.get("faturamento_anual", "não informado")
-    equipe = dados_usuario.get("numero_funcionarios", "não informado")
-    desafio = dados_usuario.get("desafio_atual", "não informado")
-
-    # Lógica simples de diagnóstico
-    restricoes = []
-    if capital < 100000 and faturamento != "não informado":
-        try:
-            if float(faturamento) > 500000:
-                restricoes.append("Capital social baixo para o faturamento declarado. Pode indicar necessidade de capital de giro.")
-        except:
-            pass
-
-    if "servico" in cnae.lower() and equipe != "não informado":
-        try:
-            if int(equipe) < 5:
-                restricoes.append("Empresa de serviços com equipe pequena. A capacidade de entrega pode estar limitada.")
-        except:
-            pass
-
-    if not restricoes:
-        restricoes.append("Nenhuma restrição crítica identificada com base nos dados fornecidos.")
-
-    return {
-        "empresa": razao,
-        "porte": porte,
-        "cnae": cnae,
-        "dados_coletados": {
-            "capital_social": capital,
-            "faturamento_informado": faturamento,
-            "equipe_informada": equipe
-        },
-        "diagnostico": {
-            "hipoteses": [
-                "A empresa possui estrutura formal definida.",
-                f"O desafio principal informado ('{desafio}') é comum em empresas de porte {porte}."
-            ],
-            "restricoes": restricoes,
-            "recomendacoes": [
-                "Validar a estrutura de capital antes de novos investimentos.",
-                "Revisar processos internos para reduzir dependência do dono."
-            ]
-        },
-        "status": "diagnóstico gerado pelo motor (versão base)"
-    }
+    except Exception as e:
+        return jsonify({"erro": f"Erro no pipeline: {str(e)}"}), 500
 
 
 if __name__ == '__main__':
+    # Cria as tabelas do banco (se não existirem)
+    if not os.path.exists(DB_PATH):
+        # O módulo db.py já deve ter a inicialização; mas vamos garantir
+        try:
+            from engine import db
+            conn = get_conn()
+            db.init_db(conn)
+            conn.close()
+        except:
+            pass
     app.run(host='0.0.0.0', port=5000, debug=True)
