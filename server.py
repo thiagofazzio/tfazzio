@@ -6,11 +6,9 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 # --- INICIALIZAÇÃO DO BANCO DE DADOS (FORA DO IF __NAME__) ---
-# Isso garante que rode mesmo com gunicorn
 from engine import db
 from enriquecimento_automatico import enriquecer_cnpj
 
-# Define o caminho do banco (usaremos um arquivo local)
 DB_PATH = os.environ.get('DATABASE_URL', 'tfazzio.db')
 if DB_PATH.startswith('sqlite:///'):
     DB_PATH = DB_PATH.replace('sqlite:///', '')
@@ -20,7 +18,6 @@ def get_conn():
     conn.row_factory = sqlite3.Row
     return conn
 
-# Cria as tabelas AGORA
 print(">>> Inicializando banco de dados...")
 try:
     conn = get_conn()
@@ -29,7 +26,6 @@ try:
     print(">>> Banco de dados inicializado com sucesso.")
 except Exception as e:
     print(f">>> ERRO ao inicializar banco: {e}")
-    # Se falhar, tenta criar o schema manualmente como fallback
     try:
         conn = get_conn()
         schema_path = os.path.join(os.path.dirname(__file__), 'engine', 'schema.sql')
@@ -40,16 +36,47 @@ except Exception as e:
         print(">>> Fallback: schema.sql executado manualmente.")
     except Exception as e2:
         print(f">>> Fallback também falhou: {e2}")
-# --- FIM DA INICIALIZAÇÃO ---
 
-# Importa o pipeline (precisa vir depois da inicialização, mas antes das rotas)
 import engine.pipeline as pipeline
 
 app = Flask(__name__)
 CORS(app)
 
+# Mapeamento para normalizar objetivos
+MAP_OBJETIVO = {
+    "reduzir_dependencia_fundador": "reduzir_dependencia_fundador",
+    "crescer_faturamento": "crescer_faturamento",
+    "aumentar_margem": "aumentar_margem",
+    "aumentar_caixa": "aumentar_caixa",
+    "vender_a_empresa": "vender_a_empresa",
+    "profissionalizar_gestao": "profissionalizar_gestao",
+    # Sinônimos comuns
+    "dificuldade_em_vender_mais": "crescer_faturamento",
+    "falta_de_capital_de_giro": "aumentar_caixa",
+    "equipe_desmotivada_ou_ineficiente": "profissionalizar_gestao",
+    "processos_ineficientes": "profissionalizar_gestao",
+    "concorrencia_acirrada": "crescer_faturamento",
+    "dificuldade_em_reter_talentos": "profissionalizar_gestao",
+    "margem_baixa": "aumentar_margem",
+    "crescimento_descontrolado": "profissionalizar_gestao",
+    "dependencia_do_fundador": "reduzir_dependencia_fundador",
+    "falta_de_planejamento_estrategico": "profissionalizar_gestao",
+    "dificuldade_em_inovar": "crescer_faturamento",
+    "problemas_com_fornecedores": "aumentar_margem",
+    "outro": None  # será tratado separadamente
+}
+
+def normalizar_objetivo(texto):
+    if not texto:
+        return None
+    # Remove espaços, substitui por underscore, lower
+    chave = texto.lower().strip().replace(' ', '_').replace('-', '_')
+    # Remove acentos? Simples: substitui ç por c, etc.
+    chave = chave.replace('ç', 'c').replace('ã', 'a').replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u')
+    return MAP_OBJETIVO.get(chave, chave)  # se não mapeado, retorna a própria chave
+
 # ------------------------------------------------------------------
-# Função que orquestra o pipeline completo (igual à anterior)
+# Função que orquestra o pipeline completo
 # ------------------------------------------------------------------
 def executar_pipeline_completo(dados_publicos, dados_usuario):
     conn = get_conn()
@@ -191,10 +218,16 @@ def diagnose():
     except Exception as e:
         return jsonify({"erro": f"Erro ao buscar CNPJ: {str(e)}"}), 500
 
+    # Pega o desafio e normaliza
+    desafio = data.get('desafio')
+    print(f"[LOG] Desafio recebido: {desafio}")  # Isso vai aparecer nos logs do Render
+    objetivo_normalizado = normalizar_objetivo(desafio)
+    print(f"[LOG] Objetivo normalizado: {objetivo_normalizado}")
+
     dados_usuario = {
         "faturamento_anual": data.get('faturamento'),
         "numero_funcionarios": data.get('equipe'),
-        "desafio_atual": data.get('desafio'),
+        "desafio_atual": objetivo_normalizado if objetivo_normalizado else "melhorar_resultados",
         "modelo_receita_percebido": data.get('modelo_receita', 'indeterminado'),
         "respostas": data.get('respostas', {})
     }
@@ -207,5 +240,4 @@ def diagnose():
 
 
 if __name__ == '__main__':
-    # Se rodar diretamente com python, também inicializa (já foi feito, mas mantemos)
     app.run(host='0.0.0.0', port=5000, debug=True)
