@@ -1,5 +1,4 @@
 import os
-import sys
 import sqlite3
 import re
 from flask import Flask, request, jsonify
@@ -18,20 +17,14 @@ def get_conn():
     conn.row_factory = sqlite3.Row
     return conn
 
-# --- FUNÇÃO PARA SEMEAR A KB (hipóteses, decisões, ações) ---
-def seed_kb(conn):
-    """Insere dados básicos na Knowledge Base se não existirem."""
-    # Verifica se já existe alguma hipótese
-    count = conn.execute("SELECT COUNT(*) as c FROM kb_hypothesis_template").fetchone()["c"]
-    if count > 0:
-        print(f">>> KB já possui {count} hipóteses. Pulando seed.")
-        return
-
-    print(">>> Inserindo hipóteses iniciais na KB...")
-
-    # Hipótese 1: Restrição Comercial (sempre aplicável)
+# --- FUNÇÃO QUE SEMPRE GARANTE AS HIPÓTESES CORINGAS ---
+def garantir_hipoteses(conn):
+    """Insere ou substitui as hipóteses coringas para garantir que sempre existam."""
+    print(">>> Garantindo hipóteses coringas na KB...")
+    
+    # 1. Hipótese Restrição Comercial
     conn.execute("""
-        INSERT OR IGNORE INTO kb_hypothesis_template
+        INSERT OR REPLACE INTO kb_hypothesis_template
         (id, nome, natureza, tipo, condition_of_applicability,
          evidence_patterns, lacunas_tipicas, decision_pattern_id,
          familia_pai_id, dimensao_capacidade, hipoteses_concorrentes)
@@ -41,7 +34,7 @@ def seed_kb(conn):
         'Restrição Comercial',
         'restricao',
         'padrao',
-        '{}',  # vazio = sempre aplicável
+        '{}',
         '[{"tipo": "confirma", "peso": "alto", "descricao": "Dificuldade em vender mais", "fecha_por": "empresario"}]',
         '["falta_processo_comercial", "equipe_comercial_pequena"]',
         'dp_001',
@@ -50,9 +43,9 @@ def seed_kb(conn):
         None
     ))
 
-    # Hipótese 2: Oportunidade de Crescimento (sempre aplicável)
+    # 2. Hipótese Oportunidade de Crescimento
     conn.execute("""
-        INSERT OR IGNORE INTO kb_hypothesis_template
+        INSERT OR REPLACE INTO kb_hypothesis_template
         (id, nome, natureza, tipo, condition_of_applicability,
          evidence_patterns, lacunas_tipicas, decision_pattern_id,
          familia_pai_id, dimensao_capacidade, hipoteses_concorrentes)
@@ -73,12 +66,12 @@ def seed_kb(conn):
 
     # Padrões de Decisão
     conn.execute("""
-        INSERT OR IGNORE INTO kb_decision_pattern (id, nome, descricao, exceptions)
+        INSERT OR REPLACE INTO kb_decision_pattern (id, nome, descricao, exceptions)
         VALUES (?, ?, ?, ?)
     """, ('dp_001', 'Fortalecer Comercial', 'Focar em estruturação da área de vendas', '[]'))
-
+    
     conn.execute("""
-        INSERT OR IGNORE INTO kb_decision_pattern (id, nome, descricao, exceptions)
+        INSERT OR REPLACE INTO kb_decision_pattern (id, nome, descricao, exceptions)
         VALUES (?, ?, ?, ?)
     """, ('dp_002', 'Planejamento Estratégico', 'Estruturar o planejamento de médio e longo prazo', '[]'))
 
@@ -93,36 +86,36 @@ def seed_kb(conn):
     ]
     for ap in acoes:
         conn.execute("""
-            INSERT OR IGNORE INTO kb_action_pattern (id, decision_pattern_id, ordem, descricao)
+            INSERT OR REPLACE INTO kb_action_pattern (id, decision_pattern_id, ordem, descricao)
             VALUES (?, ?, ?, ?)
         """, ap)
 
     conn.commit()
-    print(">>> KB semeada com sucesso.")
+    print(">>> Hipóteses coringas garantidas com sucesso.")
 
 # --- INICIALIZAÇÃO PRINCIPAL ---
 print(">>> Inicializando banco de dados...")
 try:
     conn = get_conn()
     db.init_db(conn)
-    seed_kb(conn)  # <-- Adicionado
+    garantir_hipoteses(conn)   # <-- sempre executa, garantindo que existam
     conn.close()
-    print(">>> Banco de dados inicializado e KB semeada.")
+    print(">>> Banco e KB inicializados.")
 except Exception as e:
-    print(f">>> ERRO ao inicializar banco: {e}")
-    # Fallback: tenta criar o schema manualmente
+    print(f">>> ERRO na inicialização: {e}")
+    # Fallback: executa schema.sql manualmente
     try:
         conn = get_conn()
         schema_path = os.path.join(os.path.dirname(__file__), 'engine', 'schema.sql')
         with open(schema_path, 'r', encoding='utf-8') as f:
             conn.executescript(f.read())
-        seed_kb(conn)  # mesmo após fallback, tentamos semear
+        garantir_hipoteses(conn)
         conn.close()
-        print(">>> Fallback: schema.sql executado e KB semeada.")
+        print(">>> Fallback executado com sucesso.")
     except Exception as e2:
-        print(f">>> Fallback também falhou: {e2}")
+        print(f">>> Fallback falhou: {e2}")
 
-# Importa o pipeline (precisa vir depois da inicialização)
+# Importa o pipeline
 import engine.pipeline as pipeline
 
 app = Flask(__name__)
