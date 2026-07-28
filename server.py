@@ -5,7 +5,7 @@ import re
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-# --- INICIALIZAÇÃO DO BANCO DE DADOS (FORA DO IF __NAME__) ---
+# --- INICIALIZAÇÃO DO BANCO DE DADOS ---
 from engine import db
 from enriquecimento_automatico import enriquecer_cnpj
 
@@ -18,6 +18,7 @@ def get_conn():
     conn.row_factory = sqlite3.Row
     return conn
 
+# Inicializa as tabelas
 print(">>> Inicializando banco de dados...")
 try:
     conn = get_conn()
@@ -37,65 +38,59 @@ except Exception as e:
     except Exception as e2:
         print(f">>> Fallback também falhou: {e2}")
 
+# Importa o pipeline (precisa vir depois da inicialização)
 import engine.pipeline as pipeline
 
 app = Flask(__name__)
 CORS(app)
 
-# Mapeamento para normalizar objetivos
-MAP_OBJETIVO = {
-    "reduzir_dependencia_fundador": "reduzir_dependencia_fundador",
-    "crescer_faturamento": "crescer_faturamento",
-    "aumentar_margem": "aumentar_margem",
-    "aumentar_caixa": "aumentar_caixa",
-    "vender_a_empresa": "vender_a_empresa",
-    "profissionalizar_gestao": "profissionalizar_gestao",
-    # Sinônimos comuns
-    "dificuldade_em_vender_mais": "crescer_faturamento",
-    "falta_de_capital_de_giro": "aumentar_caixa",
-    "equipe_desmotivada_ou_ineficiente": "profissionalizar_gestao",
-    "processos_ineficientes": "profissionalizar_gestao",
-    "concorrencia_acirrada": "crescer_faturamento",
-    "dificuldade_em_reter_talentos": "profissionalizar_gestao",
-    "margem_baixa": "aumentar_margem",
-    "crescimento_descontrolado": "profissionalizar_gestao",
-    "dependencia_do_fundador": "reduzir_dependencia_fundador",
-    "falta_de_planejamento_estrategico": "profissionalizar_gestao",
-    "dificuldade_em_inovar": "crescer_faturamento",
-    "problemas_com_fornecedores": "aumentar_margem",
-    "outro": None  # será tratado separadamente
+# --------------------------------------------------------------
+# Conjunto de objetivos canônicos (igual ao do pipeline)
+# --------------------------------------------------------------
+OBJETIVOS_CANONICOS = {
+    "reduzir_dependencia_fundador",
+    "crescer_faturamento",
+    "aumentar_margem",
+    "aumentar_caixa",
+    "vender_a_empresa",
+    "profissionalizar_gestao"
 }
 
-def normalizar_objetivo(texto):
-    if not texto:
-        return None
-    # Remove espaços, substitui por underscore, lower
-    chave = texto.lower().strip().replace(' ', '_').replace('-', '_')
-    # Remove acentos? Simples: substitui ç por c, etc.
-    chave = chave.replace('ç', 'c').replace('ã', 'a').replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u')
-    return MAP_OBJETIVO.get(chave, chave)  # se não mapeado, retorna a própria chave
-
-# ------------------------------------------------------------------
+# --------------------------------------------------------------
 # Função que orquestra o pipeline completo
-# ------------------------------------------------------------------
+# --------------------------------------------------------------
 def executar_pipeline_completo(dados_publicos, dados_usuario):
     conn = get_conn()
+    
+    # --- PEGA O OBJETIVO E NORMALIZA ---
+    objetivo = dados_usuario.get("desafio_atual", "crescer_faturamento")
+    # Se o objetivo não estiver na lista de canônicos, usa "crescer_faturamento" como padrão
+    if objetivo not in OBJETIVOS_CANONICOS:
+        print(f"Objetivo '{objetivo}' não reconhecido. Usando 'crescer_faturamento' como fallback.")
+        objetivo = "crescer_faturamento"
+
+    # --- USA O MODELO DE RECEITA PÚBLICO PARA EVITAR CALIBRAÇÃO DESNECESSÁRIA ---
+    modelo_receita = dados_publicos.get("modelo_receita_publico", "Prestacao de servicos")
+
     try:
+        # 1. Entrada (já com os dados corrigidos)
         caso_id = pipeline.entrada(
             conn,
             cnpj=dados_publicos.get("cnpj"),
-            modelo_receita_percebido=dados_usuario.get("modelo_receita_percebido", "indeterminado"),
-            objetivo_empresarial=dados_usuario.get("desafio_atual", "melhorar resultados")
+            modelo_receita_percebido=modelo_receita,  # <--- CORREÇÃO AQUI
+            objetivo_empresarial=objetivo
         )
     except Exception as e:
         conn.close()
         return {"erro": f"Erro na entrada: {str(e)}"}
 
+    # 1b. Verificar objetivo (agora deve passar sempre)
     objetivo_claro = pipeline.verificar_objetivo(conn, caso_id)
     if not objetivo_claro:
         conn.close()
         return {"status": "objetivo_pouco_claro", "mensagem": "O objetivo declarado é amplo demais. Por favor, refine-o."}
 
+    # 2. Enriquecimento (agora modelo_receita_percebido == modelo_receita_publico, então passa!)
     try:
         resultado_enriquecimento = pipeline.enriquecimento(conn, caso_id, dados_publicos)
         if not resultado_enriquecimento.get("congruente", True):
@@ -105,18 +100,21 @@ def executar_pipeline_completo(dados_publicos, dados_usuario):
         conn.close()
         return {"erro": f"Erro no enriquecimento: {str(e)}"}
 
+    # 3. Normalização
     try:
         pipeline.normalizacao(conn, caso_id)
     except Exception as e:
         conn.close()
         return {"erro": f"Erro na normalização: {str(e)}"}
 
+    # 4. Contextualização
     try:
         pipeline.contextualizacao(conn, caso_id)
     except Exception as e:
         conn.close()
         return {"erro": f"Erro na contextualização: {str(e)}"}
 
+    # 5. Seleção de Hipóteses
     try:
         hipoteses_selecionadas = pipeline.selecao_hipoteses(conn, caso_id)
         if not hipoteses_selecionadas:
@@ -126,17 +124,21 @@ def executar_pipeline_completo(dados_publicos, dados_usuario):
         conn.close()
         return {"erro": f"Erro na seleção de hipóteses: {str(e)}"}
 
+    # 6. Investigação
     respostas = dados_usuario.get("respostas", {})
     try:
         investigacao_concluida, novas_hipoteses = pipeline.investigacao(conn, caso_id, respostas)
         if not investigacao_concluida:
-            pendentes = conn.execute("SELECT * FROM pergunta WHERE caso_id=? AND estado='pendente'", (caso_id,)).fetchall()
+            pendentes = conn.execute(
+                "SELECT * FROM pergunta WHERE caso_id=? AND estado='pendente'", (caso_id,)
+            ).fetchall()
             conn.close()
             return {"status": "perguntas_pendentes", "perguntas": [p["texto"] for p in pendentes]}
     except Exception as e:
         conn.close()
         return {"erro": f"Erro na investigação: {str(e)}"}
 
+    # 7. Cálculo de Certeza
     try:
         certeza_suficiente = pipeline.calculo_certeza(conn, caso_id)
         if not certeza_suficiente:
@@ -146,6 +148,7 @@ def executar_pipeline_completo(dados_publicos, dados_usuario):
         conn.close()
         return {"erro": f"Erro no cálculo de certeza: {str(e)}"}
 
+    # 8. Priorização
     try:
         pma_id = pipeline.priorizacao(conn, caso_id)
         if not pma_id:
@@ -155,6 +158,7 @@ def executar_pipeline_completo(dados_publicos, dados_usuario):
         conn.close()
         return {"erro": f"Erro na priorização: {str(e)}"}
 
+    # 9. Decisão
     try:
         dec_id = pipeline.decisao(conn, caso_id)
         if not dec_id:
@@ -164,12 +168,14 @@ def executar_pipeline_completo(dados_publicos, dados_usuario):
         conn.close()
         return {"erro": f"Erro na decisão: {str(e)}"}
 
+    # 10. Plano de Ação
     try:
         pipeline.plano_acao(conn, caso_id)
     except Exception as e:
         conn.close()
         return {"erro": f"Erro no plano de ação: {str(e)}"}
 
+    # 11. Saída
     try:
         resultado = pipeline.saida(conn, caso_id)
     except Exception as e:
@@ -179,10 +185,9 @@ def executar_pipeline_completo(dados_publicos, dados_usuario):
     conn.close()
     return resultado
 
-
-# ------------------------------------------------------------------
+# --------------------------------------------------------------
 # Rotas
-# ------------------------------------------------------------------
+# --------------------------------------------------------------
 @app.route('/enrich', methods=['GET'])
 def enrich():
     cnpj = request.args.get('cnpj')
@@ -218,17 +223,17 @@ def diagnose():
     except Exception as e:
         return jsonify({"erro": f"Erro ao buscar CNPJ: {str(e)}"}), 500
 
-    # Pega o desafio e normaliza
+    # --- TRATAMENTO DO OBJETIVO (inclusive "Outro") ---
     desafio = data.get('desafio')
-    print(f"[LOG] Desafio recebido: {desafio}")  # Isso vai aparecer nos logs do Render
-    objetivo_normalizado = normalizar_objetivo(desafio)
-    print(f"[LOG] Objetivo normalizado: {objetivo_normalizado}")
+    # Se o desafio não estiver na lista de canônicos, assume "crescer_faturamento"
+    if desafio not in OBJETIVOS_CANONICOS:
+        desafio = "crescer_faturamento"
 
     dados_usuario = {
         "faturamento_anual": data.get('faturamento'),
         "numero_funcionarios": data.get('equipe'),
-        "desafio_atual": objetivo_normalizado if objetivo_normalizado else "melhorar_resultados",
-        "modelo_receita_percebido": data.get('modelo_receita', 'indeterminado'),
+        "desafio_atual": desafio,  # <-- agora sempre canônico
+        "modelo_receita_percebido": dados_publicos.get("modelo_receita_publico", "Prestacao de servicos"),
         "respostas": data.get('respostas', {})
     }
 
@@ -237,7 +242,6 @@ def diagnose():
         return jsonify(diagnostico)
     except Exception as e:
         return jsonify({"erro": f"Erro no pipeline: {str(e)}"}), 500
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
