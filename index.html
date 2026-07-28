@@ -1879,7 +1879,7 @@
         <!-- CNPJ -->
         <div style="margin-bottom:20px;">
           <label style="display:block; font-size:13px; font-weight:600; color:var(--mid); margin-bottom:6px;">CNPJ da empresa (apenas números) *</label>
-          <input type="text" id="cnpjDiag" placeholder="Ex: 05789313000194" style="width:100%; padding:12px 16px; border:1px solid var(--cream-mid); border-radius:4px; font-size:15px;" required>
+          <input type="text" id="cnpjDiag" placeholder="Ex: 12345678000101" style="width:100%; padding:12px 16px; border:1px solid var(--cream-mid); border-radius:4px; font-size:15px;" required>
         </div>
 
         <!-- Faturamento -->
@@ -1894,11 +1894,23 @@
           <input type="text" id="equipeDiag" placeholder="Ex: 12" style="width:100%; padding:12px 16px; border:1px solid var(--cream-mid); border-radius:4px; font-size:15px;">
         </div>
 
-        <!-- Desafio -->
-        <div style="margin-bottom:24px;">
-          <label style="display:block; font-size:13px; font-weight:600; color:var(--mid); margin-bottom:6px;">Qual o maior desafio da empresa agora?</label>
-          <input type="text" id="desafioDiag" placeholder="Ex: Falta de capital de giro, equipe desmotivada, vendas estagnadas..." style="width:100%; padding:12px 16px; border:1px solid var(--cream-mid); border-radius:4px; font-size:15px;">
-        </div>
+        <!-- Desafio (dropdown) -->
+<div style="margin-bottom:24px;">
+  <label style="display:block; font-size:13px; font-weight:600; color:var(--mid); margin-bottom:6px;">Qual o maior desafio da empresa agora?</label>
+  <select id="desafioDiag" style="width:100%; padding:12px 16px; border:1px solid var(--cream-mid); border-radius:4px; font-size:15px; background:white;">
+    <option value="">Selecione uma opção...</option>
+    <option value="Falta de capital de giro">Falta de capital de giro</option>
+    <option value="Dificuldade em vender mais">Dificuldade em vender mais</option>
+    <option value="Equipe desmotivada ou sem clareza">Equipe desmotivada ou sem clareza</option>
+    <option value="Processos ineficientes ou desorganizados">Processos ineficientes ou desorganizados</option>
+    <option value="Dificuldade em controlar custos e margens">Dificuldade em controlar custos e margens</option>
+    <option value="Dependência excessiva do dono">Dependência excessiva do dono</option>
+    <option value="Concorrência agressiva / pressão de preço">Concorrência agressiva / pressão de preço</option>
+    <option value="Dificuldade em inovar ou se adaptar ao mercado">Dificuldade em inovar ou se adaptar ao mercado</option>
+    <option value="Gestão financeira desorganizada (fluxo de caixa, etc.)">Gestão financeira desorganizada (fluxo de caixa, etc.)</option>
+    <option value="Outro">Outro</option>
+  </select>
+</div>
 
         <button type="submit" id="btnDiagnosticar" style="background:var(--bordo); color:white; border:none; padding:16px 32px; border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:600; letter-spacing:3px; cursor:pointer; width:100%; transition:background 0.2s;" onmouseover="this.style.background='var(--bordo-mid)'" onmouseout="this.style.background='var(--bordo)'">
           Gerar Diagnóstico Estratégico
@@ -2013,10 +2025,66 @@
     .then(() => { form.style.display = 'none'; sucesso.style.display = 'block'; })
     .catch(() => { form.style.display = 'none'; sucesso.style.display = 'block'; });
   }
-  // Diagnóstico completo (Motor TFAZZIO)
+// Diagnóstico completo (Motor TFAZZIO) - com renderização amigável
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.getElementById('formDiagnostico');
   const resultadoDiv = document.getElementById('resultadoDiagnostico');
+
+  function renderDiagnostico(data) {
+    // Se for erro, mostra mensagem simples
+    if (data.erro) {
+      return `<div style="color:#b00;">❌ Erro: ${data.erro}</div>`;
+    }
+
+    // Extrai os campos
+    const empresa = data.empresa || 'Empresa não identificada';
+    const porte = data.porte || 'não informado';
+    const cnae = data.cnae || 'não informado';
+    const diagnostico = data.diagnostico || {};
+    const hipoteses = diagnostico.hipoteses || [];
+    const restricoes = diagnostico.restricoes || [];
+    const recomendacoes = diagnostico.recomendacoes || [];
+    const dadosColetados = data.dados_coletados || {};
+
+    // Monta HTML
+    let html = `
+      <div style="font-family:'Barlow',sans-serif; line-height:1.6;">
+        <div style="background:var(--bordo); color:white; padding:16px 20px; border-radius:4px 4px 0 0; margin:-24px -24px 20px -24px;">
+          <strong style="font-size:18px;">${empresa}</strong>
+          <span style="display:block; font-size:13px; opacity:0.8; margin-top:4px;">Porte: ${porte} · CNAE: ${cnae.substring(0, 60)}...</span>
+        </div>
+
+        <div style="margin-bottom:20px;">
+          <h4 style="font-size:14px; font-weight:600; color:var(--bordo); margin-bottom:8px; letter-spacing:1px;">📌 HIPÓTESES</h4>
+          <ul style="list-style:none; padding:0; margin:0;">
+            ${hipoteses.map(h => `<li style="padding:8px 0; border-bottom:1px solid var(--cream-mid); font-size:14px;">• ${h}</li>`).join('')}
+          </ul>
+        </div>
+
+        <div style="margin-bottom:20px;">
+          <h4 style="font-size:14px; font-weight:600; color:var(--bordo); margin-bottom:8px; letter-spacing:1px;">🚧 RESTRIÇÕES</h4>
+          <ul style="list-style:none; padding:0; margin:0;">
+            ${restricoes.map(r => `<li style="padding:8px 0; border-bottom:1px solid var(--cream-mid); font-size:14px;">• ${r}</li>`).join('')}
+          </ul>
+        </div>
+
+        <div style="margin-bottom:20px;">
+          <h4 style="font-size:14px; font-weight:600; color:var(--bordo); margin-bottom:8px; letter-spacing:1px;">✅ RECOMENDAÇÕES</h4>
+          <ul style="list-style:none; padding:0; margin:0;">
+            ${recomendacoes.map(r => `<li style="padding:8px 0; border-bottom:1px solid var(--cream-mid); font-size:14px;">• ${r}</li>`).join('')}
+          </ul>
+        </div>
+
+        <div style="font-size:12px; color:var(--silver); border-top:1px solid var(--cream-mid); padding-top:16px; margin-top:8px;">
+          <details>
+            <summary style="cursor:pointer; font-weight:500;">Ver dados brutos (JSON)</summary>
+            <pre style="background:#f5f5f5; padding:12px; border-radius:4px; overflow-x:auto; font-size:12px; margin-top:8px;">${JSON.stringify(data, null, 2)}</pre>
+          </details>
+        </div>
+      </div>
+    `;
+    return html;
+  }
 
   if (form) {
     form.addEventListener('submit', function(e) {
@@ -2033,7 +2101,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
 
       resultadoDiv.style.display = 'block';
-      resultadoDiv.innerText = '⏳ Processando dados e gerando diagnóstico...';
+      resultadoDiv.innerHTML = '⏳ Processando dados e gerando diagnóstico...';
 
       const payload = {
         cnpj: cnpj,
@@ -2051,14 +2119,10 @@ document.addEventListener('DOMContentLoaded', function() {
       })
       .then(response => response.json())
       .then(data => {
-        if (data.erro) {
-          resultadoDiv.innerText = '❌ Erro: ' + data.erro;
-        } else {
-          resultadoDiv.innerText = JSON.stringify(data, null, 2);
-        }
+        resultadoDiv.innerHTML = renderDiagnostico(data);
       })
       .catch(err => {
-        resultadoDiv.innerText = '❌ Falha na conexão: ' + err.message;
+        resultadoDiv.innerHTML = '❌ Falha na conexão: ' + err.message;
       });
     });
   }
