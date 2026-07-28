@@ -18,23 +18,107 @@ def get_conn():
     conn.row_factory = sqlite3.Row
     return conn
 
-# Inicializa as tabelas
+# --- FUNÇÃO PARA SEMEAR A KB (hipóteses, decisões, ações) ---
+def seed_kb(conn):
+    """Insere dados básicos na Knowledge Base se não existirem."""
+    # Verifica se já existe alguma hipótese
+    count = conn.execute("SELECT COUNT(*) as c FROM kb_hypothesis_template").fetchone()["c"]
+    if count > 0:
+        print(f">>> KB já possui {count} hipóteses. Pulando seed.")
+        return
+
+    print(">>> Inserindo hipóteses iniciais na KB...")
+
+    # Hipótese 1: Restrição Comercial (sempre aplicável)
+    conn.execute("""
+        INSERT OR IGNORE INTO kb_hypothesis_template
+        (id, nome, natureza, tipo, condition_of_applicability,
+         evidence_patterns, lacunas_tipicas, decision_pattern_id,
+         familia_pai_id, dimensao_capacidade, hipoteses_concorrentes)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        'tpl_001',
+        'Restrição Comercial',
+        'restricao',
+        'padrao',
+        '{}',  # vazio = sempre aplicável
+        '[{"tipo": "confirma", "peso": "alto", "descricao": "Dificuldade em vender mais", "fecha_por": "empresario"}]',
+        '["falta_processo_comercial", "equipe_comercial_pequena"]',
+        'dp_001',
+        None,
+        'capacidade_comercial',
+        None
+    ))
+
+    # Hipótese 2: Oportunidade de Crescimento (sempre aplicável)
+    conn.execute("""
+        INSERT OR IGNORE INTO kb_hypothesis_template
+        (id, nome, natureza, tipo, condition_of_applicability,
+         evidence_patterns, lacunas_tipicas, decision_pattern_id,
+         familia_pai_id, dimensao_capacidade, hipoteses_concorrentes)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        'tpl_002',
+        'Oportunidade de Crescimento',
+        'oportunidade',
+        'padrao',
+        '{}',
+        '[{"tipo": "confirma", "peso": "medio", "descricao": "Faturamento consistente", "fecha_por": "empresario"}]',
+        '["planejamento_estrategico_ausente"]',
+        'dp_002',
+        None,
+        'capacidade_gestao',
+        None
+    ))
+
+    # Padrões de Decisão
+    conn.execute("""
+        INSERT OR IGNORE INTO kb_decision_pattern (id, nome, descricao, exceptions)
+        VALUES (?, ?, ?, ?)
+    """, ('dp_001', 'Fortalecer Comercial', 'Focar em estruturação da área de vendas', '[]'))
+
+    conn.execute("""
+        INSERT OR IGNORE INTO kb_decision_pattern (id, nome, descricao, exceptions)
+        VALUES (?, ?, ?, ?)
+    """, ('dp_002', 'Planejamento Estratégico', 'Estruturar o planejamento de médio e longo prazo', '[]'))
+
+    # Ações Recomendadas
+    acoes = [
+        ('ap_001', 'dp_001', 1, 'Diagnóstico do funil de vendas atual'),
+        ('ap_002', 'dp_001', 2, 'Definir processo comercial padronizado'),
+        ('ap_003', 'dp_001', 3, 'Treinar equipe comercial e ajustar metas'),
+        ('ap_004', 'dp_002', 1, 'Análise de mercado e posicionamento'),
+        ('ap_005', 'dp_002', 2, 'Definir metas e indicadores de crescimento'),
+        ('ap_006', 'dp_002', 3, 'Estruturar plano de ação para os próximos 12 meses'),
+    ]
+    for ap in acoes:
+        conn.execute("""
+            INSERT OR IGNORE INTO kb_action_pattern (id, decision_pattern_id, ordem, descricao)
+            VALUES (?, ?, ?, ?)
+        """, ap)
+
+    conn.commit()
+    print(">>> KB semeada com sucesso.")
+
+# --- INICIALIZAÇÃO PRINCIPAL ---
 print(">>> Inicializando banco de dados...")
 try:
     conn = get_conn()
     db.init_db(conn)
+    seed_kb(conn)  # <-- Adicionado
     conn.close()
-    print(">>> Banco de dados inicializado com sucesso.")
+    print(">>> Banco de dados inicializado e KB semeada.")
 except Exception as e:
     print(f">>> ERRO ao inicializar banco: {e}")
+    # Fallback: tenta criar o schema manualmente
     try:
         conn = get_conn()
         schema_path = os.path.join(os.path.dirname(__file__), 'engine', 'schema.sql')
         with open(schema_path, 'r', encoding='utf-8') as f:
             conn.executescript(f.read())
-        conn.commit()
+        seed_kb(conn)  # mesmo após fallback, tentamos semear
         conn.close()
-        print(">>> Fallback: schema.sql executado manualmente.")
+        print(">>> Fallback: schema.sql executado e KB semeada.")
     except Exception as e2:
         print(f">>> Fallback também falhou: {e2}")
 
@@ -45,7 +129,7 @@ app = Flask(__name__)
 CORS(app)
 
 # --------------------------------------------------------------
-# Conjunto de objetivos canônicos (igual ao do pipeline)
+# Conjunto de objetivos canônicos
 # --------------------------------------------------------------
 OBJETIVOS_CANONICOS = {
     "reduzir_dependencia_fundador",
@@ -62,59 +146,50 @@ OBJETIVOS_CANONICOS = {
 def executar_pipeline_completo(dados_publicos, dados_usuario):
     conn = get_conn()
     
-    # --- PEGA O OBJETIVO E NORMALIZA ---
     objetivo = dados_usuario.get("desafio_atual", "crescer_faturamento")
-    # Se o objetivo não estiver na lista de canônicos, usa "crescer_faturamento" como padrão
     if objetivo not in OBJETIVOS_CANONICOS:
-        print(f"Objetivo '{objetivo}' não reconhecido. Usando 'crescer_faturamento' como fallback.")
+        print(f"Objetivo '{objetivo}' não reconhecido. Usando 'crescer_faturamento'.")
         objetivo = "crescer_faturamento"
 
-    # --- USA O MODELO DE RECEITA PÚBLICO PARA EVITAR CALIBRAÇÃO DESNECESSÁRIA ---
     modelo_receita = dados_publicos.get("modelo_receita_publico", "Prestacao de servicos")
 
     try:
-        # 1. Entrada (já com os dados corrigidos)
         caso_id = pipeline.entrada(
             conn,
             cnpj=dados_publicos.get("cnpj"),
-            modelo_receita_percebido=modelo_receita,  # <--- CORREÇÃO AQUI
+            modelo_receita_percebido=modelo_receita,
             objetivo_empresarial=objetivo
         )
     except Exception as e:
         conn.close()
         return {"erro": f"Erro na entrada: {str(e)}"}
 
-    # 1b. Verificar objetivo (agora deve passar sempre)
     objetivo_claro = pipeline.verificar_objetivo(conn, caso_id)
     if not objetivo_claro:
         conn.close()
-        return {"status": "objetivo_pouco_claro", "mensagem": "O objetivo declarado é amplo demais. Por favor, refine-o."}
+        return {"status": "objetivo_pouco_claro", "mensagem": "O objetivo declarado é amplo demais."}
 
-    # 2. Enriquecimento (agora modelo_receita_percebido == modelo_receita_publico, então passa!)
     try:
         resultado_enriquecimento = pipeline.enriquecimento(conn, caso_id, dados_publicos)
         if not resultado_enriquecimento.get("congruente", True):
             conn.close()
-            return {"status": "calibracao_necessaria", "mensagem": "Há divergência entre o modelo de receita informado e os dados públicos."}
+            return {"status": "calibracao_necessaria", "mensagem": "Divergência no modelo de receita."}
     except Exception as e:
         conn.close()
         return {"erro": f"Erro no enriquecimento: {str(e)}"}
 
-    # 3. Normalização
     try:
         pipeline.normalizacao(conn, caso_id)
     except Exception as e:
         conn.close()
         return {"erro": f"Erro na normalização: {str(e)}"}
 
-    # 4. Contextualização
     try:
         pipeline.contextualizacao(conn, caso_id)
     except Exception as e:
         conn.close()
         return {"erro": f"Erro na contextualização: {str(e)}"}
 
-    # 5. Seleção de Hipóteses
     try:
         hipoteses_selecionadas = pipeline.selecao_hipoteses(conn, caso_id)
         if not hipoteses_selecionadas:
@@ -124,21 +199,17 @@ def executar_pipeline_completo(dados_publicos, dados_usuario):
         conn.close()
         return {"erro": f"Erro na seleção de hipóteses: {str(e)}"}
 
-    # 6. Investigação
     respostas = dados_usuario.get("respostas", {})
     try:
         investigacao_concluida, novas_hipoteses = pipeline.investigacao(conn, caso_id, respostas)
         if not investigacao_concluida:
-            pendentes = conn.execute(
-                "SELECT * FROM pergunta WHERE caso_id=? AND estado='pendente'", (caso_id,)
-            ).fetchall()
+            pendentes = conn.execute("SELECT * FROM pergunta WHERE caso_id=? AND estado='pendente'", (caso_id,)).fetchall()
             conn.close()
             return {"status": "perguntas_pendentes", "perguntas": [p["texto"] for p in pendentes]}
     except Exception as e:
         conn.close()
         return {"erro": f"Erro na investigação: {str(e)}"}
 
-    # 7. Cálculo de Certeza
     try:
         certeza_suficiente = pipeline.calculo_certeza(conn, caso_id)
         if not certeza_suficiente:
@@ -148,7 +219,6 @@ def executar_pipeline_completo(dados_publicos, dados_usuario):
         conn.close()
         return {"erro": f"Erro no cálculo de certeza: {str(e)}"}
 
-    # 8. Priorização
     try:
         pma_id = pipeline.priorizacao(conn, caso_id)
         if not pma_id:
@@ -158,7 +228,6 @@ def executar_pipeline_completo(dados_publicos, dados_usuario):
         conn.close()
         return {"erro": f"Erro na priorização: {str(e)}"}
 
-    # 9. Decisão
     try:
         dec_id = pipeline.decisao(conn, caso_id)
         if not dec_id:
@@ -168,14 +237,12 @@ def executar_pipeline_completo(dados_publicos, dados_usuario):
         conn.close()
         return {"erro": f"Erro na decisão: {str(e)}"}
 
-    # 10. Plano de Ação
     try:
         pipeline.plano_acao(conn, caso_id)
     except Exception as e:
         conn.close()
         return {"erro": f"Erro no plano de ação: {str(e)}"}
 
-    # 11. Saída
     try:
         resultado = pipeline.saida(conn, caso_id)
     except Exception as e:
@@ -215,7 +282,6 @@ def diagnose():
     if len(cnpj_limpo) != 14:
         return jsonify({"erro": "CNPJ inválido"}), 400
 
-    # Busca dados públicos
     try:
         dados_publicos = enriquecer_cnpj(cnpj_limpo)
         if "erro" in dados_publicos:
@@ -223,16 +289,14 @@ def diagnose():
     except Exception as e:
         return jsonify({"erro": f"Erro ao buscar CNPJ: {str(e)}"}), 500
 
-    # --- TRATAMENTO DO OBJETIVO (inclusive "Outro") ---
     desafio = data.get('desafio')
-    # Se o desafio não estiver na lista de canônicos, assume "crescer_faturamento"
     if desafio not in OBJETIVOS_CANONICOS:
         desafio = "crescer_faturamento"
 
     dados_usuario = {
         "faturamento_anual": data.get('faturamento'),
         "numero_funcionarios": data.get('equipe'),
-        "desafio_atual": desafio,  # <-- agora sempre canônico
+        "desafio_atual": desafio,
         "modelo_receita_percebido": dados_publicos.get("modelo_receita_publico", "Prestacao de servicos"),
         "respostas": data.get('respostas', {})
     }
