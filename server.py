@@ -261,7 +261,31 @@ def enrich():
         return jsonify(resultado)
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
+@app.route('/debug', methods=['GET'])
+def debug():
+    conn = get_conn()
+    resultado = {}
 
+    try:
+        templates = conn.execute(
+            "SELECT id, nome, tipo, condition_of_applicability, decision_pattern_id FROM kb_hypothesis_template"
+        ).fetchall()
+        resultado["hipoteses_na_kb"] = [dict(t) for t in templates]
+        resultado["total_hipoteses"] = len(templates)
+    except Exception as e:
+        resultado["erro_hipoteses"] = str(e)
+
+    try:
+        ultima_empresa = conn.execute(
+            "SELECT setor, porte, business_models, revenue_models FROM empresa ORDER BY rowid DESC LIMIT 1"
+        ).fetchone()
+        resultado["ultima_empresa"] = dict(ultima_empresa) if ultima_empresa else None
+    except Exception as e:
+        resultado["erro_empresa"] = str(e)
+
+    conn.close()
+    return jsonify(resultado)
+    
 @app.route('/diagnose', methods=['POST'])
 def diagnose():
     data = request.get_json()
