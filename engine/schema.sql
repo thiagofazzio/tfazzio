@@ -154,3 +154,68 @@ CREATE TABLE kb_action_pattern (
     erros_classicos_evitados TEXT NOT NULL DEFAULT '[]',  -- JSON list
     status                  TEXT NOT NULL DEFAULT 'Teste'
 );
+-- =====================================================
+-- INSERE HIPÓTESES DE EXEMPLO (para o motor funcionar)
+-- =====================================================
+
+-- 1. Hipótese genérica (sempre aplicável, para testes)
+INSERT OR IGNORE INTO kb_hypothesis_template (
+    id, nome, natureza, tipo, condition_of_applicability,
+    evidence_patterns, lacunas_tipicas, decision_pattern_id,
+    familia_pai_id, dimensao_capacidade, hipoteses_concorrentes
+) VALUES (
+    'tpl_001',
+    'Restrição Comercial',
+    'restricao',
+    'padrao',
+    '{}',  -- <-- VAZIO = SEMPRE APLICÁVEL
+    '[{"tipo": "confirma", "peso": "alto", "descricao": "Dificuldade em vender mais", "fecha_por": "empresario"}]',
+    '["falta_processo_comercial", "equipe_comercial_pequena"]',
+    'dp_001',
+    NULL,
+    'capacidade_comercial',
+    NULL
+);
+
+-- 2. Hipótese de oportunidade (sempre aplicável)
+INSERT OR IGNORE INTO kb_hypothesis_template (
+    id, nome, natureza, tipo, condition_of_applicability,
+    evidence_patterns, lacunas_tipicas, decision_pattern_id,
+    familia_pai_id, dimensao_capacidade, hipoteses_concorrentes
+) VALUES (
+    'tpl_002',
+    'Oportunidade de Crescimento',
+    'oportunidade',
+    'padrao',
+    '{}',  -- <-- VAZIO = SEMPRE APLICÁVEL
+    '[{"tipo": "confirma", "peso": "medio", "descricao": "Faturamento consistente", "fecha_por": "empresario"}]',
+    '["planejamento_estrategico_ausente"]',
+    'dp_002',
+    NULL,
+    'capacidade_gestao',
+    NULL
+);
+
+-- =====================================================
+-- PADRÕES DE DECISÃO (correspondentes)
+-- =====================================================
+
+INSERT OR IGNORE INTO kb_decision_pattern (id, nome, descricao, exceptions)
+VALUES 
+    ('dp_001', 'Fortalecer Comercial', 'Focar em estruturação da área de vendas antes de investir em marketing', '[]'),
+    ('dp_002', 'Planejamento Estratégico', 'Estruturar o planejamento de médio e longo prazo', '[]');
+
+-- =====================================================
+-- AÇÕES RECOMENDADAS
+-- =====================================================
+
+INSERT OR IGNORE INTO kb_action_pattern (id, decision_pattern_id, ordem, descricao)
+VALUES
+    -- Para Restrição Comercial
+    ('ap_001', 'dp_001', 1, 'Diagnóstico do funil de vendas atual'),
+    ('ap_002', 'dp_001', 2, 'Definir processo comercial padronizado'),
+    ('ap_003', 'dp_001', 3, 'Treinar equipe comercial e ajustar metas'),
+    -- Para Oportunidade de Crescimento
+    ('ap_004', 'dp_002', 1, 'Análise de mercado e posicionamento'),
+    ('ap_005', 'dp_002', 2, 'Definir metas e indicadores de crescimento'),
+    ('ap_006', 'dp_002', 3, 'Estruturar plano de ação para os próximos 12 meses');
