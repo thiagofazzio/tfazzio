@@ -196,9 +196,15 @@ def executar_pipeline_completo(dados_publicos, dados_usuario):
     try:
         investigacao_concluida, novas_hipoteses = pipeline.investigacao(conn, caso_id, respostas)
         if not investigacao_concluida:
-            pendentes = conn.execute("SELECT * FROM pergunta WHERE caso_id=? AND estado='pendente'", (caso_id,)).fetchall()
+          pendentes = conn.execute(
+                "SELECT * FROM pergunta WHERE caso_id=? AND estado='pendente'", (caso_id,)
+            ).fetchall()
             conn.close()
-            return {"status": "perguntas_pendentes", "perguntas": [p["texto"] for p in pendentes]}
+            return {
+                "status": "perguntas_pendentes",
+                "caso_id": caso_id,
+                "perguntas": [{"lacuna": p["lacuna"], "texto": p["texto"]} for p in pendentes]
+            }
     except Exception as e:
         conn.close()
         return {"erro": f"Erro na investigação: {str(e)}"}
@@ -285,7 +291,86 @@ def debug():
 
     conn.close()
     return jsonify(resultado)
-    
+
+def responder_perguntas_e_continuar(caso_id, respostas):
+    """Retoma um Caso com perguntas pendentes, aplicando as respostas e
+    seguindo o pipeline a partir do Cálculo de Certeza."""
+    from datetime import datetime
+    conn = get_conn()
+
+    caso = conn.execute("SELECT * FROM caso WHERE id=?", (caso_id,)).fetchone()
+    if not caso:
+        conn.close()
+        return {"erro": "Caso não encontrado. Reinicie o diagnóstico."}
+    if caso["estado"] != "Investigacao concluida para o ciclo atual":
+        conn.close()
+        return {"erro": f"Caso em estado inesperado: {caso['estado']}"}
+
+    pendentes = conn.execute(
+        "SELECT * FROM pergunta WHERE caso_id=? AND estado='pendente'", (caso_id,)
+    ).fetchall()
+
+    for p in pendentes:
+        resposta_texto = respostas.get(p["lacuna"])
+        if not resposta_texto:
+            continue
+        conn.execute("UPDATE pergunta SET estado='respondida', resposta=? WHERE id=?",
+                     (resposta_texto, p["id"]))
+        conn.execute(
+            """INSERT INTO evidencia (id, caso_id, conteudo, fonte, data_coleta,
+                                       confiabilidade, tipo, verificada, hipotese_id)
+               VALUES (?,?,?,?,?,?,?,1,?)""",
+            (db.new_id("ev"), caso_id, resposta_texto, "empresario",
+             datetime.utcnow().isoformat(), "alta", "resposta_pergunta", p["hipotese_id"]),
+        )
+    conn.commit()
+
+    try:
+        if not pipeline.calculo_certeza(conn, caso_id):
+            conn.close()
+            return {"status": "certeza_insuficiente", "mensagem": "Nenhuma hipótese atingiu certeza suficiente."}
+    except Exception as e:
+        conn.close(); return {"erro": f"Erro no cálculo de certeza: {str(e)}"}
+
+    try:
+        if not pipeline.priorizacao(conn, caso_id):
+            conn.close()
+            return {"status": "nenhuma_hipotese_priorizavel", "mensagem": "Nenhuma hipótese sobreviveu à priorização."}
+    except Exception as e:
+        conn.close(); return {"erro": f"Erro na priorização: {str(e)}"}
+
+    try:
+        if not pipeline.decisao(conn, caso_id):
+            conn.close()
+            return {"status": "sem_padrao_de_decisao", "mensagem": "Sem padrão de decisão catalogado."}
+    except Exception as e:
+        conn.close(); return {"erro": f"Erro na decisão: {str(e)}"}
+
+    try:
+        pipeline.plano_acao(conn, caso_id)
+    except Exception as e:
+        conn.close(); return {"erro": f"Erro no plano de ação: {str(e)}"}
+
+    try:
+        resultado = pipeline.saida(conn, caso_id)
+    except Exception as e:
+        conn.close(); return {"erro": f"Erro na saída: {str(e)}"}
+
+    conn.close()
+    return resultado
+
+
+@app.route('/responder', methods=['POST'])
+def responder():
+    data = request.get_json()
+    if not data or not data.get('caso_id'):
+        return jsonify({"erro": "caso_id é obrigatório"}), 400
+    try:
+        resultado = responder_perguntas_e_continuar(data['caso_id'], data.get('respostas', {}))
+        return jsonify(resultado)
+    except Exception as e:
+        return jsonify({"erro": f"Erro ao processar respostas: {str(e)}"}), 500
+        
 @app.route('/diagnose', methods=['POST'])
 def diagnose():
     data = request.get_json()
