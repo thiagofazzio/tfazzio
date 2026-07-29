@@ -2022,16 +2022,112 @@
     .then(() => { form.style.display = 'none'; sucesso.style.display = 'block'; })
     .catch(() => { form.style.display = 'none'; sucesso.style.display = 'block'; });
   }
-// Diagnóstico completo (Motor TFAZZIO) - com renderização amigável
+// Diagnóstico completo (Motor TFAZZIO) - com ciclo de perguntas
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.getElementById('formDiagnostico');
   const resultadoDiv = document.getElementById('resultadoDiagnostico');
+  let casoAtualId = null;
 
-  function renderDiagnostico(data) {
-    // Se for erro, mostra mensagem simples
+  function renderDiagnosticoFinal(data) {
     if (data.erro) {
       return `<div style="color:#b00;">❌ Erro: ${data.erro}</div>`;
     }
+    if (data.tipo !== 'decisao_concluida') {
+      const msg = data.mensagem || data.motivo || data.motivo_especifico || data.status || data.tipo || 'Sem decisão conclusiva ainda.';
+      return `<div style="color:#555; margin-bottom:12px;">ℹ️ ${msg}</div>
+        <details><summary style="cursor:pointer;">Ver dados brutos (JSON)</summary>
+        <pre style="background:#f5f5f5; padding:12px; border-radius:4px; overflow-x:auto; font-size:12px; margin-top:8px;">${JSON.stringify(data, null, 2)}</pre></details>`;
+    }
+    const restricao = data.constraint_dominante || 'Não identificado';
+    const acoes = [data.primeira_acao_recomendada, ...(data.demais_acoes_do_plano || [])].filter(Boolean);
+    return `
+      <div style="font-family:'Barlow',sans-serif; line-height:1.6;">
+        <div style="background:var(--bordo); color:white; padding:16px 20px; border-radius:4px 4px 0 0; margin:-24px -24px 20px -24px;">
+          <strong style="font-size:18px;">Diagnóstico Concluído</strong>
+        </div>
+        <div style="margin-bottom:20px;">
+          <h4 style="font-size:14px; font-weight:600; color:var(--bordo); margin-bottom:8px;">📌 PONTO DE MAIOR ALAVANCAGEM</h4>
+          <p style="font-size:14px; padding:8px 0;">${restricao} <span style="color:var(--silver); font-size:12px;">(certeza: ${data.certeza || '—'})</span></p>
+        </div>
+        <div style="margin-bottom:20px;">
+          <h4 style="font-size:14px; font-weight:600; color:var(--bordo); margin-bottom:8px;">✅ PLANO DE AÇÃO</h4>
+          <ul style="list-style:none; padding:0; margin:0;">
+            ${acoes.map(a => `<li style="padding:8px 0; border-bottom:1px solid var(--cream-mid); font-size:14px;">• ${a}</li>`).join('')}
+          </ul>
+        </div>
+        <div style="font-size:12px; color:var(--silver); border-top:1px solid var(--cream-mid); padding-top:16px; margin-top:8px;">
+          <details><summary style="cursor:pointer;">Ver dados brutos (JSON)</summary>
+          <pre style="background:#f5f5f5; padding:12px; border-radius:4px; overflow-x:auto; font-size:12px; margin-top:8px;">${JSON.stringify(data, null, 2)}</pre></details>
+        </div>
+      </div>`;
+  }
+
+  function renderPerguntasPendentes(data) {
+    casoAtualId = data.caso_id;
+    const inputs = data.perguntas.map(p => `
+      <div style="margin-bottom:16px;">
+        <label style="display:block; font-size:14px; font-weight:600; color:var(--mid); margin-bottom:6px;">${p.texto}</label>
+        <input type="text" class="resposta-pergunta" data-lacuna="${p.lacuna}" style="width:100%; padding:10px 14px; border:1px solid var(--cream-mid); border-radius:4px; font-size:14px;">
+      </div>`).join('');
+    return `
+      <div style="font-family:'Barlow',sans-serif;">
+        <p style="font-size:14px; color:var(--mid); margin-bottom:16px;">O motor precisa de mais algumas respostas para concluir:</p>
+        ${inputs}
+        <button id="btnContinuarDiagnostico" style="background:var(--bordo); color:white; border:none; padding:12px 24px; border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:600; letter-spacing:2px; cursor:pointer;">Continuar Diagnóstico</button>
+      </div>`;
+  }
+
+  function processarResposta(data) {
+    if (data.status === 'perguntas_pendentes') {
+      resultadoDiv.innerHTML = renderPerguntasPendentes(data);
+      document.getElementById('btnContinuarDiagnostico').addEventListener('click', continuarDiagnostico);
+    } else {
+      resultadoDiv.innerHTML = renderDiagnosticoFinal(data);
+    }
+  }
+
+  function continuarDiagnostico() {
+    const respostas = {};
+    document.querySelectorAll('.resposta-pergunta').forEach(input => {
+      if (input.value.trim()) respostas[input.dataset.lacuna] = input.value.trim();
+    });
+    resultadoDiv.innerHTML = '⏳ Processando respostas...';
+    fetch('https://motor-tfazzio.onrender.com/responder', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ caso_id: casoAtualId, respostas: respostas })
+    })
+      .then(r => r.json())
+      .then(processarResposta)
+      .catch(err => resultadoDiv.innerHTML = '❌ Falha na conexão: ' + err.message);
+  }
+
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const cnpj = document.getElementById('cnpjDiag').value.replace(/\D/g, '');
+      const faturamento = document.getElementById('faturamentoDiag').value;
+      const equipe = document.getElementById('equipeDiag').value;
+      let desafio = document.getElementById('desafioDiag').value;
+      if (desafio === 'Outro (especificar abaixo)') {
+        desafio = document.getElementById('desafioOutro').value.trim() || 'crescer_faturamento';
+      }
+      if (cnpj.length !== 14) { alert('CNPJ inválido. Digite 14 números.'); return; }
+
+      resultadoDiv.style.display = 'block';
+      resultadoDiv.innerHTML = '⏳ Processando dados e gerando diagnóstico...';
+
+      fetch('https://motor-tfazzio.onrender.com/diagnose', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cnpj, faturamento: faturamento || null, equipe: equipe || null, desafio: desafio || null })
+      })
+        .then(r => r.json())
+        .then(processarResposta)
+        .catch(err => resultadoDiv.innerHTML = '❌ Falha na conexão: ' + err.message);
+    });
+  }
+});
 
     // Extrai os campos
     const empresa = data.empresa || 'Empresa não identificada';
