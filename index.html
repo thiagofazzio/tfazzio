@@ -1866,120 +1866,6 @@
 </section>
 
 <!-- ══ DIAGNÓSTICO COMPLETO (MOTOR TFAZZIO) ════════════════════ -->
-// Diagnóstico completo (Motor TFAZZIO)
-document.addEventListener('DOMContentLoaded', function() {
-  const form = document.getElementById('formDiagnostico');
-  const resultadoDiv = document.getElementById('resultadoDiagnostico');
-
-  if (form) {
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-
-      const cnpj = document.getElementById('cnpjDiag').value.replace(/\D/g, '');
-      const faturamento = document.getElementById('faturamentoDiag').value;
-      const equipe = document.getElementById('equipeDiag').value;
-      let desafio = document.getElementById('desafioDiag').value;
-      if (desafio === 'Outro (especificar abaixo)') {
-        desafio = document.getElementById('desafioOutro').value || 'Outro desafio não especificado';
-      }
-
-      if (cnpj.length !== 14) {
-        alert('CNPJ inválido. Digite 14 números.');
-        return;
-      }
-
-      resultadoDiv.style.display = 'block';
-      resultadoDiv.innerText = '⏳ Processando dados e gerando diagnóstico...';
-
-      const payload = {
-        cnpj: cnpj,
-        faturamento: faturamento || null,
-        equipe: equipe || null,
-        desafio: desafio
-      };
-
-      const url = 'https://motor-tfazzio.onrender.com/diagnose';
-
-      fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      .then(response => response.json())
-      .then(data => {
-        // Se houver erro técnico
-        if (data.erro) {
-          resultadoDiv.innerText = '❌ Erro: ' + data.erro;
-          return;
-        }
-
-        // Caso 1: Perguntas pendentes (fluxo interativo)
-        if (data.status === 'perguntas_pendentes' && data.perguntas) {
-          let html = '📋 <strong>Precisamos de mais algumas informações:</strong><br><br>';
-          data.perguntas.forEach((p, i) => {
-            html += `<div style="margin-bottom:12px;">
-              <label style="display:block; font-weight:500; margin-bottom:4px;">${i+1}. ${p}</label>
-              <input type="text" id="pergunta_${i}" placeholder="Sua resposta..." style="width:100%; padding:8px 12px; border:1px solid #ccc; border-radius:4px;">
-            </div>`;
-          });
-          html += `<button onclick="enviarRespostas()" style="background:var(--bordo); color:white; border:none; padding:12px 24px; border-radius:4px; cursor:pointer;">Enviar respostas</button>`;
-          resultadoDiv.innerHTML = html;
-          resultadoDiv.style.display = 'block';
-          // Armazena as perguntas para reenvio
-          window._perguntasPendentes = data.perguntas;
-          return;
-        }
-
-        // Caso 2: Diagnóstico concluído ou outro status
-        resultadoDiv.innerText = JSON.stringify(data, null, 2);
-      })
-      .catch(err => {
-        resultadoDiv.innerText = '❌ Falha na conexão: ' + err.message;
-      });
-    });
-  }
-});
-
-// Função para enviar as respostas das perguntas
-function enviarRespostas() {
-  const perguntas = window._perguntasPendentes || [];
-  const respostas = {};
-  perguntas.forEach((p, i) => {
-    const input = document.getElementById(`pergunta_${i}`);
-    if (input) respostas[p] = input.value;
-  });
-
-  const resultadoDiv = document.getElementById('resultadoDiagnostico');
-  resultadoDiv.innerText = '⏳ Enviando respostas...';
-
-  const payload = {
-    cnpj: document.getElementById('cnpjDiag').value.replace(/\D/g, ''),
-    faturamento: document.getElementById('faturamentoDiag').value || null,
-    equipe: document.getElementById('equipeDiag').value || null,
-    desafio: document.getElementById('desafioDiag').value,
-    respostas: respostas
-  };
-
-  fetch('https://motor-tfazzio.onrender.com/diagnose', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  })
-  .then(r => r.json())
-  .then(data => {
-    if (data.erro) {
-      resultadoDiv.innerText = '❌ Erro: ' + data.erro;
-    } else if (data.status === 'perguntas_pendentes') {
-      // Se ainda houver perguntas, repete o fluxo (ou mostra mensagem)
-      resultadoDiv.innerText = 'Ainda há perguntas pendentes: ' + JSON.stringify(data.perguntas, null, 2);
-    } else {
-      resultadoDiv.innerText = JSON.stringify(data, null, 2);
-    }
-  })
-  .catch(err => {
-    resultadoDiv.innerText = '❌ Erro: ' + err.message;
-  });
-}
    <!-- Desafio -->
 <div style="margin-bottom:24px;">
   <label style="display:block; font-size:13px; font-weight:600; color:var(--mid); margin-bottom:6px;">Qual o maior desafio da empresa agora?</label>
@@ -2109,211 +1995,115 @@ function enviarRespostas() {
     .catch(() => { form.style.display = 'none'; sucesso.style.display = 'block'; });
   }
 // Diagnóstico completo (Motor TFAZZIO) - versão única, consolidada
-(function() {
-  try {
-    const form = document.getElementById('formDiagnostico');
-    const resultadoDiv = document.getElementById('resultadoDiagnostico');
-    let casoAtualId = null;
+// Diagnóstico completo (Motor TFAZZIO)
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('formDiagnostico');
+  const resultadoDiv = document.getElementById('resultadoDiagnostico');
 
-    if (!form) {
-      console.error('formDiagnostico não encontrado no HTML.');
-      return;
-    }
-
-    function renderDiagnosticoFinal(data) {
-      if (data.erro) {
-        return `<div style="color:#b00;">❌ Erro: ${data.erro}</div>`;
-      }
-      if (data.tipo !== 'decisao_concluida') {
-        const msg = data.mensagem || data.motivo || data.motivo_especifico || data.status || data.tipo || 'Sem decisão conclusiva ainda.';
-        return `<div style="color:#555; margin-bottom:12px;">ℹ️ ${msg}</div>
-          <details><summary style="cursor:pointer;">Ver dados brutos (JSON)</summary>
-          <pre style="background:#f5f5f5; padding:12px; border-radius:4px; overflow-x:auto; font-size:12px; margin-top:8px;">${JSON.stringify(data, null, 2)}</pre></details>`;
-      }
-      const restricao = data.constraint_dominante || 'Não identificado';
-      const acoes = [data.primeira_acao_recomendada, ...(data.demais_acoes_do_plano || [])].filter(Boolean);
-      return `
-        <div style="font-family:'Barlow',sans-serif; line-height:1.6;">
-          <div style="background:var(--bordo); color:white; padding:16px 20px; border-radius:4px 4px 0 0; margin:-24px -24px 20px -24px;">
-            <strong style="font-size:18px;">Diagnóstico Concluído</strong>
-          </div>
-          <div style="margin-bottom:20px;">
-            <h4 style="font-size:14px; font-weight:600; color:var(--bordo); margin-bottom:8px;">📌 PONTO DE MAIOR ALAVANCAGEM</h4>
-            <p style="font-size:14px; padding:8px 0;">${restricao} <span style="color:var(--silver); font-size:12px;">(certeza: ${data.certeza || '—'})</span></p>
-          </div>
-          <div style="margin-bottom:20px;">
-            <h4 style="font-size:14px; font-weight:600; color:var(--bordo); margin-bottom:8px;">✅ PLANO DE AÇÃO</h4>
-            <ul style="list-style:none; padding:0; margin:0;">
-              ${acoes.map(a => `<li style="padding:8px 0; border-bottom:1px solid var(--cream-mid); font-size:14px;">• ${a}</li>`).join('')}
-            </ul>
-          </div>
-          <div style="font-size:12px; color:var(--silver); border-top:1px solid var(--cream-mid); padding-top:16px; margin-top:8px;">
-            <details><summary style="cursor:pointer;">Ver dados brutos (JSON)</summary>
-            <pre style="background:#f5f5f5; padding:12px; border-radius:4px; overflow-x:auto; font-size:12px; margin-top:8px;">${JSON.stringify(data, null, 2)}</pre></details>
-          </div>
-        </div>`;
-    }
-
-    // Respostas rápidas com frase completa, alinhadas ao vocabulário que o motor
-    // procura em cada evidence_pattern (respostas de uma palavra só nunca batem
-    // com o casador de palavras-chave do motor — precisa ter substância).
-    const RESPOSTAS_RAPIDAS = {
-      situacao_comercial: {
-        sim: 'Sim, temos uma equipe comercial estruturada e um processo de vendas definido.',
-        nao: 'Não, as vendas dependem principalmente do fundador.'
-      },
-      planejamento_atual: {
-        sim: 'Sim, temos um planejamento estratégico formal revisado periodicamente.',
-        nao: 'Não, cada área decide seus próprios rumos, sem uma meta comum registrada.'
-      }
-    };
-
-    function renderPerguntasPendentes(data) {
-      casoAtualId = data.caso_id;
-      const inputs = data.perguntas.map((p, idx) => {
-        // Aceita tanto o formato objeto {lacuna, texto} quanto string pura,
-        // para nunca quebrar independente da versão do backend no ar.
-        const texto = (typeof p === 'string') ? p : (p && p.texto) || '[pergunta sem texto retornado pelo servidor]';
-        const lacuna = (typeof p === 'string') ? ('pergunta_' + idx) : (p && p.lacuna) || ('pergunta_' + idx);
-        const inputId = 'resposta_' + idx;
-        const rapida = RESPOSTAS_RAPIDAS[lacuna];
-        const opcaoSim = rapida ? rapida.sim : 'Sim, ' + texto.replace(/\?$/, '.');
-        const opcaoNao = rapida ? rapida.nao : 'Não, ' + texto.replace(/\?$/, '.');
-        return `
-        <div style="margin-bottom:16px;">
-          <label style="display:block; font-size:14px; font-weight:600; color:var(--mid); margin-bottom:6px;">${texto}</label>
-          <select class="select-rapido" data-target="${inputId}" style="width:100%; padding:10px 14px; margin-bottom:8px; border:1px solid var(--cream-mid); border-radius:4px; font-size:14px; background:white;">
-            <option value="">Resposta rápida (opcional)...</option>
-            <option value="${opcaoSim.replace(/"/g, '&quot;')}">Sim</option>
-            <option value="${opcaoNao.replace(/"/g, '&quot;')}">Não</option>
-          </select>
-          <input type="text" id="${inputId}" class="resposta-pergunta" data-lacuna="${lacuna}" placeholder="Ou digite/detalhe sua resposta aqui" style="width:100%; padding:10px 14px; border:1px solid var(--cream-mid); border-radius:4px; font-size:14px;">
-        </div>`;
-      }).join('');
-      return `
-        <div style="font-family:'Barlow',sans-serif;">
-          <p style="font-size:14px; color:var(--mid); margin-bottom:16px;">O motor precisa de mais algumas respostas para concluir:</p>
-          ${inputs}
-          <button type="button" id="btnContinuarDiagnostico" style="background:var(--bordo); color:white; border:none; padding:12px 24px; border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:600; letter-spacing:2px; cursor:pointer;">Continuar Diagnóstico</button>
-          <div style="font-size:12px; color:var(--silver); margin-top:16px;">
-            <details><summary style="cursor:pointer;">Ver dados brutos (JSON)</summary>
-            <pre style="background:#f5f5f5; padding:12px; border-radius:4px; overflow-x:auto; font-size:12px; margin-top:8px;">${JSON.stringify(data, null, 2)}</pre></details>
-          </div>
-        </div>`;
-    }
-
-    function processarResposta(data) {
-      if (data.status === 'perguntas_pendentes') {
-        resultadoDiv.innerHTML = renderPerguntasPendentes(data);
-        const btn = document.getElementById('btnContinuarDiagnostico');
-        if (btn) btn.addEventListener('click', continuarDiagnostico);
-        document.querySelectorAll('.select-rapido').forEach(select => {
-          select.addEventListener('change', function() {
-            if (!this.value) return;
-            const alvo = document.getElementById(this.dataset.target);
-            if (alvo) alvo.value = this.value;
-          });
-        });
-      } else {
-        resultadoDiv.innerHTML = renderDiagnosticoFinal(data);
-      }
-    }
-
-    function continuarDiagnostico() {
-      const campos = document.querySelectorAll('.resposta-pergunta');
-      const respostas = {};
-      let faltando = false;
-      campos.forEach(input => {
-        const valor = input.value.trim();
-        if (!valor) {
-          faltando = true;
-          input.style.borderColor = '#b00';
-        } else {
-          input.style.borderColor = '';
-          respostas[input.dataset.lacuna] = valor;
-        }
-      });
-      if (faltando) {
-        alert('Responda todas as perguntas antes de continuar.');
-        return;
-      }
-      if (!casoAtualId) {
-        resultadoDiv.innerHTML = '❌ Não foi possível identificar o caso em andamento. Recarregue a página e refaça o diagnóstico.';
-        return;
-      }
-
-      resultadoDiv.innerHTML = '⏳ Processando respostas...';
-      fetch('https://motor-tfazzio.onrender.com/responder', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ caso_id: casoAtualId, respostas: respostas })
-      })
-        .then(r => {
-          if (!r.ok) {
-            return r.text().then(txt => { throw new Error(`HTTP ${r.status}: ${txt}`); });
-          }
-          return r.json();
-        })
-        .then(processarResposta)
-        .catch(err => {
-          resultadoDiv.innerHTML = '❌ Falha ao continuar: ' + err.message +
-            '<br><small style="color:var(--silver);">Se isso persistir, confirme que o servidor está no ar e que o deploy mais recente foi publicado.</small>';
-          console.error(err);
-        });
-    }
-
-    // Mostra/oculta o campo "Outro" quando essa opção é escolhida no dropdown
-    const desafioSelect = document.getElementById('desafioDiag');
-    if (desafioSelect) {
-      desafioSelect.addEventListener('change', function() {
-        const outro = document.getElementById('desafioOutro');
-        if (outro) outro.style.display = (this.value === 'Outro (especificar abaixo)') ? 'block' : 'none';
-      });
-    }
-
+  if (form) {
     form.addEventListener('submit', function(e) {
       e.preventDefault();
-      e.stopPropagation();
 
       const cnpj = document.getElementById('cnpjDiag').value.replace(/\D/g, '');
       const faturamento = document.getElementById('faturamentoDiag').value;
       const equipe = document.getElementById('equipeDiag').value;
       let desafio = document.getElementById('desafioDiag').value;
+      
       if (desafio === 'Outro (especificar abaixo)') {
-        const outro = document.getElementById('desafioOutro');
-        desafio = (outro && outro.value.trim()) || 'crescer_faturamento';
+        desafio = document.getElementById('desafioOutro').value || 'Outro desafio não especificado';
       }
-      if (cnpj.length !== 14) { alert('CNPJ inválido. Digite 14 números.'); return false; }
+
+      if (cnpj.length !== 14) {
+        alert('CNPJ inválido. Digite 14 números.');
+        return;
+      }
 
       resultadoDiv.style.display = 'block';
-      resultadoDiv.innerHTML = '⏳ Processando dados e gerando diagnóstico...';
+      resultadoDiv.innerText = '⏳ Processando dados e gerando diagnóstico...';
 
-      fetch('https://motor-tfazzio.onrender.com/diagnose', {
+      const payload = {
+        cnpj: cnpj,
+        faturamento: faturamento || null,
+        equipe: equipe || null,
+        desafio: desafio
+      };
+
+      const url = 'https://motor-tfazzio.onrender.com/diagnose';
+
+      fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cnpj, faturamento: faturamento || null, equipe: equipe || null, desafio: desafio || null })
+        body: JSON.stringify(payload)
       })
-        .then(r => {
-          if (!r.ok) {
-            return r.text().then(txt => { throw new Error(`HTTP ${r.status}: ${txt}`); });
-          }
-          return r.json();
-        })
-        .then(processarResposta)
-        .catch(err => {
-          resultadoDiv.innerHTML = '❌ Falha na conexão: ' + err.message +
-            '<br><small style="color:var(--silver);">Se isso persistir, o servidor pode estar hibernando (plano gratuito) — aguarde ~30s e tente de novo.</small>';
-          console.error(err);
-        });
+      .then(response => response.json())
+      .then(data => {
+        if (data.erro) {
+          resultadoDiv.innerText = '❌ Erro: ' + data.erro;
+          return;
+        }
 
-      return false;
+        if (data.status === 'perguntas_pendentes' && data.perguntas) {
+          let html = '📋 <strong>Precisamos de mais algumas informações:</strong><br><br>';
+          data.perguntas.forEach((p, i) => {
+            html += `<div style="margin-bottom:12px;">
+              <label style="display:block; font-weight:500; margin-bottom:4px;">${i+1}. ${p}</label>
+              <input type="text" id="pergunta_${i}" placeholder="Sua resposta..." style="width:100%; padding:8px 12px; border:1px solid #ccc; border-radius:4px;">
+            </div>`;
+          });
+          html += `<button onclick="enviarRespostas()" style="background:var(--bordo); color:white; border:none; padding:12px 24px; border-radius:4px; cursor:pointer;">Enviar respostas</button>`;
+          resultadoDiv.innerHTML = html;
+          resultadoDiv.style.display = 'block';
+          window._perguntasPendentes = data.perguntas;
+          return;
+        }
+
+        resultadoDiv.innerText = JSON.stringify(data, null, 2);
+      })
+      .catch(err => {
+        resultadoDiv.innerText = '❌ Falha na conexão: ' + err.message;
+      });
     });
-
-    console.log('✅ Diagnóstico TFAZZIO: listener registrado com sucesso.');
-  } catch (err) {
-    console.error('❌ Erro ao inicializar script de diagnóstico:', err);
   }
-})();
+});
+
+function enviarRespostas() {
+  const perguntas = window._perguntasPendentes || [];
+  const respostas = {};
+  perguntas.forEach((p, i) => {
+    const input = document.getElementById(`pergunta_${i}`);
+    if (input) respostas[p] = input.value;
+  });
+
+  const resultadoDiv = document.getElementById('resultadoDiagnostico');
+  resultadoDiv.innerText = '⏳ Enviando respostas...';
+
+  const payload = {
+    cnpj: document.getElementById('cnpjDiag').value.replace(/\D/g, ''),
+    faturamento: document.getElementById('faturamentoDiag').value || null,
+    equipe: document.getElementById('equipeDiag').value || null,
+    desafio: document.getElementById('desafioDiag').value,
+    respostas: respostas
+  };
+
+  fetch('https://motor-tfazzio.onrender.com/diagnose', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.erro) {
+      resultadoDiv.innerText = '❌ Erro: ' + data.erro;
+    } else if (data.status === 'perguntas_pendentes') {
+      resultadoDiv.innerText = 'Ainda há perguntas pendentes: ' + JSON.stringify(data.perguntas, null, 2);
+    } else {
+      resultadoDiv.innerText = JSON.stringify(data, null, 2);
+    }
+  })
+  .catch(err => {
+    resultadoDiv.innerText = '❌ Erro: ' + err.message;
+  });
+}
 </script>
 
 </body>
