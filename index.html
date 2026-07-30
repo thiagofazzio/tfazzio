@@ -2156,9 +2156,8 @@ function enviarRespostas() {
     }
 
     if (valor && valor !== '') {
-      // Usa a lacuna (ou texto como fallback) como chave
-      const chave = p.lacuna || p.texto;
-      respostas[chave] = valor;
+      // Usa o TEXTO da pergunta como chave (não a lacuna)
+      respostas[p.texto] = valor;
     }
   });
 
@@ -2172,7 +2171,7 @@ function enviarRespostas() {
     faturamento: document.getElementById('faturamentoDiag').value || null,
     equipe: document.getElementById('equipeDiag').value || null,
     desafio: document.getElementById('desafioDiag').value,
-    respostas: respostas
+    respostas: respostas  // agora com chaves = texto das perguntas
   };
 
   fetch('https://motor-tfazzio.onrender.com/diagnose', {
@@ -2185,8 +2184,39 @@ function enviarRespostas() {
     if (data.erro) {
       resultadoDiv.innerText = '❌ Erro: ' + data.erro;
     } else if (data.status === 'perguntas_pendentes') {
-      resultadoDiv.innerText = 'Ainda há perguntas pendentes. Recarregue a página e tente novamente.';
+      // Se ainda houver perguntas, exibe novamente
+      if (data.perguntas && data.perguntas.length > 0) {
+        let html = '📋 <strong>Precisamos de mais algumas informações:</strong><br><br>';
+        const novasPerguntas = data.perguntas.map((p, idx) => {
+          if (typeof p === 'string') {
+            return { texto: p, lacuna: 'pergunta_' + idx };
+          } else {
+            return { texto: p.texto || p, lacuna: p.lacuna || 'pergunta_' + idx };
+          }
+        });
+        novasPerguntas.forEach((p, i) => {
+          html += `<div style="margin-bottom:16px; background:#f9f9f9; padding:12px; border-radius:6px; border-left:3px solid var(--bordo);">
+            <label style="display:block; font-weight:500; margin-bottom:6px;">${i+1}. ${p.texto}</label>
+            <select id="pergunta_select_${i}" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; font-size:14px;" onchange="toggleOutroInput(${i})">
+              <option value="">Selecione uma opção...</option>
+              <option value="Sim">Sim</option>
+              <option value="Não">Não</option>
+              <option value="Parcialmente">Parcialmente</option>
+              <option value="Outro">Outro (especificar)</option>
+            </select>
+            <div id="pergunta_outro_${i}" style="display:none; margin-top:8px;">
+              <input type="text" id="pergunta_input_${i}" placeholder="Especifique com pelo menos 2 palavras..." style="width:100%; padding:8px 12px; border:1px solid #ccc; border-radius:4px;">
+            </div>
+          </div>`;
+        });
+        html += `<button onclick="enviarRespostas()" style="background:var(--bordo); color:white; border:none; padding:12px 24px; border-radius:4px; cursor:pointer; font-weight:600;">Enviar respostas</button>`;
+        resultadoDiv.innerHTML = html;
+        window._perguntasPendentes = novasPerguntas;
+      } else {
+        resultadoDiv.innerText = 'Ainda há perguntas pendentes, mas não foram recebidas. Recarregue a página.';
+      }
     } else {
+      // Diagnóstico final
       resultadoDiv.innerText = JSON.stringify(data, null, 2);
     }
   })
