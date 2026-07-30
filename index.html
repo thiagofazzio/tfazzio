@@ -2023,7 +2023,6 @@
     .then(() => { form.style.display = 'none'; sucesso.style.display = 'block'; })
     .catch(() => { form.style.display = 'none'; sucesso.style.display = 'block'; });
   }
-// Diagnóstico completo (Motor TFAZZIO) - versão única, consolidada
 // Diagnóstico completo (Motor TFAZZIO)
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.getElementById('formDiagnostico');
@@ -2071,21 +2070,38 @@ document.addEventListener('DOMContentLoaded', function() {
           return;
         }
 
+        // --- FLUXO DE PERGUNTAS (com dropdown e validação) ---
         if (data.status === 'perguntas_pendentes' && data.perguntas) {
           let html = '📋 <strong>Precisamos de mais algumas informações:</strong><br><br>';
+          
           data.perguntas.forEach((p, i) => {
-            html += `<div style="margin-bottom:12px;">
-              <label style="display:block; font-weight:500; margin-bottom:4px;">${i+1}. ${p}</label>
-              <input type="text" id="pergunta_${i}" placeholder="Sua resposta..." style="width:100%; padding:8px 12px; border:1px solid #ccc; border-radius:4px;">
+            html += `<div style="margin-bottom:16px; background:#f9f9f9; padding:12px; border-radius:6px; border-left:3px solid var(--bordo);">
+              <label style="display:block; font-weight:500; margin-bottom:6px;">${i+1}. ${p.texto}</label>
+              <select id="pergunta_select_${i}" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; font-size:14px;" onchange="toggleOutroInput(${i})">
+                <option value="">Selecione uma opção...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+                <option value="Parcialmente">Parcialmente</option>
+                <option value="Outro">Outro (especificar)</option>
+              </select>
+              <div id="pergunta_outro_${i}" style="display:none; margin-top:8px;">
+                <input type="text" id="pergunta_input_${i}" placeholder="Especifique com pelo menos 2 palavras..." style="width:100%; padding:8px 12px; border:1px solid #ccc; border-radius:4px;">
+              </div>
+              <input type="hidden" id="pergunta_lacuna_${i}" value="${p.lacuna}">
             </div>`;
           });
-          html += `<button onclick="enviarRespostas()" style="background:var(--bordo); color:white; border:none; padding:12px 24px; border-radius:4px; cursor:pointer;">Enviar respostas</button>`;
+          
+          html += `<button onclick="enviarRespostas()" style="background:var(--bordo); color:white; border:none; padding:12px 24px; border-radius:4px; cursor:pointer; font-weight:600;">Enviar respostas</button>`;
+          
           resultadoDiv.innerHTML = html;
           resultadoDiv.style.display = 'block';
+          
+          // Armazena as perguntas para uso na função de envio
           window._perguntasPendentes = data.perguntas;
           return;
         }
 
+        // --- DIAGNÓSTICO FINAL ---
         resultadoDiv.innerText = JSON.stringify(data, null, 2);
       })
       .catch(err => {
@@ -2095,13 +2111,47 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
+// Função para mostrar/ocultar o campo "Outro"
+function toggleOutroInput(index) {
+  const select = document.getElementById(`pergunta_select_${index}`);
+  const outroDiv = document.getElementById(`pergunta_outro_${index}`);
+  if (select.value === 'Outro') {
+    outroDiv.style.display = 'block';
+  } else {
+    outroDiv.style.display = 'none';
+  }
+}
+
+// Função para enviar as respostas (agora com a chave correta e validação)
 function enviarRespostas() {
   const perguntas = window._perguntasPendentes || [];
   const respostas = {};
+  let valido = true;
+
   perguntas.forEach((p, i) => {
-    const input = document.getElementById(`pergunta_${i}`);
-    if (input) respostas[p] = input.value;
+    const select = document.getElementById(`pergunta_select_${i}`);
+    let valor = select.value;
+
+    if (valor === 'Outro') {
+      const input = document.getElementById(`pergunta_input_${i}`);
+      if (input) {
+        valor = input.value.trim();
+        // Validação: mínimo 2 palavras
+        if (valor.split(/\s+/).length < 2) {
+          alert(`Por favor, especifique "${p.texto}" com pelo menos 2 palavras.`);
+          valido = false;
+          return;
+        }
+      }
+    }
+
+    if (valor && valor !== 'Outro') {
+      // Usa o lacuna (código) como chave, não o texto da pergunta
+      respostas[p.lacuna] = valor;
+    }
   });
+
+  if (!valido) return;
 
   const resultadoDiv = document.getElementById('resultadoDiagnostico');
   resultadoDiv.innerText = '⏳ Enviando respostas...';
@@ -2111,7 +2161,7 @@ function enviarRespostas() {
     faturamento: document.getElementById('faturamentoDiag').value || null,
     equipe: document.getElementById('equipeDiag').value || null,
     desafio: document.getElementById('desafioDiag').value,
-    respostas: respostas
+    respostas: respostas  // Agora enviando com as chaves corretas!
   };
 
   fetch('https://motor-tfazzio.onrender.com/diagnose', {
@@ -2124,7 +2174,8 @@ function enviarRespostas() {
     if (data.erro) {
       resultadoDiv.innerText = '❌ Erro: ' + data.erro;
     } else if (data.status === 'perguntas_pendentes') {
-      resultadoDiv.innerText = 'Ainda há perguntas pendentes: ' + JSON.stringify(data.perguntas, null, 2);
+      // Se ainda houver perguntas (recursivo), recarrega a página ou mostra mensagem
+      resultadoDiv.innerText = 'Ainda há perguntas pendentes. Recarregue a página e tente novamente.';
     } else {
       resultadoDiv.innerText = JSON.stringify(data, null, 2);
     }
