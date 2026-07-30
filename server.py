@@ -19,7 +19,7 @@ def get_conn():
 
 # --- FUNÇÃO QUE SEMPRE GARANTE AS HIPÓTESES CORINGAS ---
 def garantir_hipoteses(conn):
-    """Insere ou substitui as hipóteses coringas para garantir que sempre existam."""
+    """Insere ou substitui as hipóteses coringas com lacunas no formato correto (lista de dicionários)."""
     print(">>> Garantindo hipóteses coringas na KB...")
     
     # 1. Hipótese Restrição Comercial
@@ -36,7 +36,11 @@ def garantir_hipoteses(conn):
         'padrao',
         '{}',
         '[{"tipo": "confirma", "peso": "alto", "descricao": "Dificuldade em vender mais", "fecha_por": "empresario"}]',
-        '["falta_processo_comercial", "equipe_comercial_pequena"]',
+        # --- LACUNAS CORRIGIDAS (lista de dicionários) ---
+        '[' 
+        '{"nome": "falta_processo_comercial", "classe": "pergunta", "pergunta_canonica": "Você tem um processo comercial documentado e seguido por toda a equipe?"}, '
+        '{"nome": "equipe_comercial_pequena", "classe": "pergunta", "pergunta_canonica": "Sua equipe comercial tem o tamanho adequado para o volume de oportunidades que você gera?"}'
+        ']',
         'dp_001',
         None,
         'capacidade_comercial',
@@ -57,7 +61,11 @@ def garantir_hipoteses(conn):
         'padrao',
         '{}',
         '[{"tipo": "confirma", "peso": "medio", "descricao": "Faturamento consistente", "fecha_por": "empresario"}]',
-        '["planejamento_estrategico_ausente"]',
+        # --- LACUNAS CORRIGIDAS ---
+        '['
+        '{"nome": "planejamento_estrategico_ausente", "classe": "pergunta", "pergunta_canonica": "Você tem um planejamento estratégico formal para os próximos 12 meses?"}, '
+        '{"nome": "falta_indicadores", "classe": "pergunta", "pergunta_canonica": "Você acompanha regularmente indicadores de desempenho (ex: margem, conversão, ticket médio)?"}'
+        ']',
         'dp_002',
         None,
         'capacidade_gestao',
@@ -92,7 +100,6 @@ def garantir_hipoteses(conn):
 
     conn.commit()
     print(">>> Hipóteses coringas garantidas com sucesso.")
-
 # --- INICIALIZAÇÃO PRINCIPAL ---
 print(">>> Inicializando banco de dados...")
 try:
