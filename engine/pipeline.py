@@ -112,10 +112,6 @@ def entrada(conn, cnpj, modelo_receita_percebido, objetivo_empresarial, versao_m
 # ------------------------------------------------------------------
 # 1b. Gate "Objetivo pouco claro" (KB-001 / Hipotese de qualidade de input)
 # ------------------------------------------------------------------
-# Esta NAO e uma Hypothesis normal do pool diagnostico (comercial/caixa/
-# operacao/...). E um gate sobre a qualidade do proprio input do modulo 1 -
-# roda ANTES do Enriquecimento, no mesmo espirito da pergunta de calibracao
-# de modelo de receita (Contratos §2), mas para o campo Objetivo Empresarial.
 OBJETIVOS_CANONICOS = {
     "reduzir_dependencia_fundador",
     "crescer_faturamento",
@@ -413,10 +409,10 @@ def investigacao(conn, caso_id, respostas: dict = None,
 
         for lac in lacunas:
             # tenta fechar por fonte pública antes de qualquer pergunta (Raciocínio §4.1):
-            # existe evidence_pattern "confirma"/fecha_por=publica cujas palavras-chave já
+            # existe evidence_pattern "confirma" e "fecha_por=publica" cujas palavras-chave já
             # aparecem em alguma evidência pública coletada no Enriquecimento?
             ep_confirma_publica = [ep for ep in evidence_patterns
-                                    if ep["tipo"] == "confirma" and ep["fecha_por"] == "publica"]
+                                    if ep["tipo"] == "confirma" and ep.get("fecha_por") == "publica"]
             tem_publica = any(
                 _evidencia_satisfaz(_keywords(ep["descricao"]), ev)
                 for ep in ep_confirma_publica for ev in evidencias_conteudo
@@ -803,30 +799,43 @@ def saida(conn, caso_id):
     passos = db.loads(plano["passos"])
     evidencias = conn.execute("SELECT * FROM evidencia WHERE caso_id=?", (caso_id,)).fetchall()
 
-    # Biblioteca de Perguntas Poderosas (versão leve, Contratos §11: módulo
-    # "apenas consulta" Pergunta e Hipótese - nada aqui é inventado, é a
-    # mesma pergunta/resposta já registrada, mais o contexto de analogia e
-    # reflexão que já vive dentro de lacunas_tipicas na KB, quando existente.
-    # Campos analogia/se_resposta_sim/se_resposta_nao são opcionais - uma
-    # hipótese sem eles simplesmente não gera reflexão nenhuma, sem quebrar.
-    lacunas_tipicas = db.loads(template["lacunas_tipicas"]) or []
-    lacunas_por_nome = {lac["nome"]: lac for lac in lacunas_tipicas if lac.get("classe") == "pergunta"}
-    perguntas_respondidas = conn.execute(
-        "SELECT * FROM pergunta WHERE caso_id=? AND hipotese_id=? AND estado='respondida'",
-        (caso_id, hipotese["id"]),
-    ).fetchall()
-    perguntas_e_reflexoes = []
-    for p in perguntas_respondidas:
-        lac = lacunas_por_nome.get(p["lacuna"])
-        item = {"pergunta": p["texto"], "resposta": p["resposta"]}
-        if lac:
-            if lac.get("analogia"):
-                item["analogia"] = lac["analogia"]
-            if lac.get("se_resposta_sim"):
-                item["se_resposta_sim"] = lac["se_resposta_sim"]
-            if lac.get("se_resposta_nao"):
-                item["se_resposta_nao"] = lac["se_resposta_nao"]
-        perguntas_e_reflexoes.append(item)
+    # --- COLETA PERGUNTAS E REFLEXÕES DA HIPÓTESE VENCEDORA ---
+    perguntas_reflexoes = []
+    lacunas = db.loads(hipotese["lacunas"]) or []
+    for lacuna in lacunas:
+        # Busca perguntas respondidas associadas a esta hipótese
+        pergs = conn.execute(
+            "SELECT * FROM pergunta WHERE caso_id=? AND hipotese_id=? AND lacuna=? AND estado='respondida'",
+            (caso_id, hipotese["id"], lacuna)
+        ).fetchall()
+        for p in pergs:
+            # Tenta extrair metadados do template (analogia, se_resposta_sim, se_resposta_nao)
+            # Se o template tiver lacunas_tipicas com esses campos, eles estarão no JSON
+            # Vamos buscar a definição da lacuna no template (se existir)
+            template_lacunas = db.loads(template["lacunas_tipicas"]) or []
+            meta = {}
+            for tl in template_lacunas:
+                if tl.get("nome") == lacuna:
+                    meta = tl
+                    break
+            
+            perguntas_reflexoes.append({
+                "pergunta": p["texto"],
+                "resposta": p["resposta"],
+                "analogia": meta.get("analogia"),
+                "se_resposta_sim": meta.get("se_resposta_sim"),
+                "se_resposta_nao": meta.get("se_resposta_nao"),
+                "lacuna": lacuna
+            })
+
+    # --- CORREÇÃO: Incluir respostas do empresário em evidencias_citadas ---
+    evidencias_citadas = []
+    for e in evidencias:
+        if e["tipo"] in ("publica", "resposta_pergunta"):
+            evidencias_citadas.append({
+                "conteudo": e["conteudo"],
+                "fonte": e["fonte"]
+            })
 
     conn.execute("UPDATE caso SET estado='encerrado' WHERE id=?", (caso_id,))
     conn.commit()
@@ -838,7 +847,6 @@ def saida(conn, caso_id):
         "decision_pattern": dec["decision_pattern_id"],
         "primeira_acao_recomendada": passos[0]["descricao"],
         "demais_acoes_do_plano": [p["descricao"] for p in passos[1:]],
-        "evidencias_citadas": [{"conteudo": e["conteudo"], "fonte": e["fonte"]} for e in evidencias
-                                if e["tipo"] in ("publica", "resposta_pergunta")],
-        "perguntas_e_reflexoes": perguntas_e_reflexoes,
+        "evidencias_citadas": evidencias_citadas,
+        "perguntas_e_reflexoes": perguntas_reflexoes  # <-- NOVO CAMPO
     }
