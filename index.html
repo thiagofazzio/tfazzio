@@ -2070,11 +2070,22 @@ document.addEventListener('DOMContentLoaded', function() {
           return;
         }
 
-        // --- FLUXO DE PERGUNTAS (com dropdown e validação) ---
+        // --- FLUXO DE PERGUNTAS (com suporte a string ou objeto) ---
         if (data.status === 'perguntas_pendentes' && data.perguntas) {
           let html = '📋 <strong>Precisamos de mais algumas informações:</strong><br><br>';
           
-          data.perguntas.forEach((p, i) => {
+          // Normaliza para array de objetos {texto, lacuna}
+          let perguntasNormalizadas = data.perguntas.map((p, index) => {
+            if (typeof p === 'string') {
+              return { texto: p, lacuna: 'pergunta_' + index };
+            } else if (typeof p === 'object' && p.texto) {
+              return { texto: p.texto, lacuna: p.lacuna || 'pergunta_' + index };
+            } else {
+              return { texto: 'Pergunta ' + (index+1), lacuna: 'pergunta_' + index };
+            }
+          });
+
+          perguntasNormalizadas.forEach((p, i) => {
             html += `<div style="margin-bottom:16px; background:#f9f9f9; padding:12px; border-radius:6px; border-left:3px solid var(--bordo);">
               <label style="display:block; font-weight:500; margin-bottom:6px;">${i+1}. ${p.texto}</label>
               <select id="pergunta_select_${i}" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; font-size:14px;" onchange="toggleOutroInput(${i})">
@@ -2096,8 +2107,8 @@ document.addEventListener('DOMContentLoaded', function() {
           resultadoDiv.innerHTML = html;
           resultadoDiv.style.display = 'block';
           
-          // Armazena as perguntas para uso na função de envio
-          window._perguntasPendentes = data.perguntas;
+          // Armazena as perguntas normalizadas para uso no envio
+          window._perguntasPendentes = perguntasNormalizadas;
           return;
         }
 
@@ -2122,7 +2133,7 @@ function toggleOutroInput(index) {
   }
 }
 
-// Função para enviar as respostas (agora com a chave correta e validação)
+// Função para enviar as respostas
 function enviarRespostas() {
   const perguntas = window._perguntasPendentes || [];
   const respostas = {};
@@ -2136,7 +2147,6 @@ function enviarRespostas() {
       const input = document.getElementById(`pergunta_input_${i}`);
       if (input) {
         valor = input.value.trim();
-        // Validação: mínimo 2 palavras
         if (valor.split(/\s+/).length < 2) {
           alert(`Por favor, especifique "${p.texto}" com pelo menos 2 palavras.`);
           valido = false;
@@ -2145,9 +2155,10 @@ function enviarRespostas() {
       }
     }
 
-    if (valor && valor !== 'Outro') {
-      // Usa o lacuna (código) como chave, não o texto da pergunta
-      respostas[p.lacuna] = valor;
+    if (valor && valor !== '') {
+      // Usa a lacuna (ou texto como fallback) como chave
+      const chave = p.lacuna || p.texto;
+      respostas[chave] = valor;
     }
   });
 
@@ -2161,7 +2172,7 @@ function enviarRespostas() {
     faturamento: document.getElementById('faturamentoDiag').value || null,
     equipe: document.getElementById('equipeDiag').value || null,
     desafio: document.getElementById('desafioDiag').value,
-    respostas: respostas  // Agora enviando com as chaves corretas!
+    respostas: respostas
   };
 
   fetch('https://motor-tfazzio.onrender.com/diagnose', {
@@ -2174,7 +2185,6 @@ function enviarRespostas() {
     if (data.erro) {
       resultadoDiv.innerText = '❌ Erro: ' + data.erro;
     } else if (data.status === 'perguntas_pendentes') {
-      // Se ainda houver perguntas (recursivo), recarrega a página ou mostra mensagem
       resultadoDiv.innerText = 'Ainda há perguntas pendentes. Recarregue a página e tente novamente.';
     } else {
       resultadoDiv.innerText = JSON.stringify(data, null, 2);
