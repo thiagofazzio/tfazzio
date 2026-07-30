@@ -214,9 +214,14 @@ def executar_pipeline_completo(dados_publicos, dados_usuario):
     try:
         investigacao_concluida, novas_hipoteses = pipeline.investigacao(conn, caso_id, respostas)
         if not investigacao_concluida:
-            pendentes = conn.execute("SELECT * FROM pergunta WHERE caso_id=? AND estado='pendente'", (caso_id,)).fetchall()
-            conn.close()
-            return {"status": "perguntas_pendentes", "perguntas": [p["texto"] for p in pendentes]}
+    pendentes = conn.execute(
+        "SELECT * FROM pergunta WHERE caso_id=? AND estado='pendente'", (caso_id,)
+    ).fetchall()
+    conn.close()
+    return {
+        "status": "perguntas_pendentes",
+        "perguntas": [{"texto": p["texto"], "lacuna": p["lacuna"]} for p in pendentes]
+    }
     except Exception as e:
         conn.close()
         return {"erro": f"Erro na investigação: {str(e)}"}
