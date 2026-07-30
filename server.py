@@ -8,6 +8,17 @@ from flask_cors import CORS
 from engine import db
 from enriquecimento_automatico import enriquecer_cnpj
 
+# Se a variável RESET_DB estiver ativa, apaga o banco existente
+if os.environ.get('RESET_DB') == 'true':
+    db_path = os.environ.get('DATABASE_URL', 'tfazzio.db')
+    if db_path.startswith('sqlite:///'):
+        db_path = db_path.replace('sqlite:///', '')
+    if os.path.exists(db_path):
+        os.remove(db_path)
+        print(f">>> Banco {db_path} removido (RESET_DB=true)")
+    # Opcional: desativar após o reset para não apagar sempre
+    # os.environ['RESET_DB'] = 'false'
+
 DB_PATH = os.environ.get('DATABASE_URL', 'tfazzio.db')
 if DB_PATH.startswith('sqlite:///'):
     DB_PATH = DB_PATH.replace('sqlite:///', '')
