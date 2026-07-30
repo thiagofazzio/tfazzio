@@ -2156,8 +2156,11 @@ function enviarRespostas() {
     }
 
     if (valor && valor !== '') {
-      // Usa o TEXTO da pergunta como chave (não a lacuna)
-      respostas[p.texto] = valor;
+      // *** ALTERAÇÃO AQUI ***
+      // Pega a lacuna do campo hidden (ou usa p.lacuna como fallback)
+      const lacunaInput = document.getElementById(`pergunta_lacuna_${i}`);
+      const chave = lacunaInput ? lacunaInput.value : (p.lacuna || 'pergunta_' + i);
+      respostas[chave] = valor;
     }
   });
 
@@ -2171,7 +2174,7 @@ function enviarRespostas() {
     faturamento: document.getElementById('faturamentoDiag').value || null,
     equipe: document.getElementById('equipeDiag').value || null,
     desafio: document.getElementById('desafioDiag').value,
-    respostas: respostas  // agora com chaves = texto das perguntas
+    respostas: respostas  // agora com chaves = lacunas
   };
 
   fetch('https://motor-tfazzio.onrender.com/diagnose', {
@@ -2207,6 +2210,7 @@ function enviarRespostas() {
             <div id="pergunta_outro_${i}" style="display:none; margin-top:8px;">
               <input type="text" id="pergunta_input_${i}" placeholder="Especifique com pelo menos 2 palavras..." style="width:100%; padding:8px 12px; border:1px solid #ccc; border-radius:4px;">
             </div>
+            <input type="hidden" id="pergunta_lacuna_${i}" value="${p.lacuna}">
           </div>`;
         });
         html += `<button onclick="enviarRespostas()" style="background:var(--bordo); color:white; border:none; padding:12px 24px; border-radius:4px; cursor:pointer; font-weight:600;">Enviar respostas</button>`;
