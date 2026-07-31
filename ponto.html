@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Raio-X Empresarial · TFAZZIO</title>
+  <meta name="description" content="Descubra em poucos minutos qual decisão merece sua atenção primeiro." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    /* ─── RESET & BASE (mesmo estilo do site) ─────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bordo: #6B0F1A;
+      --bordo-mid: #7B1D2E;
+      --bordo-dark: #4A0A12;
+      --gold: #D4AF37;
+      --gold-pale: #E8CC6A;
+      --graphite: #1A1A1A;
+      --mid: #2E2E2E;
+      --muted: #5A6270;
+      --silver: #8A929C;
+      --rule: #D8D3CB;
+      --white: #FFFFFF;
+      --off: #F9F7F3;
+      --cream: #F2EEE7;
+      --cream-mid: #E8E2D8;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--white);
+      color: var(--graphite);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      line-height: 1.75;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    .t-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      display: block;
+    }
+    .t-label--muted { color: var(--silver); }
+    .t-display {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      line-height: 1.06;
+      color: var(--graphite);
+    }
+    .t-display em { font-style: italic; color: var(--bordo); }
+    .t-display--lg { font-size: clamp(36px, 5vw, 68px); }
+    .t-display--md { font-size: clamp(28px, 3.5vw, 50px); }
+    .t-display--sm { font-size: clamp(22px, 2.8vw, 36px); }
+    .t-display--inv { color: var(--white); }
+    .t-display--inv em { color: var(--gold-pale); }
+    .t-body { font-size: 16px; color: var(--muted); line-height: 1.9; }
+    .t-body--sm { font-size: 14px; }
+    .btn {
+      display: inline-block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 17px 48px;
+      transition: all 0.22s;
+      cursor: pointer;
+      border: none;
+      line-height: 1;
+    }
+    .btn--bordo { background: var(--bordo); color: var(--white); }
+    .btn--bordo:hover { background: var(--bordo-mid); transform: translateY(-2px); }
+    .btn--gold { background: var(--gold); color: var(--bordo-dark); }
+    .btn--gold:hover { background: var(--gold-pale); transform: translateY(-2px); }
+    .btn--outline {
+      background: transparent;
+      color: var(--bordo);
+      border: 1px solid var(--bordo);
+      padding: 16px 46px;
+    }
+    .btn--outline:hover { background: var(--bordo); color: var(--white); }
+    .btn--block { display: block; width: 100%; text-align: center; }
+    .btn--sm { padding: 13px 32px; font-size: 10px; }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 0 60px; }
+    .wrap--narrow { max-width: 860px; margin: 0 auto; padding: 0 60px; }
+    .section { padding: 120px 0; }
+    .gold-line { display: block; width: 36px; height: 2px; background: var(--gold); }
+
+    /* ─── NAV (copiada do site) ───────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 60px;
+      background: rgba(255,255,255,0.96);
+      border-bottom: 1px solid var(--cream-mid);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .nav-logo-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: 5px;
+      color: var(--bordo);
+      text-decoration: none;
+    }
+    .nav-links { display: flex; align-items: center; gap: 36px; }
+    .nav-link {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-link:hover { color: var(--bordo); }
+    .nav-cta {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      text-decoration: none;
+      background: var(--bordo);
+      color: var(--white);
+      padding: 10px 24px;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--bordo-mid); }
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+    .nav-hamburger span { display: block; width: 22px; height: 1.5px; background: var(--bordo); }
+    .mob-menu {
+      display: none;
+      position: fixed;
+      top: 68px; left: 0; right: 0;
+      background: var(--white);
+      border-bottom: 1px solid var(--cream-mid);
+      padding: 28px 32px 36px;
+      flex-direction: column;
+      gap: 0;
+      z-index: 199;
+      max-height: calc(100vh - 68px);
+      overflow-y: auto;
+    }
+    .mob-menu.open { display: flex; }
+    .mob-menu .nav-link {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--cream);
+      font-size: 12px;
+    }
+    .mob-menu .nav-cta { margin-top: 20px; text-align: center; padding: 14px; }
+
+    /* ─── RAIO-X SPECIFIC ───────────────────────────────── */
+    .rx-section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 100px 0 80px;
+      background: var(--white);
+    }
+    .rx-section--alt { background: var(--off); }
+
+    /* tela de boas-vindas */
+    .rx-hero {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .rx-hero .t-label { margin-bottom: 24px; }
+    .rx-hero .t-display { margin-bottom: 16px; }
+    .rx-hero .t-body { max-width: 480px; margin: 0 auto 40px; }
+
+    /* steps */
+    .rx-step {
+      display: none;
+      animation: fadeSlide 0.4s ease forwards;
+      max-width: 640px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .rx-step.active { display: block; }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .rx-step-header { margin-bottom: 32px; }
+    .rx-step-header .t-label { margin-bottom: 8px; }
+    .rx-step-header .step-counter {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: var(--silver);
+      margin-bottom: 12px;
+      display: block;
+    }
+    .rx-step-header .step-question {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(24px, 3vw, 40px);
+      font-weight: 300;
+      line-height: 1.2;
+      color: var(--graphite);
+    }
+    .rx-step-header .step-question em { font-style: italic; color: var(--bordo); }
+    .rx-step-header .step-hint {
+      font-size: 13px;
+      color: var(--silver);
+      margin-top: 8px;
+      font-style: italic;
+    }
+    .rx-gamification {
+      font-size: 13px;
+      color: var(--gold);
+      font-family: 'Barlow Condensed', sans-serif;
+      letter-spacing: 2px;
+      margin-top: 8px;
+      opacity: 0.8;
+    }
+
+    /* inputs */
+    .rx-input-group { margin: 24px 0 32px; }
+    .rx-input-group label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      color: var(--mid);
+      display: block;
+      margin-bottom: 6px;
+    }
+    .rx-input-group .rx-input {
+      width: 100%;
+      padding: 14px 16px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 16px;
+      font-weight: 300;
+      border: 1px solid var(--cream-mid);
+      background: var(--white);
+      color: var(--graphite);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .rx-input-group .rx-input:focus { border-color: var(--bordo); }
+    .rx-input-group .rx-input--select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235A6270' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; padding-right: 40px; }
+    .rx-input-group .rx-input--textarea { min-height: 80px; resize: vertical; }
+
+    /* radio group */
+    .rx-radio-group {
+      display: flex;
+      gap: 16px;
+      margin: 16px 0 24px;
+      flex-wrap: wrap;
+    }
+    .rx-radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 15px;
+      color: var(--mid);
+      cursor: pointer;
+    }
+    .rx-radio-group input[type="radio"] {
+      appearance: none;
+      width: 18px; height: 18px;
+      border: 2px solid var(--cream-mid);
+      border-radius: 50%;
+      transition: border-color 0.2s, background 0.2s;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .rx-radio-group input[type="radio"]:checked {
+      border-color: var(--bordo);
+      background: var(--bordo);
+      box-shadow: inset 0 0 0 3px var(--white);
+    }
+
+    /* nota 1-5 (gestão) */
+    .rx-nota-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 24px;
+      margin: 16px 0 24px;
+    }
+    .rx-nota-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: space-between;
+    }
+    .rx-nota-item label {
+      font-size: 14px;
+      color: var(--mid);
+      font-weight: 400;
+      flex: 1;
+    }
+    .rx-nota-item select {
+      padding: 6px 8px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 14px;
+      border: 1px solid var(--cream-mid);
+      background: var(--white);
+      border-radius: 0;
+      outline: none;
+      width: 64px;
+    }
+    .rx-nota-item select:focus { border-color: var(--bordo); }
+
+    /* progress bar */
+    .rx-progress {
+      margin: 32px 0 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .rx-progress-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--silver);
+      font-family: 'Barlow Condensed', sans-serif;
+      letter-spacing: 1px;
+    }
+    .rx-progress-bar {
+      height: 4px;
+      background: var(--cream-mid);
+      border-radius: 0;
+      overflow: hidden;
+    }
+    .rx-progress-fill {
+      height: 100%;
+      background: var(--bordo);
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+    .rx-progress-message {
+      font-size: 13px;
+      color: var(--gold);
+      font-family: 'Barlow Condensed', sans-serif;
+      letter-spacing: 1.5px;
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    .rx-step-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-top: 8px;
+    }
+    .rx-step-actions .btn--back {
+      background: none;
+      border: none;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--silver);
+      cursor: pointer;
+      padding: 8px 0;
+      transition: color 0.2s;
+    }
+    .rx-step-actions .btn--back:hover { color: var(--bordo); }
+    .rx-step-actions .btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .rx-validation-warning {
+      font-size: 13px;
+      color: var(--bordo);
+      font-style: italic;
+      margin-top: 8px;
+      text-align: right;
+      min-height: 18px;
+    }
+
+    /* loading */
+    .rx-loading {
+      text-align: center;
+      padding: 60px 0;
+    }
+    .rx-loading .spinner {
+      width: 48px; height: 48px;
+      border: 2px solid var(--cream-mid);
+      border-top-color: var(--bordo);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 32px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .rx-loading .loading-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px;
+      font-weight: 300;
+      color: var(--mid);
+    }
+    .rx-loading .loading-text span {
+      display: block;
+      font-size: 14px;
+      color: var(--silver);
+      margin-top: 8px;
+      font-family: 'Barlow', sans-serif;
+    }
+
+    /* dashboard / relatório */
+    .rx-relatorio {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .rx-relatorio .secao {
+      margin-bottom: 48px;
+      border-bottom: 1px solid var(--cream-mid);
+      padding-bottom: 40px;
+    }
+    .rx-relatorio .secao:last-child { border-bottom: none; margin-bottom: 0; }
+
+    .rx-card-indice {
+      background: var(--off);
+      padding: 40px 48px;
+      text-align: center;
+      border-top: 3px solid var(--gold);
+    }
+    .rx-card-indice .valor {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 64px;
+      font-weight: 300;
+      color: var(--bordo);
+      line-height: 1;
+    }
+    .rx-card-indice .rotulo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--silver);
+      margin-top: 8px;
+    }
+    .rx-card-indice .nivel {
+      font-size: 18px;
+      color: var(--mid);
+      margin-top: 8px;
+    }
+    .rx-card-indice .explicacao {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 12px;
+      font-style: italic;
+    }
+
+    .rx-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .rx-card {
+      background: var(--white);
+      border: 1px solid var(--cream-mid);
+      padding: 24px 28px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+    .rx-card .label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--silver);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .rx-card .valor {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 300;
+      color: var(--graphite);
+    }
+    .rx-card .sub {
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .badge {
+      display: inline-block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 2px 12px;
+      background: var(--cream-mid);
+      color: var(--mid);
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    .badge--green { background: #d4edda; color: #155724; }
+    .badge--yellow { background: #fff3cd; color: #856404; }
+    .badge--red { background: #f8d7da; color: #721c24; }
+
+    .rx-radar-container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 16px 0;
+    }
+    .rx-radar-container canvas { width: 100% !important; height: auto !important; }
+    .rx-radar-desc {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px 24px;
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+    .rx-radar-desc span::before {
+      content: '•';
+      color: var(--bordo);
+      margin-right: 6px;
+    }
+
+    .rx-mapa-calor {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px 32px;
+      justify-content: center;
+      padding: 8px 0;
+    }
+    .rx-mapa-calor .item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+    }
+    .rx-mapa-calor .item .emoji { font-size: 20px; }
+
+    .rx-diagnostico-texto {
+      background: var(--off);
+      padding: 28px 32px;
+      border-left: 3px solid var(--gold);
+      margin: 16px 0;
+    }
+    .rx-diagnostico-texto p {
+      font-size: 16px;
+      color: var(--mid);
+      line-height: 1.85;
+      margin-bottom: 12px;
+    }
+    .rx-diagnostico-texto p:last-child { margin-bottom: 0; }
+    .rx-diagnostico-texto strong { color: var(--bordo); font-weight: 500; }
+
+    .rx-ranking {
+      list-style: none;
+      padding: 0;
+      margin: 12px 0;
+    }
+    .rx-ranking li {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--cream);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 15px;
+      color: var(--mid);
+    }
+    .rx-ranking li:last-child { border-bottom: none; }
+    .rx-ranking .rank-emoji { font-size: 20px; }
+    .rx-ranking .rank-detail { color: var(--silver); font-size: 13px; margin-left: auto; }
+
+    .rx-roadmap {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 2px;
+      margin: 16px 0;
+    }
+    .rx-roadmap-item {
+      background: var(--off);
+      padding: 24px 28px;
+      border-top: 2px solid var(--bordo);
+    }
+    .rx-roadmap-item .phase {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      display: block;
+      margin-bottom: 8px;
+    }
+    .rx-roadmap-item h4 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;
+      font-weight: 400;
+      color: var(--graphite);
+      margin-bottom: 12px;
+    }
+    .rx-roadmap-item ul {
+      list-style: none;
+      padding: 0;
+    }
+    .rx-roadmap-item ul li {
+      font-size: 14px;
+      color: var(--muted);
+      padding: 6px 0;
+      border-bottom: 1px solid var(--cream);
+      display: flex;
+      gap: 10px;
+      line-height: 1.6;
+    }
+    .rx-roadmap-item ul li:last-child { border-bottom: none; }
+    .rx-roadmap-item ul li::before { content: '→'; color: var(--gold); flex-shrink: 0; }
+
+    .rx-cta-final {
+      text-align: center;
+      padding: 32px 0 0;
+    }
+    .rx-cta-final .t-body { max-width: 480px; margin: 0 auto 24px; }
+    .rx-cta-final .texto-encerramento {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 300;
+      color: var(--graphite);
+      line-height: 1.5;
+      max-width: 600px;
+      margin: 0 auto 32px;
+    }
+    .rx-cta-final .texto-encerramento em { font-style: italic; color: var(--bordo); }
+
+    .rx-pdf-btn { text-align: right; margin: 16px 0 0; }
+    .rx-pdf-btn .btn { padding: 12px 28px; font-size: 10px; }
+
+    /* responsivo */
+    @media (max-width: 960px) {
+      nav { padding: 0 24px; }
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+      .wrap, .wrap--narrow { padding: 0 24px; }
+      .rx-section { padding: 80px 0 60px; }
+      .rx-grid-2 { grid-template-columns: 1fr; }
+      .rx-roadmap { grid-template-columns: 1fr; }
+      .rx-nota-grid { grid-template-columns: 1fr; }
+      .rx-card-indice { padding: 32px 24px; }
+    }
+    @media (max-width: 560px) {
+      .rx-step-actions { flex-wrap: wrap; }
+      .rx-step-actions .btn { width: 100%; text-align: center; }
+      .rx-step-actions .btn--back { width: auto; }
+      .rx-card { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ NAV ═══════════════════════════════════════════════════ -->
+<nav>
+  <a href="/" class="nav-logo-text">TFAZZIO</a>
+  <div class="nav-links">
+    <a href="/#escolha" class="nav-link">Programas</a>
+    <a href="/#sobre" class="nav-link">Sobre</a>
+    <a href="https://wa.me/5516992752758?text=Ol%C3%A1%21%20Vim%20pelo%20Raio-X%20e%20gostaria%20de%20conversar%20sobre%20minha%20empresa." target="_blank" class="nav-cta">Falar com a TFAZZIO</a>
+  </div>
+  <button class="nav-hamburger" aria-label="Abrir menu" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mob-menu" id="mobMenu">
+  <a href="/#escolha" class="nav-link" onclick="toggleMenu()">Programas</a>
+  <a href="/#sobre" class="nav-link" onclick="toggleMenu()">Sobre</a>
+  <a href="https://wa.me/5516992752758?text=Ol%C3%A1%21%20Vim%20pelo%20Raio-X%20e%20gostaria%20de%20conversar%20sobre%20minha%20empresa." target="_blank" class="nav-cta" onclick="toggleMenu()">Falar com a TFAZZIO</a>
+</div>
+
+<!-- ══ RAIO-X: TELA 1 (Boas-vindas) ══════════════════════════ -->
+<section class="rx-section" id="rx-app">
+  <div class="wrap--narrow">
+    <div id="rx-screen-welcome" class="rx-step active">
+      <div class="rx-hero">
+        <span class="t-label">✦ TFAZZIO</span>
+        <h1 class="t-display t-display--lg">Raio-X<br><em>Empresarial</em></h1>
+        <p class="t-body" style="max-width:480px;margin:16px auto 32px;">
+          Em poucos minutos você descobrirá qual decisão merece sua atenção primeiro.
+          <br><br>
+          Não analisamos apenas números.<br>
+          Analisamos como sua empresa funciona.
+          <br><br>
+          Ao final você receberá gratuitamente um diagnóstico estratégico.
+        </p>
+        <button class="btn btn--bordo" onclick="startDiagnostico()">Começar Diagnóstico</button>
+        <p style="font-size:13px;color:var(--silver);margin-top:16px;font-style:italic;">Aprox. 5 minutos · dados confidenciais</p>
+      </div>
+    </div>
+
+    <!-- container para os steps dinâmicos -->
+    <div id="rx-step-container"></div>
+
+    <!-- Tela de análise (loading) -->
+    <div id="rx-screen-loading" class="rx-step" style="display:none;">
+      <div class="rx-loading">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loading-text">
+          Analisando indicadores financeiros…
+          <span id="loading-sub">Comparando padrões de gestão…</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tela de resultado (relatório) -->
+    <div id="rx-screen-result" class="rx-step" style="display:none;">
+      <div id="rx-relatorio-content"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SCRIPTS ════════════════════════════════════════════════ -->
+<script>
+  // ─── TOGGLE MENU ──────────────────────────────────────────
+  function toggleMenu() {
+    document.getElementById('mobMenu').classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    const m = document.getElementById('mobMenu');
+    if (m.classList.contains('open') && !e.target.closest('nav') && !e.target.closest('#mobMenu')) {
+      m.classList.remove('open');
+    }
+  });
+
+  // ─── ESTADO GLOBAL ────────────────────────────────────────
+  const state = {
+    // abertura
+    objPrincipal: '',
+    dificuldade: '',
+    // dados empresa
+    nomeEmpresa: '',
+    segmento: '',
+    cidade: '',
+    tempoMercado: '',
+    numFuncionarios: '',
+    regimeTributario: '',
+    // financeiro
+    faturamento: '',
+    custosFixos: '',
+    custosVariaveisPct: '',
+    aliquotaImpostos: '',
+    proLabore: '',
+    ticketMedio: '',
+    numClientesMes: '',
+    // comercial
+    taxaConversao: '',
+    existeCRM: '',
+    equipeComercial: '',
+    // gestão (notas 1-5)
+    notaFinanceiro: '',
+    notaComercial: '',
+    notaOperacao: '',
+    notaGestao: '',
+    notaPessoas: '',
+    notaEstrategia: '',
+    // perguntas estratégicas (sim/não)
+    pergFerias30: '',
+    pergMargemLiquida: '',
+    pergFluxoCaixa: '',
+    pergMetasPlano: '',
+  };
+
+  // ─── DEFINIÇÃO DOS STEPS (20 no total) ──────────────────
+  const steps = [];
+
+  function addStep(type, config) {
+    steps.push({ type, ...config });
+  }
+
+  // 1. Objetivo (texto)
+  addStep('field', { field: { id: 'objPrincipal', label: 'Qual é o principal objetivo da sua empresa para os próximos 12 meses?', type: 'textarea', hint: 'Descreva com suas palavras' } });
+  // 2. Dificuldade (texto)
+  addStep('field', { field: { id: 'dificuldade', label: 'Qual é hoje sua maior dificuldade?', type: 'textarea', hint: 'O que mais te preocupa?' } });
+  // 3-7. Dados da empresa (agrupados)
+  addStep('group', {
+    title: 'Agora, alguns dados da sua empresa',
+    fields: [
+      { id: 'nomeEmpresa', label: 'Nome da empresa', type: 'text', placeholder: 'Razão social ou nome fantasia' },
+      { id: 'segmento', label: 'Segmento', type: 'text', placeholder: 'Ex: varejo, indústria, serviços' },
+      { id: 'cidade', label: 'Cidade', type: 'text', placeholder: 'Sua cidade' },
+      { id: 'tempoMercado', label: 'Tempo de mercado (anos)', type: 'number', placeholder: 'Ex: 5' },
+      { id: 'numFuncionarios', label: 'Número de funcionários', type: 'number', placeholder: 'Quantos colaboradores' },
+      { id: 'regimeTributario', label: 'Regime tributário', type: 'select', options: ['Simples Nacional', 'Lucro Presumido', 'Lucro Real'] },
+    ]
+  });
+  // 8-14. Financeiro (campo único por step)
+  const finFields = [
+    { id: 'faturamento', label: 'Faturamento médio mensal (R$)', hint: 'Média dos últimos 3 a 6 meses', type: 'number' },
+    { id: 'custosFixos', label: 'Custos fixos mensais (R$)', hint: 'Aluguel, folha, contas, softwares etc.', type: 'number' },
+    { id: 'custosVariaveisPct', label: 'Custos variáveis (%)', hint: '% do faturamento (ex: matéria-prima, comissões)', type: 'number' },
+    { id: 'aliquotaImpostos', label: 'Alíquota efetiva de impostos (%)', hint: '% do faturamento pago em impostos', type: 'number' },
+    { id: 'proLabore', label: 'Pró-labore mensal (R$)', hint: 'Remuneração formal do(s) sócio(s)', type: 'number' },
+    { id: 'ticketMedio', label: 'Ticket médio (R$)', hint: 'Valor médio por venda ou por cliente', type: 'number' },
+    { id: 'numClientesMes', label: 'Número médio de clientes por mês', hint: 'Quantos clientes ativos por mês', type: 'number' },
+  ];
+  finFields.forEach(f => addStep('field', { field: f }));
+
+  // 15. Taxa de conversão
+  addStep('field', { field: { id: 'taxaConversao', label: 'Taxa de conversão (%)', hint: '% de leads que viram clientes', type: 'number' } });
+  // 16. CRM
+  addStep('field', { field: { id: 'existeCRM', label: 'Existe CRM?', type: 'radio', options: ['Sim', 'Não'] } });
+  // 17. Equipe comercial
+  addStep('field', { field: { id: 'equipeComercial', label: 'Existe equipe comercial?', type: 'radio', options: ['Sim', 'Não'] } });
+
+  // 18. Autoavaliação (6 áreas)
+  const gestaoFields = [
+    { id: 'notaFinanceiro', label: 'Financeiro' },
+    { id: 'notaComercial', label: 'Comercial' },
+    { id: 'notaOperacao', label: 'Operação' },
+    { id: 'notaGestao', label: 'Gestão' },
+    { id: 'notaPessoas', label: 'Pessoas' },
+    { id: 'notaEstrategia', label: 'Estratégia' },
+  ];
+  addStep('gestao', { fields: gestaoFields });
+
+  // 19. Perguntas estratégicas (4 em uma tela)
+  const pergFields = [
+    { id: 'pergFerias30', label: 'A empresa funciona sem você por 30 dias?' },
+    { id: 'pergMargemLiquida', label: 'Você conhece sua margem líquida?' },
+    { id: 'pergFluxoCaixa', label: 'Existe fluxo de caixa projetado?' },
+    { id: 'pergMetasPlano', label: 'Há metas e plano de crescimento definidos?' },
+  ];
+  addStep('perguntas', { fields: pergFields });
+
+  // ─── RENDERIZAÇÃO ──────────────────────────────────────────
+  let currentStep = 0;
+  const totalSteps = steps.length;
+
+  const progressMessages = [
+    'Estamos construindo seu diagnóstico…',
+    'Seu Índice de Clareza está tomando forma…',
+    'Faltam apenas algumas perguntas.',
+    'O diagnóstico já está quase pronto.',
+  ];
+
+  // ─── VALIDAÇÃO: a tela está completa? ────────────────────
+  // Cada tipo de step tem sua própria regra de "preenchido".
+  // Isso evita que categorias fiquem com nota zero por omissão,
+  // o que inflaria artificialmente o Índice de Clareza.
+  function isStepComplete(step) {
+    if (step.type === 'group') {
+      return step.fields.every(f => {
+        const v = state[f.id];
+        return v !== '' && v !== undefined && v !== null;
+      });
+    }
+    if (step.type === 'field') {
+      const f = step.field;
+      const v = state[f.id];
+      return v !== '' && v !== undefined && v !== null;
+    }
+    if (step.type === 'gestao') {
+      return step.fields.every(f => {
+        const v = state[f.id];
+        return v !== '' && v !== undefined && v !== null;
+      });
+    }
+    if (step.type === 'perguntas') {
+      return step.fields.every(f => {
+        const v = state[f.id];
+        return v === 'Sim' || v === 'Não';
+      });
+    }
+    return true;
+  }
+
+  // Lista os labels dos campos ainda pendentes, para o aviso na tela
+  function pendingFieldLabels(step) {
+    if (step.type === 'group' || step.type === 'gestao') {
+      return step.fields.filter(f => {
+        const v = state[f.id];
+        return v === '' || v === undefined || v === null;
+      }).map(f => f.label);
+    }
+    if (step.type === 'perguntas') {
+      return step.fields.filter(f => {
+        const v = state[f.id];
+        return v !== 'Sim' && v !== 'Não';
+      }).map(f => f.label);
+    }
+    return [];
+  }
+
+  function renderStep(index) {
+    const container = document.getElementById('rx-step-container');
+    const step = steps[index];
+    if (!step) return;
+
+    let html = `<div class="rx-step active">`;
+    // Cabeçalho
+    html += `<div class="rx-step-header">`;
+    const pct = Math.round(((index) / totalSteps) * 100);
+    html += `<span class="step-counter">Etapa ${index + 1} de ${totalSteps}</span>`;
+    if (step.type === 'group') {
+      html += `<h2 class="step-question">${step.title}</h2>`;
+    } else if (step.type === 'field') {
+      const f = step.field;
+      html += `<h2 class="step-question">${f.label}</h2>`;
+      if (f.hint) html += `<div class="step-hint">${f.hint}</div>`;
+    } else if (step.type === 'gestao') {
+      html += `<h2 class="step-question">Autoavaliação: como você vê sua empresa?</h2>`;
+      html += `<div class="step-hint">Nota 1 (muito ruim) a 5 (excelente) para cada área</div>`;
+    } else if (step.type === 'perguntas') {
+      html += `<h2 class="step-question">Últimas perguntas estratégicas</h2>`;
+      html += `<div class="step-hint">Responda com sinceridade</div>`;
+    }
+    // Gamificação
+    const msgIdx = Math.min(Math.floor((index / totalSteps) * progressMessages.length), progressMessages.length - 1);
+    html += `<div class="rx-gamification">${progressMessages[msgIdx]}</div>`;
+    html += `</div>`;
+
+    // Conteúdo
+    html += `<div class="rx-input-group">`;
+    if (step.type === 'group') {
+      step.fields.forEach(f => {
+        const val = state[f.id] || '';
+        html += `<div style="margin-bottom:16px;">`;
+        html += `<label for="${f.id}">${f.label}</label>`;
+        if (f.type === 'select') {
+          html += `<select id="${f.id}" class="rx-input rx-input--select" onchange="updateField('${f.id}', this.value)">`;
+          html += `<option value="">Selecione</option>`;
+          f.options.forEach(opt => {
+            html += `<option value="${opt}" ${val===opt?'selected':''}>${opt}</option>`;
+          });
+          html += `</select>`;
+        } else {
+          html += `<input id="${f.id}" type="${f.type}" class="rx-input" placeholder="${f.placeholder||''}" value="${val}" oninput="updateField('${f.id}', this.value)" />`;
+        }
+        html += `</div>`;
+      });
+    } else if (step.type === 'field') {
+      const f = step.field;
+      const val = state[f.id] || '';
+      if (f.type === 'radio') {
+        html += `<div class="rx-radio-group">`;
+        f.options.forEach(opt => {
+          const checked = val === opt ? 'checked' : '';
+          html += `<label><input type="radio" name="${f.id}" value="${opt}" ${checked} onchange="updateField('${f.id}', this.value)" /> ${opt}</label>`;
+        });
+        html += `</div>`;
+      } else if (f.type === 'textarea') {
+        html += `<textarea id="${f.id}" class="rx-input rx-input--textarea" placeholder="Digite sua resposta..." oninput="updateField('${f.id}', this.value)">${val}</textarea>`;
+      } else {
+        html += `<input id="${f.id}" type="${f.type}" class="rx-input" placeholder="${f.placeholder||''}" value="${val}" oninput="updateField('${f.id}', this.value)" />`;
+      }
+    } else if (step.type === 'gestao') {
+      html += `<div class="rx-nota-grid">`;
+      step.fields.forEach(f => {
+        const val = state[f.id] || '';
+        html += `<div class="rx-nota-item">`;
+        html += `<label for="${f.id}">${f.label}</label>`;
+        html += `<select id="${f.id}" onchange="updateField('${f.id}', this.value)">`;
+        html += `<option value="">—</option>`;
+        for (let i = 1; i <= 5; i++) {
+          html += `<option value="${i}" ${val==i?'selected':''}>${i}</option>`;
+        }
+        html += `</select>`;
+        html += `</div>`;
+      });
+      html += `</div>`;
+    } else if (step.type === 'perguntas') {
+      step.fields.forEach(f => {
+        const val = state[f.id] || '';
+        html += `<div style="margin-bottom:16px;">`;
+        html += `<label>${f.label}</label>`;
+        html += `<div class="rx-radio-group">`;
+        ['Sim', 'Não'].forEach(opt => {
+          const checked = val === opt ? 'checked' : '';
+          html += `<label><input type="radio" name="${f.id}" value="${opt}" ${checked} onchange="updateField('${f.id}', this.value)" /> ${opt}</label>`;
+        });
+        html += `</div>`;
+        html += `</div>`;
+      });
+    }
+    html += `</div>`;
+
+    // Barra de progresso melhorada
+    const pct2 = Math.round(((index + 1) / totalSteps) * 100);
+    html += `<div class="rx-progress">`;
+    html += `<div class="rx-progress-top"><span>${pct2}% concluído</span><span>Etapa ${index + 1} de ${totalSteps}</span></div>`;
+    html += `<div class="rx-progress-bar"><div class="rx-progress-fill" style="width:${pct2}%;"></div></div>`;
+    html += `</div>`;
+
+    // Ações
+    const complete = isStepComplete(step);
+    const disabledAttr = complete ? '' : 'disabled';
+    html += `<div class="rx-step-actions">`;
+    if (index > 0) {
+      html += `<button class="btn--back" onclick="goToStep(${index - 1})">← Voltar</button>`;
+    } else {
+      html += `<span></span>`;
+    }
+    if (index < totalSteps - 1) {
+      html += `<button class="btn btn--bordo" id="rx-next-btn" ${disabledAttr} onclick="nextStep()">Próximo</button>`;
+    } else {
+      html += `<button class="btn btn--gold" id="rx-next-btn" ${disabledAttr} onclick="finalizar()">Ver Resultado</button>`;
+    }
+    html += `</div>`;
+
+    // Aviso de campos pendentes (só aparece quando falta algo)
+    const pending = pendingFieldLabels(step);
+    html += `<div class="rx-validation-warning" id="rx-validation-msg">`;
+    if (pending.length > 0) {
+      html += `Falta responder: ${pending.join(', ')}`;
+    }
+    html += `</div>`;
+
+    html += `</div>`;
+    container.innerHTML = html;
+    // Esconder outras telas
+    document.getElementById('rx-screen-welcome').style.display = 'none';
+    document.getElementById('rx-screen-loading').style.display = 'none';
+    document.getElementById('rx-screen-result').style.display = 'none';
+    container.style.display = 'block';
+  }
+
+  // ─── NAVEGAÇÃO ────────────────────────────────────────────
+  function startDiagnostico() {
+    currentStep = 0;
+    renderStep(0);
+  }
+
+  function nextStep() {
+    if (!isStepComplete(steps[currentStep])) return;
+    if (currentStep < totalSteps - 1) {
+      currentStep++;
+      renderStep(currentStep);
+    }
+  }
+
+  function goToStep(index) {
+    currentStep = index;
+    renderStep(currentStep);
+  }
+
+  function updateField(id, value) {
+    state[id] = value;
+    revalidateCurrentStep();
+  }
+
+  // Reavalia o botão e o aviso sem re-renderizar a tela inteira,
+  // para não perder o foco de quem está digitando.
+  function revalidateCurrentStep() {
+    const step = steps[currentStep];
+    if (!step) return;
+    const btn = document.getElementById('rx-next-btn');
+    const msg = document.getElementById('rx-validation-msg');
+    if (!btn || !msg) return;
+
+    const complete = isStepComplete(step);
+    btn.disabled = !complete;
+
+    const pending = pendingFieldLabels(step);
+    msg.textContent = pending.length > 0 ? `Falta responder: ${pending.join(', ')}` : '';
+  }
+
+  // ─── FINALIZAR → ANÁLISE COM MENSAGENS ──────────────────
+  function finalizar() {
+    if (!isStepComplete(steps[currentStep])) return;
+    document.getElementById('rx-step-container').style.display = 'none';
+    const loadingScreen = document.getElementById('rx-screen-loading');
+    loadingScreen.style.display = 'block';
+    loadingScreen.className = 'rx-step active';
+
+    const messages = [
+      'Analisando indicadores financeiros…',
+      'Comparando padrões de gestão…',
+      'Calculando Índice de Clareza TFAZZIO…',
+      'Identificando gargalos…',
+      'Definindo prioridades…',
+      'Gerando plano inicial…',
+      'Diagnóstico concluído.'
+    ];
+    let idx = 0;
+    const textEl = document.getElementById('loading-text');
+    const subEl = document.getElementById('loading-sub');
+
+    const interval = setInterval(() => {
+      if (idx < messages.length) {
+        if (idx === 0) { textEl.textContent = messages[idx]; subEl.textContent = ''; }
+        else if (idx === messages.length - 1) { textEl.textContent = messages[idx]; subEl.textContent = 'Preparando seu relatório…'; }
+        else { subEl.textContent = messages[idx]; }
+        idx++;
+      } else {
+        clearInterval(interval);
+        setTimeout(() => {
+          loadingScreen.style.display = 'none';
+          document.getElementById('rx-screen-result').style.display = 'block';
+          document.getElementById('rx-screen-result').className = 'rx-step active';
+          renderResultado();
+        }, 600);
+      }
+    }, 800);
+  }
+
+  // Formata número como moeda brasileira (R$ 12.345,67)
+  function formatarMoeda(valor) {
+    if (valor === null || valor === undefined || !isFinite(valor)) return '—';
+    return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+  }
+
+  // ─── CÁLCULOS (baseado na lógica da planilha) ────────────
+  function calcular() {
+    const F = parseFloat(state.faturamento) || 0;
+    const CF = parseFloat(state.custosFixos) || 0;
+    const CVpct = parseFloat(state.custosVariaveisPct) || 0;
+    const Aliq = parseFloat(state.aliquotaImpostos) || 0;
+    const PL = parseFloat(state.proLabore) || 0;
+    const Ticket = parseFloat(state.ticketMedio) || 0;
+    const NumClientes = parseFloat(state.numClientesMes) || 0;
+    const Conv = parseFloat(state.taxaConversao) || 0;
+    const Caixa = 0; // não temos mais saldo caixa, usamos apenas os indicadores
+
+    // Custos operacionais
+    const CustosOp = CF + (CVpct / 100) * F;
+    const Impostos = (Aliq / 100) * F;
+    const LucroOp = F - CustosOp - Impostos - PL;
+    const Margem = F > 0 ? LucroOp / F : 0;
+    const PctComprometido = F > 0 ? (CustosOp + Impostos + PL) / F : 0;
+    const PontoEquilibrio = (1 - (CVpct/100) - (Aliq/100)) > 0 ? CF / (1 - (CVpct/100) - (Aliq/100)) : Infinity;
+    const PontoEquilibrioPct = F > 0 && isFinite(PontoEquilibrio) ? PontoEquilibrio / F : 1;
+
+    // Receita Implícita: cruza Ticket Médio x Clientes/mês contra o
+    // faturamento declarado. Quando os dois números não batem, é sinal
+    // de que o empresário não tem clareza sobre a própria receita,
+    // que é exatamente o tipo de coisa que o Raio-X existe para revelar.
+    const ReceitaImplicita = Ticket * NumClientes;
+    const temDadosParaCruzamento = Ticket > 0 && NumClientes > 0 && F > 0;
+    const DivergenciaReceitaPct = temDadosParaCruzamento ? (ReceitaImplicita - F) / F : null;
+    // Divergência acima de 20% para qualquer lado é tratada como
+    // relevante o suficiente para aparecer no relatório.
+    const divergenciaRelevante = temDadosParaCruzamento && Math.abs(DivergenciaReceitaPct) >= 0.2;
+
+    // Status
+    const statusMargem = Margem >= 0.2 ? 'Verde' : Margem >= 0.1 ? 'Amarelo' : 'Vermelho';
+    const statusPE = PontoEquilibrioPct < 0.7 ? 'Verde' : PontoEquilibrioPct <= 0.85 ? 'Amarelo' : 'Vermelho';
+    const statusCustoFixo = CF / F < 0.2 ? 'Verde' : CF / F <= 0.35 ? 'Amarelo' : 'Vermelho';
+
+    // Notas das categorias (0-100)
+    function n100(status) {
+      if (status === 'Verde') return 100;
+      if (status === 'Amarelo') return 60;
+      return 20;
+    }
+
+    // Financeiro
+    const nFin = [
+      n100(statusMargem),
+      n100(statusPE),
+      n100(statusCustoFixo),
+      state.pergMargemLiquida === 'Sim' ? 100 : 0,
+      state.pergFluxoCaixa === 'Sim' ? 100 : 0,
+      (parseFloat(state.notaFinanceiro) || 0) * 20,
+    ].filter(v => !isNaN(v));
+    const catFinanceiro = nFin.length ? nFin.reduce((a,b) => a+b, 0) / nFin.length : 0;
+
+    // Comercial
+    const nCom = [
+      Conv >= 0.2 ? 100 : Conv >= 0.1 ? 60 : 20,
+      state.existeCRM === 'Sim' ? 100 : 0,
+      state.equipeComercial === 'Sim' ? 100 : 0,
+      (parseFloat(state.notaComercial) || 0) * 20,
+    ].filter(v => !isNaN(v));
+    const catComercial = nCom.length ? nCom.reduce((a,b) => a+b, 0) / nCom.length : 0;
+
+    // Operação
+    const nOp = [
+      state.pergFerias30 === 'Sim' ? 100 : 0,
+      (parseFloat(state.notaOperacao) || 0) * 20,
+    ].filter(v => !isNaN(v));
+    const catOperacao = nOp.length ? nOp.reduce((a,b) => a+b, 0) / nOp.length : 0;
+
+    // Gestão
+    const nGest = [
+      (parseFloat(state.notaGestao) || 0) * 20,
+    ].filter(v => !isNaN(v));
+    const catGestao = nGest.length ? nGest.reduce((a,b) => a+b, 0) / nGest.length : 0;
+
+    // Pessoas
+    const nPes = [
+      (parseFloat(state.notaPessoas) || 0) * 20,
+    ].filter(v => !isNaN(v));
+    const catPessoas = nPes.length ? nPes.reduce((a,b) => a+b, 0) / nPes.length : 0;
+
+    // Estratégia
+    const nEst = [
+      state.pergMetasPlano === 'Sim' ? 100 : 0,
+      (parseFloat(state.notaEstrategia) || 0) * 20,
+    ].filter(v => !isNaN(v));
+    const catEstrategia = nEst.length ? nEst.reduce((a,b) => a+b, 0) / nEst.length : 0;
+
+    // Índice de Clareza
+    // A validação obrigatória (ver isStepComplete) garante que todas as
+    // 6 categorias têm dados reais antes de chegar aqui, então não há
+    // mais motivo para excluir categorias "zeradas": uma nota zero agora
+    // é sempre uma nota real, e precisa contar na média.
+    const cats = [catEstrategia, catFinanceiro, catComercial, catOperacao, catGestao, catPessoas];
+    const indiceClareza = cats.reduce((a,b) => a+b, 0) / cats.length;
+
+    // Nível de maturidade
+    let nivel = 'Iniciante';
+    if (indiceClareza >= 85) nivel = 'Alta Performance';
+    else if (indiceClareza >= 70) nivel = 'Escalável';
+    else if (indiceClareza >= 55) nivel = 'Estruturada';
+    else if (indiceClareza >= 40) nivel = 'Organizada';
+
+    // Ranking de categorias (todas entram, pelo mesmo motivo acima)
+    const catMap = { Estratégia: catEstrategia, Financeiro: catFinanceiro, Comercial: catComercial, Operação: catOperacao, Gestão: catGestao, Pessoas: catPessoas };
+    const sorted = Object.entries(catMap).sort((a,b) => a[1] - b[1]);
+    const gargalo = sorted[0][0];
+    const oportunidade = sorted[sorted.length-1][0];
+
+    const statusCat = (v) => v >= 70 ? 'Verde' : v >= 50 ? 'Amarelo' : 'Vermelho';
+
+    // Distância até o breakeven, em R$ e em %, para o card de
+    // ponto de equilíbrio no relatório final.
+    const breakevenValido = isFinite(PontoEquilibrio);
+    const distanciaBreakevenRS = breakevenValido ? F - PontoEquilibrio : null;
+    const distanciaBreakevenPct = breakevenValido && PontoEquilibrio > 0 ? (F - PontoEquilibrio) / PontoEquilibrio : null;
+
+    return {
+      faturamento: F,
+      margem: Margem,
+      statusMargem,
+      pontoEquilibrio: breakevenValido ? PontoEquilibrio : null,
+      distanciaBreakevenRS,
+      distanciaBreakevenPct,
+      ticketMedio: Ticket,
+      numClientesMes: NumClientes,
+      receitaImplicita: temDadosParaCruzamento ? ReceitaImplicita : null,
+      divergenciaReceitaPct: DivergenciaReceitaPct,
+      divergenciaRelevante,
+      catEstrategia, catFinanceiro, catComercial, catOperacao, catGestao, catPessoas,
+      indiceClareza, nivel, gargalo, oportunidade,
+      statusCatEstrategia: statusCat(catEstrategia),
+      statusCatFinanceiro: statusCat(catFinanceiro),
+      statusCatComercial: statusCat(catComercial),
+      statusCatOperacao: statusCat(catOperacao),
+      statusCatGestao: statusCat(catGestao),
+      statusCatPessoas: statusCat(catPessoas),
+    };
+  }
+
+  // ─── DIAGNÓSTICO HUMANO (mensagens condicionais) ──────────
+  function gerarDiagnostico(d) {
+    const frases = [];
+
+    // Mensagens baseadas no gargalo e status
+    if (d.gargalo === 'Financeiro') {
+      if (d.statusCatFinanceiro === 'Vermelho') {
+        frases.push('Sua empresa vende, mas a estrutura de custos e a margem estão comprometendo a saúde financeira. É provável que o lucro esteja sendo perdido em despesas que poderiam ser controladas.');
+      } else if (d.statusCatFinanceiro === 'Amarelo') {
+        frases.push('O financeiro está no limite do confortável. Pequenos ajustes na precificação ou nos custos fixos podem liberar margem para crescimento.');
+      } else {
+        frases.push('A base financeira é sólida, o que permite planejar crescimento com mais segurança.');
+      }
+    }
+
+    if (d.gargalo === 'Comercial') {
+      if (d.statusCatComercial === 'Vermelho') {
+        frases.push('A geração de receita ainda depende muito de esforço individual. Sem um processo comercial estruturado, fica difícil escalar as vendas.');
+      } else if (d.statusCatComercial === 'Amarelo') {
+        frases.push('As vendas acontecem, mas de forma pouco previsível. Fortalecer o funil e métricas como conversão vai trazer mais consistência.');
+      } else {
+        frases.push('O comercial está maduro, com processo e previsibilidade. Isso é uma base excelente para crescer.');
+      }
+    }
+
+    if (d.gargalo === 'Operação') {
+      if (d.statusCatOperacao === 'Vermelho') {
+        frases.push('A operação ainda é dependente do dono. Sem processos claros, a empresa trava quando você se ausenta.');
+      } else if (d.statusCatOperacao === 'Amarelo') {
+        frases.push('A operação funciona, mas ainda há espaço para padronizar e reduzir a dependência de pessoas-chave.');
+      } else {
+        frases.push('A operação é bem estruturada e não depende exclusivamente de você. Isso permite delegar e focar no estratégico.');
+      }
+    }
+
+    if (d.gargalo === 'Gestão') {
+      if (d.statusCatGestao === 'Vermelho') {
+        frases.push('A gestão é reativa. Faltam indicadores e planejamento para antecipar problemas e tomar decisões mais seguras.');
+      } else if (d.statusCatGestao === 'Amarelo') {
+        frases.push('Há gestão, mas ainda com foco no operacional. Migrar para uma gestão mais estratégica vai destravar o próximo nível.');
+      } else {
+        frases.push('A gestão é sólida, com indicadores e planejamento. Isso é um diferencial importante.');
+      }
+    }
+
+    if (d.gargalo === 'Pessoas') {
+      if (d.statusCatPessoas === 'Vermelho') {
+        frases.push('A equipe ainda não está alinhada ou treinada para operar sem supervisão constante. Isso gera desgaste e limita o crescimento.');
+      } else if (d.statusCatPessoas === 'Amarelo') {
+        frases.push('O time tem potencial, mas precisa de mais desenvolvimento e autonomia para entregar resultados consistentes.');
+      } else {
+        frases.push('O time é um ponto forte. Pessoas engajadas e capacitadas são a base para escalar.');
+      }
+    }
+
+    if (d.gargalo === 'Estratégia') {
+      if (d.statusCatEstrategia === 'Vermelho') {
+        frases.push('A empresa opera no reativo. Sem metas claras e um plano de crescimento definido, as decisões consomem energia sem gerar direção.');
+      } else if (d.statusCatEstrategia === 'Amarelo') {
+        frases.push('Há direção, mas ainda falta um plano mais estruturado para transformar intenção em ação concreta.');
+      } else {
+        frases.push('A estratégia está bem definida, com metas e um plano de ação. Isso é fundamental para crescer com consistência.');
+      }
+    }
+
+    // Frase adicional geral
+    if (d.indiceClareza < 40) {
+      frases.push('O momento exige atenção: os sintomas estão claros, e o foco deve ser estruturar o básico antes de qualquer movimento de crescimento.');
+    } else if (d.indiceClareza < 60) {
+      frases.push('Existem oportunidades claras de melhoria. O diagnóstico aponta que alguns ajustes podem gerar um impacto significativo no resultado.');
+    } else {
+      frases.push('Sua empresa está em um bom patamar. O foco agora é refinar e acelerar o que já funciona, com ações mais precisas.');
+    }
+
+    return frases;
+  }
+
+  // ─── RENDER RESULTADO (RELATÓRIO EXECUTIVO) ──────────────
+  function renderResultado() {
+    const d = calcular();
+    const container = document.getElementById('rx-relatorio-content');
+    const diagTextos = gerarDiagnostico(d);
+
+    // Preparar dados radar
+    const radarData = {
+      labels: ['Estratégia', 'Financeiro', 'Comercial', 'Operação', 'Gestão', 'Pessoas'],
+      values: [d.catEstrategia, d.catFinanceiro, d.catComercial, d.catOperacao, d.catGestao, d.catPessoas]
+    };
+
+    let html = `
+      <div class="rx-relatorio">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
+          <span class="t-label">Diagnóstico concluído</span>
+          <div class="rx-pdf-btn">
+            <button class="btn btn--outline btn--sm" onclick="baixarPDF()">📄 Baixar Relatório</button>
+          </div>
+        </div>
+
+        <!-- 1. Índice de Clareza -->
+        <div class="secao">
+          <div class="rx-card-indice">
+            <div class="rotulo">Índice de Clareza TFAZZIO</div>
+            <div class="valor">${Math.round(d.indiceClareza)} <span style="font-size:32px;color:var(--muted);">/ 100</span></div>
+            <div class="nivel">${d.nivel}</div>
+            <div class="explicacao">Este índice representa o nível atual de clareza estratégica da empresa.</div>
+          </div>
+        </div>
+
+        <!-- 2. Resumo Executivo (curto) -->
+        <div class="secao">
+          <span class="t-label">Resumo Executivo</span>
+          <p class="t-body" style="margin-top:8px;">
+            Com base nas respostas, identificamos que <strong>${d.gargalo}</strong> é a área que mais demanda atenção. 
+            ${d.oportunidade} aparece como a principal força a ser alavancada. 
+            O Índice de Clareza de ${Math.round(d.indiceClareza)} indica que a empresa está no nível <strong>${d.nivel}</strong>.
+          </p>
+        </div>
+
+        <!-- 3. Gargalo e Oportunidade -->
+        <div class="secao">
+          <div class="rx-grid-2">
+            <div class="rx-card">
+              <span class="label">Principal Gargalo</span>
+              <div class="valor">${d.gargalo}</div>
+              <div class="sub">Categoria com menor nota</div>
+            </div>
+            <div class="rx-card">
+              <span class="label">Principal Oportunidade</span>
+              <div class="valor">${d.oportunidade}</div>
+              <div class="sub">Categoria com maior nota</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3b. Ponto de Equilíbrio (Breakeven) -->
+        <div class="secao">
+          <span class="t-label">Ponto de Equilíbrio</span>
+          ${d.pontoEquilibrio !== null ? `
+            <div class="rx-grid-2" style="margin-top:8px;">
+              <div class="rx-card">
+                <span class="label">Faturamento de Equilíbrio</span>
+                <div class="valor">${formatarMoeda(d.pontoEquilibrio)}</div>
+                <div class="sub">Necessário por mês para cobrir custos e impostos</div>
+              </div>
+              <div class="rx-card">
+                <span class="label">Distância do Equilíbrio</span>
+                <div class="valor" style="color:${d.distanciaBreakevenRS >= 0 ? 'var(--bordo)' : '#721c24'};">
+                  ${d.distanciaBreakevenRS >= 0 ? '+' : ''}${formatarMoeda(d.distanciaBreakevenRS)}
+                </div>
+                <div class="sub">${d.distanciaBreakevenPct !== null ? (d.distanciaBreakevenPct >= 0 ? `${(d.distanciaBreakevenPct*100).toFixed(0)}% acima do equilíbrio` : `${Math.abs(d.distanciaBreakevenPct*100).toFixed(0)}% abaixo do equilíbrio`) : ''}</div>
+              </div>
+            </div>
+            <p class="t-body t-body--sm" style="margin-top:16px;">
+              ${d.distanciaBreakevenRS >= 0
+                ? `Seu faturamento atual está acima do ponto de equilíbrio. Isso significa que, depois de cobrir custos fixos, variáveis e impostos, ainda sobra margem para reinvestir ou distribuir.`
+                : `Seu faturamento atual ainda não cobre o ponto de equilíbrio mensal. Isso significa que parte dos custos fixos, variáveis ou impostos está sendo coberta por caixa acumulado, aporte ou crédito, não por operação.`
+              }
+            </p>
+          ` : `
+            <p class="t-body t-body--sm" style="margin-top:8px;">
+              Não foi possível calcular o ponto de equilíbrio com os dados informados. Isso costuma acontecer quando os custos variáveis somados aos impostos ultrapassam 100% do faturamento.
+            </p>
+          `}
+        </div>
+
+        <!-- 4. Radar -->
+        <div class="secao">
+          <span class="t-label">Radar da Clareza Empresarial</span>
+          <div class="rx-radar-container">
+            <canvas id="radarChart" width="500" height="500"></canvas>
+          </div>
+          <div class="rx-radar-desc">
+            <span>Estratégia</span><span>Financeiro</span><span>Comercial</span>
+            <span>Operação</span><span>Gestão</span><span>Pessoas</span>
+          </div>
+        </div>
+
+        <!-- 5. Mapa de Calor -->
+        <div class="secao">
+          <span class="t-label">Mapa de Calor</span>
+          <div class="rx-mapa-calor">
+            ${[
+              {label:'Estratégia', status:d.statusCatEstrategia},
+              {label:'Financeiro', status:d.statusCatFinanceiro},
+              {label:'Comercial', status:d.statusCatComercial},
+              {label:'Operação', status:d.statusCatOperacao},
+              {label:'Gestão', status:d.statusCatGestao},
+              {label:'Pessoas', status:d.statusCatPessoas}
+            ].map(c => `
+              <div class="item">
+                <span>${c.label}</span>
+                <span class="emoji">${c.status === 'Verde' ? '🟢' : c.status === 'Amarelo' ? '🟡' : '🔴'}</span>
+                <span style="font-size:12px;color:var(--silver);">${c.status === 'Verde' ? 'Saudável' : c.status === 'Amarelo' ? 'Atenção' : 'Crítico'}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- 6. Diagnóstico Humano -->
+        <div class="secao">
+          <span class="t-label">Diagnóstico Estratégico</span>
+          <div class="rx-diagnostico-texto">
+            ${diagTextos.map(p => `<p>${p}</p>`).join('')}
+          </div>
+        </div>
+
+        <!-- 7. Plano de Ação (dinâmico) -->
+        <div class="secao">
+          <span class="t-label">Plano de Ação</span>
+          <div class="rx-roadmap">
+            ${gerarRoadmap(d.gargalo)}
+          </div>
+        </div>
+
+        <!-- 8. Benchmark -->
+        <div class="secao">
+          <span class="t-label">Benchmark de Mercado</span>
+          <div style="font-size:15px;color:var(--mid);line-height:1.8;padding:8px 0;">
+            <p>Empresas semelhantes costumam operar com margem entre 10% e 20%. A sua margem estimada é de <strong>${(d.margem*100).toFixed(1)}%</strong>.</p>
+            ${state.taxaConversao ? `<p>Times comerciais estruturados convertem entre 15% e 25% dos leads. Sua taxa estimada é de <strong>${state.taxaConversao}%</strong>.</p>` : ''}
+            ${d.ticketMedio > 0 ? `<p>Seu ticket médio informado é de <strong>${formatarMoeda(d.ticketMedio)}</strong>, com aproximadamente <strong>${Math.round(d.numClientesMes)}</strong> clientes por mês.</p>` : ''}
+          </div>
+        </div>
+
+        <!-- 8b. Checagem de Consistência da Receita -->
+        ${d.receitaImplicita !== null ? `
+        <div class="secao">
+          <span class="t-label">Checagem de Consistência</span>
+          <p class="t-body t-body--sm" style="margin-top:8px;">
+            Cruzamos o ticket médio com o número de clientes por mês para estimar sua receita de outra forma, e comparamos com o faturamento que você informou.
+          </p>
+          <div class="rx-grid-2" style="margin-top:16px;">
+            <div class="rx-card">
+              <span class="label">Faturamento Informado</span>
+              <div class="valor">${formatarMoeda(d.faturamento)}</div>
+              <div class="sub">Valor que você declarou</div>
+            </div>
+            <div class="rx-card">
+              <span class="label">Receita Implícita</span>
+              <div class="valor">${formatarMoeda(d.receitaImplicita)}</div>
+              <div class="sub">Ticket médio × clientes/mês</div>
+            </div>
+          </div>
+          ${d.divergenciaRelevante ? `
+            <div class="rx-diagnostico-texto" style="margin-top:16px;">
+              <p>Encontramos uma diferença de <strong>${Math.abs(d.divergenciaReceitaPct*100).toFixed(0)}%</strong> entre o faturamento informado e a receita implícita pelo ticket médio e volume de clientes. Isso pode indicar que um desses três números (faturamento, ticket médio ou número de clientes) está sendo estimado de cabeça, sem base em relatório ou planilha. Ter clareza sobre a própria receita é o primeiro passo antes de qualquer decisão estratégica.</p>
+            </div>
+          ` : `
+            <p class="t-body t-body--sm" style="margin-top:16px;">Os dois números são consistentes entre si, o que é um bom sinal de que você tem controle sobre sua receita.</p>
+          `}
+        </div>
+        ` : ''}
+
+        <!-- 9. Encerramento e CTA -->
+        <div class="secao" style="border-bottom:none;">
+          <div class="rx-cta-final">
+            <div class="texto-encerramento">
+              Você acabou de enxergar sua empresa sob uma perspectiva diferente.
+              <br>
+              O Índice de Clareza TFAZZIO mostra <em>onde estão os sintomas</em>.
+              <br>
+              Agora é hora de entender as causas.
+              <br><br>
+              Na Sessão Estratégica, aprofundamos este diagnóstico, definimos prioridades e construímos um plano claro para que sua empresa cresça com mais segurança e menos desperdício de energia.
+              <br><br>
+              <strong>Clareza para crescer.</strong>
+            </div>
+            <a href="https://wa.me/5516992752758?text=Ol%C3%A1%21%20Vim%20pelo%20Raio-X%20e%20gostaria%20de%20agendar%20minha%20Sess%C3%A3o%20Estrat%C3%A9gica." target="_blank" class="btn btn--bordo">Agendar minha Sessão Estratégica</a>
+          </div>
+        </div>
+      </div>
+    `;
+
+    container.innerHTML = html;
+
+    // Inicializar radar
+    setTimeout(() => {
+      const ctx = document.getElementById('radarChart');
+      if (ctx) {
+        new Chart(ctx, {
+          type: 'radar',
+          data: {
+            labels: radarData.labels,
+            datasets: [{
+              label: 'Índice TFAZZIO',
+              data: radarData.values,
+              backgroundColor: 'rgba(107,15,26,0.15)',
+              borderColor: '#6B0F1A',
+              pointBackgroundColor: '#6B0F1A',
+              borderWidth: 2,
+              pointRadius: 5,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+              r: {
+                beginAtZero: true,
+                max: 100,
+                ticks: { stepSize: 20, font: { size: 10 } },
+                grid: { color: 'rgba(0,0,0,0.05)' },
+                pointLabels: { font: { size: 13, family: 'Barlow', weight: '500' } }
+              }
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return context.raw + '/100';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+    }, 100);
+  }
+
+  // ─── ROADMAP DINÂMICO ─────────────────────────────────────
+  function gerarRoadmap(gargalo) {
+    const planos = {
+      'Financeiro': {
+        titulo: 'Revisão Financeira',
+        fases: [
+          ['Revisar custos fixos e variáveis', 'Calcular margem real por produto/serviço', 'Melhorar fluxo de caixa projetado'],
+          ['Revisar precificação', 'Negociar fornecedores', 'Implementar controle de custos'],
+          ['Consolidar indicadores financeiros', 'Planejar investimentos', 'Revisar estrutura de capital']
+        ]
+      },
+      'Comercial': {
+        titulo: 'Estruturação Comercial',
+        fases: [
+          ['Mapear funil de vendas', 'Definir metas por canal', 'Implementar CRM'],
+          ['Treinar equipe comercial', 'Criar script de vendas', 'Acompanhar indicadores de conversão'],
+          ['Automatizar prospecção', 'Escalar canais de maior performance', 'Revisar processo de pós-venda']
+        ]
+      },
+      'Operação': {
+        titulo: 'Eficiência Operacional',
+        fases: [
+          ['Mapear processos críticos', 'Documentar procedimentos', 'Definir responsabilidades'],
+          ['Implementar melhorias na operação', 'Reduzir gargalos', 'Criar manuais de onboarding'],
+          ['Padronizar operação', 'Preparar para crescimento', 'Revisar estrutura de equipe']
+        ]
+      },
+      'Gestão': {
+        titulo: 'Fortalecimento da Gestão',
+        fases: [
+          ['Definir indicadores-chave (KPIs)', 'Criar rotina de reuniões', 'Estabelecer metas claras'],
+          ['Implementar painel de gestão', 'Acompanhar resultados semanalmente', 'Ajustar plano conforme necessário'],
+          ['Consolidar cultura de gestão', 'Preparar sucessão', 'Revisar planejamento anual']
+        ]
+      },
+      'Pessoas': {
+        titulo: 'Desenvolvimento de Pessoas',
+        fases: [
+          ['Avaliar competências da equipe', 'Definir plano de desenvolvimento', 'Melhorar comunicação interna'],
+          ['Treinar lideranças', 'Criar programa de capacitação', 'Estabelecer feedback contínuo'],
+          ['Consolidar cultura organizacional', 'Preparar plano de carreira', 'Revisar estrutura de times']
+        ]
+      },
+      'Estratégia': {
+        titulo: 'Planejamento Estratégico',
+        fases: [
+          ['Definir visão de longo prazo', 'Estabelecer metas anuais', 'Mapear cenários de mercado'],
+          ['Criar plano de ação detalhado', 'Alinhar equipe com a estratégia', 'Definir indicadores de progresso'],
+          ['Revisar estratégia periodicamente', 'Ajustar rota conforme aprendizado', 'Preparar próximo ciclo']
+        ]
+      }
+    };
+
+    const padrao = {
+      titulo: 'Plano Estratégico',
+      fases: [
+        ['Diagnóstico aprofundado', 'Definir prioridades', 'Criar plano de ação'],
+        ['Implementar ações prioritárias', 'Monitorar resultados', 'Ajustar rota'],
+        ['Consolidar melhorias', 'Preparar para crescimento', 'Revisar planejamento']
+      ]
+    };
+
+    const plano = planos[gargalo] || padrao;
+
+    return `
+      <div class="rx-roadmap-item">
+        <span class="phase">Primeiros 30 dias</span>
+        <h4>${plano.titulo}</h4>
+        <ul>${plano.fases[0].map(item => `<li>${item}</li>`).join('')}</ul>
+      </div>
+      <div class="rx-roadmap-item">
+        <span class="phase">30 a 60 dias</span>
+        <h4>Implementação</h4>
+        <ul>${plano.fases[1].map(item => `<li>${item}</li>`).join('')}</ul>
+      </div>
+      <div class="rx-roadmap-item">
+        <span class="phase">60 a 90 dias</span>
+        <h4>Consolidação</h4>
+        <ul>${plano.fases[2].map(item => `<li>${item}</li>`).join('')}</ul>
+      </div>
+    `;
+  }
+
+  // ─── PDF PROFISSIONAL ─────────────────────────────────────
+  function baixarPDF() {
+    const btn = document.querySelector('.rx-pdf-btn .btn');
+    btn.textContent = '⏳ Gerando...';
+    btn.disabled = true;
+
+    // Capturar o conteúdo do relatório
+    const content = document.getElementById('rx-relatorio-content');
+    html2canvas(content, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#FFFFFF',
+      logging: false,
+    }).then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      // Capa personalizada
+      pdf.setFillColor('#6B0F1A');
+      pdf.rect(0, 0, pdfWidth, pdfHeight, 'F');
+      pdf.setTextColor('#D4AF37');
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(22);
+      pdf.text('TFAZZIO', pdfWidth/2, 60, { align: 'center' });
+      pdf.setFontSize(14);
+      pdf.setTextColor('#FFFFFF');
+      pdf.text('Raio-X Empresarial', pdfWidth/2, 80, { align: 'center' });
+      pdf.setFontSize(12);
+      pdf.text('Relatório de Diagnóstico', pdfWidth/2, 95, { align: 'center' });
+      pdf.text(`Empresa: ${state.nomeEmpresa || '—'}`, pdfWidth/2, 115, { align: 'center' });
+      pdf.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, pdfWidth/2, 130, { align: 'center' });
+      pdf.setFontSize(10);
+      pdf.setTextColor('#D4AF37');
+      pdf.text('Clareza para crescer.', pdfWidth/2, 270, { align: 'center' });
+
+      // Adicionar página com o conteúdo do relatório
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save('Raio-X_Empresarial_TFAZZIO.pdf');
+
+      btn.textContent = '📄 Baixar Relatório';
+      btn.disabled = false;
+    }).catch(err => {
+      console.error('Erro ao gerar PDF:', err);
+      btn.textContent = '📄 Baixar Relatório';
+      btn.disabled = false;
+      alert('Ocorreu um erro ao gerar o PDF. Tente novamente.');
+    });
+  }
+
+  // ─── INICIALIZA ──────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    // Tela de boas-vindas já está visível
+  });
+</script>
+
+<!-- ══ WHATSAPP FLOAT (copiado do site) ════════════════════ -->
+<a href="https://wa.me/5516992752758?text=Ol%C3%A1%21%20Vim%20pelo%20Raio-X%20e%20gostaria%20de%20conversar%20sobre%20minha%20empresa." target="_blank" class="wa" aria-label="Falar no WhatsApp" style="position:fixed;bottom:32px;right:32px;z-index:999;width:54px;height:54px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(37,211,102,0.38);transition:transform .2s,box-shadow .2s;text-decoration:none;">
+  <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg" style="width:26px;height:26px;">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+</a>
+<style>
+  .wa:hover { transform: scale(1.1); box-shadow: 0 6px 26px rgba(37,211,102,0.55); }
+  @media (max-width:560px) { .wa { bottom:20px; right:20px; width:48px; height:48px; } .wa svg { width:22px; height:22px; } }
+</style>
+
+</body>
+</html>
