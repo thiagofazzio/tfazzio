@@ -696,12 +696,26 @@
     revalidateCurrentStep();
   }
 
-  function startDiagnostico() {
-    currentStep = 0;
-    const welcome = document.getElementById('pi-screen-welcome');
-    if (welcome) welcome.style.display = 'none';
-    renderStep(0);
+ function startDiagnostico() {
+  console.log('startDiagnostico chamado');
+  currentStep = 0;
+  
+  // Esconde a tela de boas-vindas
+  const welcome = document.getElementById('pi-screen-welcome');
+  if (welcome) {
+    welcome.style.display = 'none';
+    welcome.className = 'pi-step'; // remove a classe active
   }
+  
+  // Garante que o container existe e está visível
+  const container = document.getElementById('pi-step-container');
+  if (container) {
+    container.style.display = 'block';
+    renderStep(0);
+  } else {
+    console.error('Container pi-step-container não encontrado');
+  }
+}
 
   function nextStep() {
     if (!isStepComplete(steps[currentStep])) return;
