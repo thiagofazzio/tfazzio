@@ -1,0 +1,6 @@
+{
+  "name": "Ponto de Impacto",
+  "description": "Diagnóstico estratégico empresarial para PMEs. Descubra o gargalo de crescimento da sua empresa, Ponto de Equilíbrio e Plano de Ação de 90 dias em menos de 10 minutos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
