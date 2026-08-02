@@ -1,1 +1,1065 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ponto de Impacto · TFAZZIO</title>
+  <meta name="description" content="Descubra em poucos minutos qual decisao merece sua atencao primeiro." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bordo: #6B0F1A; --bordo-mid: #7B1D2E; --bordo-dark: #4A0A12;
+      --gold: #D4AF37; --gold-pale: #E8CC6A;
+      --graphite: #1A1A1A; --mid: #2E2E2E; --muted: #5A6270; --silver: #8A929C;
+      --rule: #D8D3CB; --white: #FFFFFF; --off: #F9F7F3; --cream: #F2EEE7; --cream-mid: #E8E2D8;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--white); color: var(--graphite); font-family: 'Barlow', sans-serif;
+      font-weight: 300; line-height: 1.75; overflow-x: hidden; -webkit-font-smoothing: antialiased;
+    }
+    .t-label {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 600;
+      letter-spacing: 5px; text-transform: uppercase; color: var(--gold); display: block;
+    }
+    .t-label--muted { color: var(--silver); }
+    .t-display {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 500; line-height: 1.08; color: var(--graphite);
+    }
+    .t-display em { font-style: italic; color: var(--bordo); }
+    .t-display--lg { font-size: clamp(36px, 5vw, 68px); }
+    .t-display--md { font-size: clamp(28px, 3.5vw, 50px); }
+    .t-display--sm { font-size: clamp(22px, 2.8vw, 36px); }
+    .t-display--inv { color: var(--white); }
+    .t-display--inv em { color: var(--gold-pale); }
+    .t-body { font-size: 16px; color: var(--muted); line-height: 1.9; }
+    .t-body--sm { font-size: 14px; }
+    .btn {
+      display: inline-block; font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
+      font-weight: 600; letter-spacing: 3px; text-transform: uppercase; text-decoration: none;
+      padding: 17px 48px; transition: all 0.22s; cursor: pointer; border: none; line-height: 1;
+    }
+    .btn--bordo { background: var(--bordo); color: var(--white); }
+    .btn--bordo:hover { background: var(--bordo-mid); transform: translateY(-2px); }
+    .btn--gold { background: var(--gold); color: var(--bordo-dark); }
+    .btn--gold:hover { background: var(--gold-pale); transform: translateY(-2px); }
+    .btn--outline {
+      background: transparent; color: var(--bordo); border: 1px solid var(--bordo); padding: 16px 46px;
+    }
+    .btn--outline:hover { background: var(--bordo); color: var(--white); }
+    .btn--block { display: block; width: 100%; text-align: center; }
+    .btn--sm { padding: 13px 32px; font-size: 10px; }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 0 60px; }
+    .wrap--narrow { max-width: 860px; margin: 0 auto; padding: 0 60px; }
+    .section { padding: 120px 0; }
+    .gold-line { display: block; width: 36px; height: 2px; background: var(--gold); }
 
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200; height: 68px;
+      display: flex; align-items: center; justify-content: space-between; padding: 0 60px;
+      background: rgba(255,255,255,0.96); border-bottom: 1px solid var(--cream-mid);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    }
+    .nav-logo-text {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px;
+      letter-spacing: 5px; color: var(--bordo); text-decoration: none;
+    }
+    .nav-links { display: flex; align-items: center; gap: 36px; }
+    .nav-link {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600;
+      letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s;
+    }
+    .nav-link:hover { color: var(--bordo); }
+    .nav-cta {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700;
+      letter-spacing: 2.5px; text-transform: uppercase; text-decoration: none;
+      background: var(--bordo); color: var(--white); padding: 10px 24px; transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--bordo-mid); }
+    .nav-hamburger {
+      display: none; flex-direction: column; gap: 5px; cursor: pointer;
+      background: none; border: none; padding: 4px;
+    }
+    .nav-hamburger span { display: block; width: 22px; height: 1.5px; background: var(--bordo); }
+    .mob-menu {
+      display: none; position: fixed; top: 68px; left: 0; right: 0; background: var(--white);
+      border-bottom: 1px solid var(--cream-mid); padding: 28px 32px 36px;
+      flex-direction: column; gap: 0; z-index: 199;
+      max-height: calc(100vh - 68px); overflow-y: auto;
+    }
+    .mob-menu.open { display: flex; }
+    .mob-menu .nav-link { padding: 14px 0; border-bottom: 1px solid var(--cream); font-size: 12px; }
+    .mob-menu .nav-cta { margin-top: 20px; text-align: center; padding: 14px; }
+
+    .pi-section {
+      min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+      padding: 100px 0 80px; background: var(--white);
+    }
+    .pi-section--alt { background: var(--off); }
+    .pi-hero { text-align: center; max-width: 720px; margin: 0 auto; }
+    .pi-hero .t-label { margin-bottom: 24px; }
+    .pi-hero .t-display { margin-bottom: 16px; }
+    .pi-hero .t-body { max-width: 480px; margin: 0 auto 40px; }
+
+    .pi-step {
+      display: none; animation: fadeSlide 0.4s ease forwards;
+      max-width: 640px; margin: 0 auto; width: 100%;
+    }
+    .pi-step.active { display: block; }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .pi-step-header { margin-bottom: 32px; }
+    .pi-step-header .t-label { margin-bottom: 8px; }
+    .pi-step-header .step-counter {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 600;
+      letter-spacing: 2px; color: var(--silver); margin-bottom: 12px; display: block;
+    }
+    .pi-step-header .step-question {
+      font-family: 'Barlow Condensed', sans-serif; font-size: clamp(24px, 3vw, 40px);
+      font-weight: 500; line-height: 1.2; color: var(--graphite);
+    }
+    .pi-step-header .step-question em { font-style: italic; color: var(--bordo); }
+    .pi-step-header .step-hint {
+      font-size: 13px; color: var(--silver); margin-top: 8px; font-style: italic;
+    }
+    .pi-gamification {
+      font-size: 13px; color: var(--gold); font-family: 'Barlow Condensed', sans-serif;
+      letter-spacing: 2px; margin-top: 8px; opacity: 0.8;
+    }
+
+    .pi-input-group { margin: 24px 0 32px; }
+    .pi-input-group label {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 600;
+      letter-spacing: 1.5px; color: var(--mid); display: block; margin-bottom: 6px;
+    }
+    .pi-input-group .pi-input {
+      width: 100%; padding: 14px 16px; font-family: 'Barlow', sans-serif;
+      font-size: 16px; font-weight: 300; border: 1px solid var(--cream-mid);
+      background: var(--white); color: var(--graphite); outline: none; transition: border-color 0.2s;
+    }
+    .pi-input-group .pi-input:focus { border-color: var(--bordo); }
+    .pi-input-group .pi-input--select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235A6270' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 16px center; padding-right: 40px;
+    }
+    .pi-input-group .pi-input--textarea { min-height: 80px; resize: vertical; }
+
+    .pi-radio-group { display: flex; gap: 16px; margin: 16px 0 24px; flex-wrap: wrap; }
+    .pi-radio-group label {
+      display: flex; align-items: center; gap: 8px;
+      font-family: 'Barlow', sans-serif; font-size: 15px; color: var(--mid); cursor: pointer;
+    }
+    .pi-radio-group input[type="radio"] {
+      appearance: none; width: 18px; height: 18px; border: 2px solid var(--cream-mid);
+      border-radius: 50%; transition: border-color 0.2s, background 0.2s; cursor: pointer; flex-shrink: 0;
+    }
+    .pi-radio-group input[type="radio"]:checked {
+      border-color: var(--bordo); background: var(--bordo); box-shadow: inset 0 0 0 3px var(--white);
+    }
+
+    .pi-nota-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; margin: 16px 0 24px; }
+    .pi-nota-item { display: flex; align-items: center; gap: 12px; justify-content: space-between; }
+    .pi-nota-item label { font-size: 14px; color: var(--mid); font-weight: 400; flex: 1; }
+    .pi-nota-item select {
+      padding: 6px 8px; font-family: 'Barlow', sans-serif; font-size: 14px;
+      border: 1px solid var(--cream-mid); background: var(--white); border-radius: 0;
+      outline: none; width: 64px;
+    }
+    .pi-nota-item select:focus { border-color: var(--bordo); }
+
+    .pi-progress { margin: 32px 0 24px; display: flex; flex-direction: column; gap: 8px; }
+    .pi-progress-top {
+      display: flex; justify-content: space-between; font-size: 13px; color: var(--silver);
+      font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px;
+    }
+    .pi-progress-bar { height: 4px; background: var(--cream-mid); border-radius: 0; overflow: hidden; }
+    .pi-progress-fill { height: 100%; background: var(--bordo); width: 0%; transition: width 0.4s ease; }
+    .pi-progress-message {
+      font-size: 13px; color: var(--gold); font-family: 'Barlow Condensed', sans-serif;
+      letter-spacing: 1.5px; text-align: center; margin-top: 4px;
+    }
+
+    .pi-step-actions {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 16px; margin-top: 8px;
+    }
+    .pi-step-actions .btn--back {
+      background: none; border: none; font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--silver); cursor: pointer; padding: 8px 0; transition: color 0.2s;
+    }
+    .pi-step-actions .btn--back:hover { color: var(--bordo); }
+    .pi-step-actions .btn:disabled {
+      opacity: 0.35; cursor: not-allowed; pointer-events: none;
+    }
+    .pi-validation-warning {
+      font-size: 13px; color: var(--bordo); font-style: italic; margin-top: 8px;
+      text-align: right; min-height: 18px;
+    }
+
+    .pi-loading { text-align: center; padding: 60px 0; }
+    .pi-loading .spinner {
+      width: 48px; height: 48px; border: 2px solid var(--cream-mid);
+      border-top-color: var(--bordo); border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 32px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .pi-loading .loading-text {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 500; color: var(--mid);
+    }
+    .pi-loading .loading-text span {
+      display: block; font-size: 14px; color: var(--silver); margin-top: 8px; font-family: 'Barlow', sans-serif;
+    }
+
+    .pi-relatorio { max-width: 900px; margin: 0 auto; }
+    .pi-relatorio .secao {
+      margin-bottom: 48px; border-bottom: 1px solid var(--cream-mid); padding-bottom: 40px;
+    }
+    .pi-relatorio .secao:last-child { border-bottom: none; margin-bottom: 0; }
+
+    .pi-card-indice {
+      background: var(--off); padding: 40px 48px; text-align: center; border-top: 3px solid var(--gold);
+    }
+    .pi-card-indice .valor {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 64px; font-weight: 500;
+      color: var(--bordo); line-height: 1;
+    }
+    .pi-card-indice .rotulo {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 600;
+      letter-spacing: 3px; text-transform: uppercase; color: var(--silver); margin-top: 8px;
+    }
+    .pi-card-indice .nivel { font-size: 18px; color: var(--mid); margin-top: 8px; }
+    .pi-card-indice .explicacao { font-size: 14px; color: var(--muted); margin-top: 12px; font-style: italic; }
+
+    .pi-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .pi-card {
+      background: var(--white); border: 1px solid var(--cream-mid);
+      padding: 24px 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+    .pi-card .label {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 600;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--silver); display: block; margin-bottom: 4px;
+    }
+    .pi-card .valor {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 500; color: var(--graphite);
+    }
+    .pi-card .sub { font-size: 14px; color: var(--muted); }
+    .badge {
+      display: inline-block; font-family: 'Barlow Condensed', sans-serif; font-size: 10px;
+      font-weight: 700; letter-spacing: 1px; padding: 2px 12px;
+      background: var(--cream-mid); color: var(--mid); margin-left: 8px; vertical-align: middle;
+    }
+    .badge--green { background: #d4edda; color: #155724; }
+    .badge--yellow { background: #fff3cd; color: #856404; }
+    .badge--red { background: #f8d7da; color: #721c24; }
+
+    .pi-radar-container { max-width: 500px; margin: 0 auto; padding: 16px 0; }
+    .pi-radar-container canvas { width: 100% !important; height: auto !important; }
+    .pi-radar-desc {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 24px;
+      font-size: 13px; color: var(--muted); margin-top: 8px;
+    }
+    .pi-radar-desc span::before { content: '•'; color: var(--bordo); margin-right: 6px; }
+
+    .pi-mapa-calor {
+      display: flex; flex-wrap: wrap; gap: 16px 32px;
+      justify-content: center; padding: 8px 0;
+    }
+    .pi-mapa-calor .item { display: flex; align-items: center; gap: 8px; font-size: 15px; }
+    .pi-mapa-calor .item .emoji { font-size: 20px; }
+
+    .pi-diagnostico-texto {
+      background: var(--off); padding: 28px 32px; border-left: 3px solid var(--gold); margin: 16px 0;
+    }
+    .pi-diagnostico-texto p { font-size: 16px; color: var(--mid); line-height: 1.85; margin-bottom: 12px; }
+    .pi-diagnostico-texto p:last-child { margin-bottom: 0; }
+    .pi-diagnostico-texto strong { color: var(--bordo); font-weight: 500; }
+
+    .pi-ranking { list-style: none; padding: 0; margin: 12px 0; }
+    .pi-ranking li {
+      padding: 10px 0; border-bottom: 1px solid var(--cream);
+      display: flex; align-items: center; gap: 16px; font-size: 15px; color: var(--mid);
+    }
+    .pi-ranking li:last-child { border-bottom: none; }
+    .pi-ranking .rank-emoji { font-size: 20px; }
+    .pi-ranking .rank-detail { color: var(--silver); font-size: 13px; margin-left: auto; }
+
+    .pi-roadmap { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; margin: 16px 0; }
+    .pi-roadmap-item {
+      background: var(--off); padding: 24px 28px; border-top: 2px solid var(--bordo);
+    }
+    .pi-roadmap-item .phase {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 8px;
+    }
+    .pi-roadmap-item h4 {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 500;
+      color: var(--graphite); margin-bottom: 12px;
+    }
+    .pi-roadmap-item ul { list-style: none; padding: 0; }
+    .pi-roadmap-item ul li {
+      font-size: 14px; color: var(--muted); padding: 6px 0; border-bottom: 1px solid var(--cream);
+      display: flex; gap: 10px; line-height: 1.6;
+    }
+    .pi-roadmap-item ul li:last-child { border-bottom: none; }
+    .pi-roadmap-item ul li::before { content: '->'; color: var(--gold); flex-shrink: 0; }
+
+    .pi-cta-final { text-align: center; padding: 32px 0 0; }
+    .pi-cta-final .t-body { max-width: 480px; margin: 0 auto 24px; }
+    .pi-cta-final .texto-encerramento {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 500;
+      color: var(--graphite); line-height: 1.5; max-width: 600px; margin: 0 auto 32px;
+    }
+    .pi-cta-final .texto-encerramento em { font-style: italic; color: var(--bordo); }
+
+    .pi-pdf-btn { text-align: right; margin: 16px 0 0; }
+    .pi-pdf-btn .btn { padding: 12px 28px; font-size: 10px; }
+
+    .pi-empresa-card {
+      background: var(--off); padding: 20px 28px; border-left: 3px solid var(--bordo); margin: 16px 0;
+    }
+    .pi-empresa-card .nome {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 500; color: var(--graphite);
+    }
+    .pi-empresa-card .dados { font-size: 14px; color: var(--muted); margin-top: 4px; }
+    .pi-empresa-card .dados span { margin-right: 16px; }
+
+    .pi-resumo-respostas {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4px 24px;
+      background: var(--off); padding: 16px 20px; margin: 12px 0; font-size: 13px;
+    }
+    .pi-resumo-respostas .item {
+      display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--cream);
+    }
+    .pi-resumo-respostas .item:last-child { border-bottom: none; }
+    .pi-resumo-respostas .chave { color: var(--silver); }
+    .pi-resumo-respostas .valor { color: var(--mid); font-weight: 500; }
+
+    .wa {
+      position: fixed; bottom: 32px; right: 32px; z-index: 999;
+      width: 54px; height: 54px; background: #25D366; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 18px rgba(37,211,102,0.38);
+      transition: transform 0.2s, box-shadow 0.2s; text-decoration: none;
+    }
+    .wa:hover { transform: scale(1.1); box-shadow: 0 6px 26px rgba(37,211,102,0.55); }
+    .wa svg { width: 26px; height: 26px; }
+
+    @media (max-width: 960px) {
+      nav { padding: 0 24px; }
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+      .wrap, .wrap--narrow { padding: 0 24px; }
+      .pi-section { padding: 80px 0 60px; }
+      .pi-grid-2 { grid-template-columns: 1fr; }
+      .pi-roadmap { grid-template-columns: 1fr; }
+      .pi-nota-grid { grid-template-columns: 1fr; }
+      .pi-card-indice { padding: 32px 24px; }
+      .pi-resumo-respostas { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .pi-step-actions { flex-wrap: wrap; }
+      .pi-step-actions .btn { width: 100%; text-align: center; }
+      .pi-step-actions .btn--back { width: auto; }
+      .pi-card { padding: 16px; }
+      .wa { bottom: 20px; right: 20px; width: 48px; height: 48px; }
+      .wa svg { width: 22px; height: 22px; }
+    }
+  </style>
+<base target="_blank">
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo-text">TFAZZIO</a>
+  <div class="nav-links">
+    <a href="/#produtos" class="nav-link">Programas</a>
+    <a href="/#sobre" class="nav-link">Sobre</a>
+    <a href="https://wa.me/5516992752758?text=Ola!%20Vim%20pelo%20Ponto%20de%20Impacto%20e%20gostaria%20de%20conversar%20sobre%20minha%20empresa." target="_blank" class="nav-cta">Falar com a TFAZZIO</a>
+  </div>
+  <button class="nav-hamburger" aria-label="Abrir menu" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mob-menu" id="mobMenu">
+  <a href="/#produtos" class="nav-link" onclick="toggleMenu()">Programas</a>
+  <a href="/#sobre" class="nav-link" onclick="toggleMenu()">Sobre</a>
+  <a href="https://wa.me/5516992752758?text=Ola!%20Vim%20pelo%20Ponto%20de%20Impacto%20e%20gostaria%20de%20conversar%20sobre%20minha%20empresa." target="_blank" class="nav-cta" onclick="toggleMenu()">Falar com a TFAZZIO</a>
+</div>
+
+<section class="pi-section" id="pi-app">
+  <div class="wrap--narrow">
+    <div id="pi-screen-welcome" class="pi-step active">
+      <div class="pi-hero">
+        <span class="t-label">TFAZZIO</span>
+        <h1 class="t-display t-display--lg">Ponto de<br><em>Impacto</em></h1>
+        <p class="t-body" style="max-width:480px;margin:16px auto 32px;">
+          Em poucos minutos voce descobrira qual decisao merece sua atencao primeiro.
+          <br><br>
+          Nao analisamos apenas numeros.<br>
+          Analisamos como sua empresa funciona.
+          <br><br>
+          Ao final voce recebera gratuitamente um diagnostico estrategico.
+        </p>
+        <button class="btn btn--bordo" id="btn-start" onclick="startDiagnostico()">Comecar Diagnostico</button>
+        <p style="font-size:13px;color:var(--silver);margin-top:16px;font-style:italic;">Aprox. 5 minutos · dados confidenciais</p>
+      </div>
+    </div>
+    <div id="pi-step-container"></div>
+    <div id="pi-screen-loading" class="pi-step" style="display:none;">
+      <div class="pi-loading">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loading-text">
+          Analisando indicadores financeiros...
+          <span id="loading-sub">Comparando padroes de gestao...</span>
+        </div>
+      </div>
+    </div>
+    <div id="pi-screen-result" class="pi-step" style="display:none;">
+      <div id="pi-relatorio-content"></div>
+    </div>
+  </div>
+</section>
+<script>
+  // Toggle menu
+  function toggleMenu() {
+    document.getElementById('mobMenu').classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    const m = document.getElementById('mobMenu');
+    if (m.classList.contains('open') && !e.target.closest('nav') && !e.target.closest('#mobMenu')) {
+      m.classList.remove('open');
+    }
+  });
+
+  // Estado global
+  const state = {
+    cnpj: '', dadosPublicos: null,
+    objPrincipal: '', dificuldade: '',
+    nomeEmpresa: '', segmento: '', cidade: '', tempoMercado: '', numFuncionarios: '', regimeTributario: '',
+    faturamento: '', custosFixos: '', custosVariaveisPct: '', aliquotaImpostos: '', proLabore: '', ticketMedio: '', numClientesMes: '',
+    taxaConversao: '', existeCRM: '', equipeComercial: '',
+    notaFinanceiro: '', notaComercial: '', notaOperacao: '', notaGestao: '', notaPessoas: '', notaEstrategia: '',
+    pergFerias30: '', pergMargemLiquida: '', pergFluxoCaixa: '', pergMetasPlano: '',
+    perguntasPipeline: [], respostasPipeline: {},
+  };
+
+  // Definicao dos steps
+  const steps = [];
+  function addStep(type, config) { steps.push({ type, ...config }); }
+
+  addStep('cnpj', {});
+  addStep('field', { field: { id: 'objPrincipal', label: 'Qual e o principal objetivo da sua empresa para os proximos 12 meses?', type: 'textarea', hint: 'Descreva com suas palavras' } });
+  addStep('field', { field: { id: 'dificuldade', label: 'Qual e hoje sua maior dificuldade?', type: 'textarea', hint: 'O que mais te preocupa?' } });
+  addStep('group', {
+    title: 'Agora, alguns dados da sua empresa',
+    fields: [
+      { id: 'nomeEmpresa', label: 'Nome da empresa', type: 'text', placeholder: 'Razao social ou nome fantasia' },
+      { id: 'segmento', label: 'Segmento', type: 'text', placeholder: 'Ex: varejo, industria, servicos' },
+      { id: 'cidade', label: 'Cidade', type: 'text', placeholder: 'Sua cidade' },
+      { id: 'tempoMercado', label: 'Tempo de mercado (anos)', type: 'number', placeholder: 'Ex: 5' },
+      { id: 'numFuncionarios', label: 'Numero de funcionarios', type: 'number', placeholder: 'Quantos colaboradores' },
+      { id: 'regimeTributario', label: 'Regime tributario', type: 'select', options: ['Simples Nacional', 'Lucro Presumido', 'Lucro Real'] },
+    ]
+  });
+  const finFields = [
+    { id: 'faturamento', label: 'Faturamento medio mensal (R$)', hint: 'Media dos ultimos 3 a 6 meses', type: 'number' },
+    { id: 'custosFixos', label: 'Custos fixos mensais (R$)', hint: 'Aluguel, folha, contas, softwares etc.', type: 'number' },
+    { id: 'custosVariaveisPct', label: 'Custos variaveis (%)', hint: '% do faturamento (ex: materia-prima, comissoes)', type: 'number' },
+    { id: 'aliquotaImpostos', label: 'Aliquota efetiva de impostos (%)', hint: '% do faturamento pago em impostos', type: 'number' },
+    { id: 'proLabore', label: 'Pro-labore mensal (R$)', hint: 'Remuneracao formal do(s) socio(s)', type: 'number' },
+    { id: 'ticketMedio', label: 'Ticket medio (R$)', hint: 'Valor medio por venda ou por cliente', type: 'number' },
+    { id: 'numClientesMes', label: 'Numero medio de clientes por mes', hint: 'Quantos clientes ativos por mes', type: 'number' },
+  ];
+  finFields.forEach(f => addStep('field', { field: f }));
+  addStep('field', { field: { id: 'taxaConversao', label: 'Taxa de conversao (%)', hint: '% de leads que viram clientes', type: 'number' } });
+  addStep('field', { field: { id: 'existeCRM', label: 'Existe CRM?', type: 'radio', options: ['Sim', 'Nao'] } });
+  addStep('field', { field: { id: 'equipeComercial', label: 'Existe equipe comercial?', type: 'radio', options: ['Sim', 'Nao'] } });
+  const gestaoFields = [
+    { id: 'notaFinanceiro', label: 'Financeiro' },
+    { id: 'notaComercial', label: 'Comercial' },
+    { id: 'notaOperacao', label: 'Operacao' },
+    { id: 'notaGestao', label: 'Gestao' },
+    { id: 'notaPessoas', label: 'Pessoas' },
+    { id: 'notaEstrategia', label: 'Estrategia' },
+  ];
+  addStep('gestao', { fields: gestaoFields });
+  const pergFields = [
+    { id: 'pergFerias30', label: 'A empresa funciona sem voce por 30 dias?' },
+    { id: 'pergMargemLiquida', label: 'Voce conhece sua margem liquida?' },
+    { id: 'pergFluxoCaixa', label: 'Existe fluxo de caixa projetado?' },
+    { id: 'pergMetasPlano', label: 'Ha metas e plano de crescimento definidos?' },
+  ];
+  addStep('perguntas', { fields: pergFields });
+
+  let currentStep = 0;
+  const totalSteps = steps.length;
+
+  const progressMessages = [
+    'Estamos construindo seu diagnostico...',
+    'Seu Indice de Clareza esta tomando forma...',
+    'Faltam apenas algumas perguntas.',
+    'O diagnostico ja esta quase pronto.',
+  ];
+
+  function isStepComplete(step) {
+    if (step.type === 'cnpj') { return state.cnpj && state.cnpj.length === 14; }
+    if (step.type === 'group') { return step.fields.every(f => { const v = state[f.id]; return v !== '' && v !== undefined && v !== null; }); }
+    if (step.type === 'field') { const f = step.field; const v = state[f.id]; return v !== '' && v !== undefined && v !== null; }
+    if (step.type === 'gestao') { return step.fields.every(f => { const v = state[f.id]; return v !== '' && v !== undefined && v !== null; }); }
+    if (step.type === 'perguntas') { return step.fields.every(f => { const v = state[f.id]; return v === 'Sim' || v === 'Nao'; }); }
+    return true;
+  }
+
+  function pendingFieldLabels(step) {
+    if (step.type === 'cnpj') { return state.cnpj.length === 14 ? [] : ['CNPJ']; }
+    if (step.type === 'group' || step.type === 'gestao') {
+      return step.fields.filter(f => { const v = state[f.id]; return v === '' || v === undefined || v === null; }).map(f => f.label);
+    }
+    if (step.type === 'perguntas') {
+      return step.fields.filter(f => { const v = state[f.id]; return v !== 'Sim' && v !== 'Nao'; }).map(f => f.label);
+    }
+    return [];
+  }
+
+  function renderStep(index) {
+    const container = document.getElementById('pi-step-container');
+    const step = steps[index];
+    if (!step) return;
+
+    let html = '<div class="pi-step active">';
+    html += '<div class="pi-step-header">';
+    const pct = Math.round(((index) / totalSteps) * 100);
+    html += '<span class="step-counter">Etapa ' + (index + 1) + ' de ' + totalSteps + '</span>';
+
+    if (step.type === 'cnpj') {
+      html += '<h2 class="step-question">Qual o <em>CNPJ</em> da empresa?</h2>';
+      html += '<div class="step-hint">Apenas numeros, sem pontos ou tracos</div>';
+    } else if (step.type === 'group') {
+      html += '<h2 class="step-question">' + step.title + '</h2>';
+    } else if (step.type === 'field') {
+      const f = step.field;
+      html += '<h2 class="step-question">' + f.label + '</h2>';
+      if (f.hint) html += '<div class="step-hint">' + f.hint + '</div>';
+    } else if (step.type === 'gestao') {
+      html += '<h2 class="step-question">Autoavaliacao: como voce ve sua empresa?</h2>';
+      html += '<div class="step-hint">Nota 1 (muito ruim) a 5 (excelente) para cada area</div>';
+    } else if (step.type === 'perguntas') {
+      html += '<h2 class="step-question">Ultimas perguntas estrategicas</h2>';
+      html += '<div class="step-hint">Responda com sinceridade</div>';
+    }
+
+    const msgIdx = Math.min(Math.floor((index / totalSteps) * progressMessages.length), progressMessages.length - 1);
+    html += '<div class="pi-gamification">' + progressMessages[msgIdx] + '</div>';
+    html += '</div>';
+
+    html += '<div class="pi-input-group">';
+    if (step.type === 'cnpj') {
+      html += '<div style="margin-bottom:16px;">';
+      html += '<label for="cnpjDiag">CNPJ</label>';
+      html += '<input id="cnpjDiag" type="text" class="pi-input" placeholder="Ex: 12345678000101" value="' + (state.cnpj || '') + '" oninput="updateFieldCNPJ(this.value)" maxlength="14" />';
+      html += '<div style="font-size:12px;color:var(--silver);margin-top:4px;">Digite apenas numeros</div>';
+      html += '</div>';
+      html += '<div id="cnpj-resultado" style="display:none;margin-top:12px;padding:12px;background:var(--off);border-left:3px solid var(--bordo);">';
+      html += '<div id="cnpj-dados"></div>';
+      html += '</div>';
+    } else if (step.type === 'group') {
+      step.fields.forEach(f => {
+        const val = state[f.id] || '';
+        html += '<div style="margin-bottom:16px;">';
+        html += '<label for="' + f.id + '">' + f.label + '</label>';
+        if (f.type === 'select') {
+          html += '<select id="' + f.id + '" class="pi-input pi-input--select" onchange="updateField('' + f.id + '', this.value)">';
+          html += '<option value="">Selecione</option>';
+          f.options.forEach(opt => { html += '<option value="' + opt + '" ' + (val===opt?'selected':'') + '>' + opt + '</option>'; });
+          html += '</select>';
+        } else {
+          html += '<input id="' + f.id + '" type="' + f.type + '" class="pi-input" placeholder="' + (f.placeholder||'') + '" value="' + val + '" oninput="updateField('' + f.id + '', this.value)" />';
+        }
+        html += '</div>';
+      });
+    } else if (step.type === 'field') {
+      const f = step.field;
+      const val = state[f.id] || '';
+      if (f.type === 'radio') {
+        html += '<div class="pi-radio-group">';
+        f.options.forEach(opt => {
+          const checked = val === opt ? 'checked' : '';
+          html += '<label><input type="radio" name="' + f.id + '" value="' + opt + '" ' + checked + ' onchange="updateField('' + f.id + '', this.value)" /> ' + opt + '</label>';
+        });
+        html += '</div>';
+      } else if (f.type === 'textarea') {
+        html += '<textarea id="' + f.id + '" class="pi-input pi-input--textarea" placeholder="Digite sua resposta..." oninput="updateField('' + f.id + '', this.value)">' + val + '</textarea>';
+      } else {
+        html += '<input id="' + f.id + '" type="' + f.type + '" class="pi-input" placeholder="' + (f.placeholder||'') + '" value="' + val + '" oninput="updateField('' + f.id + '', this.value)" />';
+      }
+    } else if (step.type === 'gestao') {
+      html += '<div class="pi-nota-grid">';
+      step.fields.forEach(f => {
+        const val = state[f.id] || '';
+        html += '<div class="pi-nota-item">';
+        html += '<label for="' + f.id + '">' + f.label + '</label>';
+        html += '<select id="' + f.id + '" onchange="updateField('' + f.id + '', this.value)">';
+        html += '<option value="">-</option>';
+        for (let i = 1; i <= 5; i++) { html += '<option value="' + i + '" ' + (val==i?'selected':'') + '>' + i + '</option>'; }
+        html += '</select>';
+        html += '</div>';
+      });
+      html += '</div>';
+    } else if (step.type === 'perguntas') {
+      step.fields.forEach(f => {
+        const val = state[f.id] || '';
+        html += '<div style="margin-bottom:16px;">';
+        html += '<label>' + f.label + '</label>';
+        html += '<div class="pi-radio-group">';
+        ['Sim', 'Nao'].forEach(opt => {
+          const checked = val === opt ? 'checked' : '';
+          html += '<label><input type="radio" name="' + f.id + '" value="' + opt + '" ' + checked + ' onchange="updateField('' + f.id + '', this.value)" /> ' + opt + '</label>';
+        });
+        html += '</div>';
+        html += '</div>';
+      });
+    }
+    html += '</div>';
+
+    const pct2 = Math.round(((index + 1) / totalSteps) * 100);
+    html += '<div class="pi-progress">';
+    html += '<div class="pi-progress-top"><span>' + pct2 + '% concluido</span><span>Etapa ' + (index + 1) + ' de ' + totalSteps + '</span></div>';
+    html += '<div class="pi-progress-bar"><div class="pi-progress-fill" style="width:' + pct2 + '%;"></div></div>';
+    html += '</div>';
+
+    const complete = isStepComplete(step);
+    html += '<div class="pi-step-actions">';
+    if (index > 0) { html += '<button class="btn--back" onclick="goToStep(' + (index - 1) + ')">&larr; Voltar</button>'; }
+    else { html += '<span></span>'; }
+    if (index < totalSteps - 1) {
+      html += '<button class="btn btn--bordo" id="pi-next-btn" ' + (complete ? '' : 'disabled') + ' onclick="nextStep()">Proximo</button>';
+    } else {
+      html += '<button class="btn btn--gold" id="pi-next-btn" ' + (complete ? '' : 'disabled') + ' onclick="finalizar()">Ver Resultado</button>';
+    }
+    html += '</div>';
+
+    const pending = pendingFieldLabels(step);
+    html += '<div class="pi-validation-warning" id="pi-validation-msg">';
+    if (pending.length > 0) { html += 'Falta responder: ' + pending.join(', '); }
+    html += '</div>';
+    html += '</div>';
+
+    container.innerHTML = html;
+    document.getElementById('pi-screen-welcome').style.display = 'none';
+    document.getElementById('pi-screen-loading').style.display = 'none';
+    document.getElementById('pi-screen-result').style.display = 'none';
+    container.style.display = 'block';
+
+    if (step.type === 'cnpj' && state.dadosPublicos) { mostrarDadosCNPJ(state.dadosPublicos); }
+  }
+
+  function mostrarDadosCNPJ(dados) {
+    const div = document.getElementById('cnpj-resultado');
+    const conteudo = document.getElementById('cnpj-dados');
+    if (!div || !conteudo) return;
+    if (dados && !dados.erro) {
+      div.style.display = 'block';
+      const nome = dados.razao_social || dados.nome_fantasia || 'Empresa nao encontrada';
+      const porte = dados.porte || 'nao informado';
+      const cnae = dados.cnae_principal || 'nao informado';
+      conteudo.innerHTML = '<div class="pi-empresa-card" style="border-left-color:var(--gold);"><div class="nome">' + nome + '</div><div class="dados"><span>Porte: ' + porte + '</span><span>CNAE: ' + cnae.substring(0, 60) + (cnae.length > 60 ? '...' : '') + '</span></div></div>';
+    } else {
+      div.style.display = 'block';
+      conteudo.innerHTML = '<p style="color:var(--bordo);">' + (dados?.erro || 'CNPJ nao encontrado') + '</p>';
+    }
+  }
+
+  function updateFieldCNPJ(value) {
+    const limpo = value.replace(/\D/g, '');
+    state.cnpj = limpo;
+    if (limpo.length === 14) {
+      const url = 'https://motor-tfazzio.onrender.com/enrich?cnpj=' + limpo;
+      fetch(url)
+        .then(r => r.json())
+        .then(data => { state.dadosPublicos = data; mostrarDadosCNPJ(data); revalidateCurrentStep(); })
+        .catch(() => { state.dadosPublicos = { erro: 'Erro ao buscar CNPJ' }; mostrarDadosCNPJ(state.dadosPublicos); });
+    } else {
+      state.dadosPublicos = null;
+      const div = document.getElementById('cnpj-resultado');
+      if (div) div.style.display = 'none';
+    }
+    revalidateCurrentStep();
+  }
+
+ function startDiagnostico() {
+  console.log('startDiagnostico chamado');
+  currentStep = 0;
+  
+  // Esconde a tela de boas-vindas
+  const welcome = document.getElementById('pi-screen-welcome');
+  if (welcome) {
+    welcome.style.display = 'none';
+    welcome.className = 'pi-step'; // remove a classe active
+  }
+  
+  // Garante que o container existe e está visível
+  const container = document.getElementById('pi-step-container');
+  if (container) {
+    container.style.display = 'block';
+    renderStep(0);
+  } else {
+    console.error('Container pi-step-container não encontrado');
+  }
+}
+
+  function nextStep() {
+    if (!isStepComplete(steps[currentStep])) return;
+    if (steps[currentStep].type === 'cnpj' && !state.dadosPublicos) {
+      const msg = document.getElementById('pi-validation-msg');
+      if (msg) msg.textContent = 'Aguardando dados do CNPJ...';
+      return;
+    }
+    if (currentStep < totalSteps - 1) { currentStep++; renderStep(currentStep); }
+  }
+
+  function goToStep(index) { currentStep = index; renderStep(currentStep); }
+
+  function updateField(id, value) { state[id] = value; revalidateCurrentStep(); }
+
+  function revalidateCurrentStep() {
+    const step = steps[currentStep];
+    if (!step) return;
+    const btn = document.getElementById('pi-next-btn');
+    const msg = document.getElementById('pi-validation-msg');
+    if (!btn || !msg) return;
+    const complete = isStepComplete(step);
+    btn.disabled = !complete;
+    const pending = pendingFieldLabels(step);
+    msg.textContent = pending.length > 0 ? 'Falta responder: ' + pending.join(', ') : '';
+  }
+
+  function finalizar() {
+    if (!isStepComplete(steps[currentStep])) return;
+    const payload = {
+      cnpj: state.cnpj,
+      faturamento: state.faturamento || null,
+      equipe: state.numFuncionarios || null,
+      desafio: state.objPrincipal || 'melhorar resultados',
+      respostas: state.respostasPipeline || {}
+    };
+    document.getElementById('pi-step-container').style.display = 'none';
+    const loadingScreen = document.getElementById('pi-screen-loading');
+    loadingScreen.style.display = 'block';
+    loadingScreen.className = 'pi-step active';
+    const textEl = document.getElementById('loading-text');
+    const subEl = document.getElementById('loading-sub');
+    const messages = [
+      'Analisando dados da empresa...',
+      'Identificando padroes de gestao...',
+      'Calculando Indice de Clareza...',
+      'Gerando diagnostico estrategico...'
+    ];
+    let idx = 0;
+    const interval = setInterval(() => {
+      if (idx < messages.length) {
+        if (idx === 0) { textEl.textContent = messages[idx]; subEl.textContent = 'Verificando indicadores...'; }
+        else if (idx === messages.length - 1) { textEl.textContent = messages[idx]; subEl.textContent = 'Preparando seu relatorio...'; }
+        else { subEl.textContent = messages[idx]; }
+        idx++;
+      } else { clearInterval(interval); }
+    }, 1200);
+
+    fetch('https://motor-tfazzio.onrender.com/diagnose', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(data => {
+      clearInterval(interval);
+      if (data.erro) {
+        textEl.textContent = 'Erro: ' + data.erro;
+        subEl.textContent = 'Tente novamente mais tarde.';
+        return;
+      }
+      if (data.status === 'perguntas_pendentes' && data.perguntas) {
+        state.perguntasPipeline = data.perguntas;
+        loadingScreen.style.display = 'none';
+        mostrarPerguntasPipeline(data.perguntas);
+        return;
+      }
+      loadingScreen.style.display = 'none';
+      const resultScreen = document.getElementById('pi-screen-result');
+      resultScreen.style.display = 'block';
+      resultScreen.className = 'pi-step active';
+      renderResultado(data);
+    })
+    .catch(err => {
+      clearInterval(interval);
+      textEl.textContent = 'Erro de conexao';
+      subEl.textContent = err.message;
+    });
+  }
+
+  function mostrarPerguntasPipeline(perguntas) {
+    const container = document.getElementById('pi-step-container');
+    container.style.display = 'block';
+    let html = '<div class="pi-step active">';
+    html += '<div class="pi-step-header">';
+    html += '<span class="step-counter">Perguntas adicionais</span>';
+    html += '<h2 class="step-question">Precisamos de <em>mais algumas informacoes</em></h2>';
+    html += '<div class="step-hint">Responda para refinar o diagnostico</div>';
+    html += '</div>';
+    html += '<div class="pi-input-group">';
+    perguntas.forEach((p, i) => {
+      const texto = typeof p === 'string' ? p : p.texto || p;
+      const lacuna = typeof p === 'object' ? p.lacuna : 'pergunta_' + i;
+      const val = state.respostasPipeline[lacuna] || '';
+      html += '<div style="margin-bottom:16px;background:#f9f9f9;padding:12px;border-radius:6px;border-left:3px solid var(--bordo);">';
+      html += '<label style="display:block;font-weight:500;margin-bottom:6px;">' + (i+1) + '. ' + texto + '</label>';
+      html += '<select id="pergunta_pipeline_' + i + '" class="pi-input pi-input--select" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:4px;font-size:14px;" onchange="updateRespostaPipeline('' + lacuna + '', this.value)">';
+      html += '<option value="">Selecione uma opcao...</option>';
+      html += '<option value="Sim" ' + (val==='Sim'?'selected':'') + '>Sim</option>';
+      html += '<option value="Nao" ' + (val==='Nao'?'selected':'') + '>Nao</option>';
+      html += '<option value="Parcialmente" ' + (val==='Parcialmente'?'selected':'') + '>Parcialmente</option>';
+      html += '<option value="Outro" ' + (val==='Outro'?'selected':'') + '>Outro (especificar)</option>';
+      html += '</select>';
+      html += '<div id="pergunta_pipeline_outro_' + i + '" style="display:' + (val==='Outro'?'block':'none') + ';margin-top:8px;">';
+      html += '<input type="text" id="pergunta_pipeline_input_' + i + '" placeholder="Especifique..." style="width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:4px;" oninput="updateRespostaPipeline('' + lacuna + '', this.value)" value="' + (val==='Outro' ? val : '') + '" />';
+      html += '</div>';
+      html += '<input type="hidden" id="pergunta_pipeline_lacuna_' + i + '" value="' + lacuna + '">';
+      html += '</div>';
+    });
+    html += '<button class="btn btn--gold" onclick="enviarRespostasPipeline()" style="width:100%;padding:16px;">Enviar respostas e finalizar diagnostico</button>';
+    html += '</div></div>';
+    container.innerHTML = html;
+    document.getElementById('pi-screen-loading').style.display = 'none';
+    document.getElementById('pi-screen-result').style.display = 'none';
+    container.style.display = 'block';
+  }
+
+  function updateRespostaPipeline(lacuna, valor) { state.respostasPipeline[lacuna] = valor; }
+
+  function enviarRespostasPipeline() {
+    const payload = {
+      cnpj: state.cnpj,
+      faturamento: state.faturamento || null,
+      equipe: state.numFuncionarios || null,
+      desafio: state.objPrincipal || 'melhorar resultados',
+      respostas: state.respostasPipeline
+    };
+    document.getElementById('pi-step-container').style.display = 'none';
+    const loadingScreen = document.getElementById('pi-screen-loading');
+    loadingScreen.style.display = 'block';
+    loadingScreen.className = 'pi-step active';
+    const textEl = document.getElementById('loading-text');
+    const subEl = document.getElementById('loading-sub');
+    textEl.textContent = 'Processando respostas...';
+    subEl.textContent = 'Refinando o diagnostico...';
+
+    fetch('https://motor-tfazzio.onrender.com/diagnose', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.erro) {
+        textEl.textContent = 'Erro: ' + data.erro;
+        subEl.textContent = 'Tente novamente mais tarde.';
+        return;
+      }
+      if (data.status === 'perguntas_pendentes' && data.perguntas) {
+        loadingScreen.style.display = 'none';
+        mostrarPerguntasPipeline(data.perguntas);
+        return;
+      }
+      loadingScreen.style.display = 'none';
+      const resultScreen = document.getElementById('pi-screen-result');
+      resultScreen.style.display = 'block';
+      resultScreen.className = 'pi-step active';
+      renderResultado(data);
+    })
+    .catch(err => {
+      textEl.textContent = 'Erro: ' + err.message;
+      subEl.textContent = 'Tente novamente.';
+    });
+  }
+
+  function renderResultado(data) {
+    const container = document.getElementById('pi-relatorio-content');
+    const constraint = data.constraint_dominante || data.constraint || 'Gargalo identificado';
+    const natureza = data.natureza || 'restricao';
+    const certeza = data.certeza || 'Provavel';
+    const primeiraAcao = data.primeira_acao_recomendada || 'Diagnostico aprofundado';
+    const demaisAcoes = data.demais_acoes_do_plano || [];
+    const evidencias = data.evidencias_citadas || [];
+    const perguntasReflexoes = data.perguntas_e_reflexoes || [];
+    const nomeEmpresa = state.nomeEmpresa || state.dadosPublicos?.razao_social || 'Empresa';
+    const plano = gerarRoadmap(constraint);
+
+    let html = '<div class="pi-relatorio">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:24px;">';
+    html += '<span class="t-label">Diagnostico concluido</span>';
+    html += '<div class="pi-pdf-btn"><button class="btn btn--outline btn--sm" onclick="baixarPDF()">Baixar Relatorio</button></div>';
+    html += '</div>';
+
+    html += '<div class="secao">';
+    html += '<div class="pi-empresa-card">';
+    html += '<div class="nome">' + nomeEmpresa + '</div>';
+    html += '<div class="dados">';
+    html += '<span>CNPJ: ' + state.cnpj + '</span>';
+    if (state.segmento) html += '<span>Segmento: ' + state.segmento + '</span>';
+    if (state.tempoMercado) html += '<span>' + state.tempoMercado + ' anos de mercado</span>';
+    html += '</div></div></div>';
+
+    html += '<div class="secao">';
+    html += '<span class="t-label">O que encontramos</span>';
+    html += '<div class="pi-card-indice" style="background:var(--bordo);border-top-color:var(--gold);">';
+    html += '<div class="rotulo" style="color:var(--gold-pale);">Principal Gargalo</div>';
+    html += '<div class="valor" style="color:var(--white);font-size:36px;">' + constraint + '</div>';
+    html += '<div class="nivel" style="color:var(--gold-pale);">Certeza: ' + certeza + '</div>';
+    html += '<div class="explicacao" style="color:rgba(255,255,255,0.6);">Esta e a area que mais demanda atencao para desbloquear o proximo nivel da empresa.</div>';
+    html += '</div></div>';
+
+    if (evidencias.length > 0) {
+      html += '<div class="secao">';
+      html += '<span class="t-label">Evidencias que sustentam</span>';
+      html += '<ul class="pi-ranking">';
+      evidencias.forEach(e => {
+        const conteudo = e.conteudo || e;
+        const fonte = e.fonte || 'empresario';
+        html += '<li><span>' + conteudo + '</span><span class="rank-detail">fonte: ' + fonte + '</span></li>';
+      });
+      html += '</ul></div>';
+    }
+
+    if (perguntasReflexoes.length > 0) {
+      html += '<div class="secao">';
+      html += '<span class="t-label">Reflexoes que guiaram o diagnostico</span>';
+      perguntasReflexoes.forEach(p => {
+        html += '<div class="pi-diagnostico-texto" style="margin:12px 0;">';
+        html += '<p><strong>Pergunta:</strong> ' + p.pergunta + '</p>';
+        html += '<p><strong>Sua resposta:</strong> ' + p.resposta + '</p>';
+        if (p.analogia) html += '<p style="font-style:italic;color:var(--gold);">' + p.analogia + '</p>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+
+    html += '<div class="secao">';
+    html += '<span class="t-label">Plano de Acao</span>';
+    html += '<p class="t-body t-body--sm" style="margin-bottom:16px;">Com base no gargalo identificado, este e o caminho recomendado para os proximos 90 dias.</p>';
+    html += '<div class="pi-roadmap">' + plano + '</div>';
+    html += '</div>';
+
+    html += '<div class="secao" style="border-bottom:none;">';
+    html += '<div class="pi-cta-final">';
+    html += '<div class="texto-encerramento">';
+    html += 'Voce acabou de enxergar sua empresa sob uma perspectiva diferente.<br>';
+    html += 'O diagnostico mostra <em>qual e o proximo limitador</em>.<br>';
+    html += 'Agora e hora de atuar sobre ele.<br><br>';
+    html += 'Na Sessao Estrategica, aprofundamos este diagnostico, definimos prioridades e construimos um plano claro para que sua empresa cresca com mais seguranca e menos desperdicio de energia.<br><br>';
+    html += '<strong>Clareza para crescer.</strong>';
+    html += '</div>';
+    html += '<a href="https://wa.me/5516992752758?text=Ola!%20Vim%20pelo%20Ponto%20de%20Impacto%20e%20gostaria%20de%20agendar%20minha%20Sessao%20Estrategica." target="_blank" class="btn btn--bordo">Agendar minha Sessao Estrategica</a>';
+    html += '</div></div>';
+    html += '</div>';
+    container.innerHTML = html;
+  }
+
+  function gerarRoadmap(gargalo) {
+    const planos = {
+      'Restricao Comercial': {
+        titulo: 'Estruturacao Comercial',
+        fases: [
+          ['Mapear funil de vendas atual', 'Definir metas por canal', 'Implementar CRM'],
+          ['Treinar equipe comercial', 'Criar script de vendas', 'Acompanhar indicadores de conversao'],
+          ['Automatizar prospeccao', 'Escalar canais de maior performance', 'Revisar processo de pos-venda']
+        ]
+      },
+      'Restricao Financeira': {
+        titulo: 'Revisao Financeira',
+        fases: [
+          ['Revisar custos fixos e variaveis', 'Calcular margem real por produto/servico', 'Melhorar fluxo de caixa'],
+          ['Revisar precificacao', 'Negociar fornecedores', 'Implementar controle de custos'],
+          ['Consolidar indicadores financeiros', 'Planejar investimentos', 'Revisar estrutura de capital']
+        ]
+      },
+      'Restricao Operacional': {
+        titulo: 'Eficiencia Operacional',
+        fases: [
+          ['Mapear processos criticos', 'Identificar gargalos de producao', 'Padronizar entregas'],
+          ['Documentar processos', 'Treinar equipe em novos fluxos', 'Implementar indicadores de produtividade'],
+          ['Automatizar tarefas repetitivas', 'Escalar sem aumentar caos', 'Revisar qualidade e padroes']
+        ]
+      },
+      'Restricao de Pessoas': {
+        titulo: 'Desenvolvimento de Pessoas',
+        fases: [
+          ['Avaliar competencias da equipe', 'Identificar lacunas de habilidade', 'Revisar estrutura organizacional'],
+          ['Criar plano de desenvolvimento', 'Implementar feedback continuo', 'Revisar remuneracao e beneficios'],
+          ['Planos de sucessao', 'Cultura de alta performance', 'Retencao de talentos']
+        ]
+      },
+      'Restricao Estrategica': {
+        titulo: 'Direcao Estrategica',
+        fases: [
+          ['Revisar missao, visao e valores', 'Analisar posicionamento de mercado', 'Mapear concorrentes'],
+          ['Definir objetivos estrategicos', 'Criar plano de acao detalhado', 'Alinhar equipe com direcao'],
+          ['Monitorar indicadores estrategicos', 'Ajustar rota conforme mercado', 'Planejar proximos ciclos']
+        ]
+      }
+    };
+    const plano = planos[gargalo] || planos['Restricao Estrategica'];
+    let html = '';
+    const phases = ['FASE 1', 'FASE 2', 'FASE 3'];
+    plano.fases.forEach((fase, i) => {
+      html += '<div class="pi-roadmap-item">';
+      html += '<span class="phase">' + phases[i] + '</span>';
+      html += '<h4>' + plano.titulo + '</h4>';
+      html += '<ul>';
+      fase.forEach(item => { html += '<li>' + item + '</li>'; });
+      html += '</ul></div>';
+    });
+    return html;
+  }
+
+  function baixarPDF() {
+    const el = document.getElementById('pi-relatorio-content');
+    if (!el) return;
+    html2canvas(el, { scale: 2, useCORS: true }).then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+      pdf.save('diagnostico-tfazzio.pdf');
+    });
+  }
+</script>
+
+<a href="https://wa.me/5516992752758?text=Ola!%20Vim%20pelo%20Ponto%20de%20Impacto%20e%20gostaria%20de%20conversar%20sobre%20minha%20empresa." target="_blank" class="wa" aria-label="Falar no WhatsApp">
+  <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+</a>
+
+</body>
+</html>
