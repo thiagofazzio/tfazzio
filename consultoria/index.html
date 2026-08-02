@@ -306,4 +306,408 @@
       font-weight: 500; color: var(--graphite); line-height: 1.15; margin-bottom: 12px;
     }
     .ebook-title-sm em { font-style: italic; color: var(--bordo); }
-    .ebook-desc-sm
+    .ebook-desc-sm { font-size: 14px; color: var(--muted); line-height: 1.8; }
+    .ebook-action { text-align: right; }
+    .ebook-form-inline { display: flex; flex-direction: column; gap: 10px; }
+    .form-input-sm {
+      padding: 12px 14px; background: var(--off); border: 1px solid var(--cream-mid);
+      color: var(--graphite); font-family: 'Barlow', sans-serif; font-size: 13px; outline: none;
+    }
+    .form-input-sm:focus { border-color: var(--bordo); }
+    .form-input-sm::placeholder { color: var(--silver); }
+    #ebook-sucesso-inline { display: none; text-align: center; }
+
+    .faq { background: var(--white); }
+    .faq .t-label { margin-bottom: 28px; }
+    .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-top: 60px; }
+    .faq-item { background: var(--off); padding: 36px 40px; }
+    .faq-q { font-size: 15px; font-weight: 500; color: var(--graphite); margin-bottom: 14px; line-height: 1.4; }
+    .faq-a { font-size: 14px; color: var(--muted); line-height: 1.85; }
+
+    .cta-final {
+      background: var(--bordo-dark); padding: 140px 0; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-final .t-label { margin-bottom: 32px; text-align: center; }
+    .cta-title {
+      font-family: 'Barlow Condensed', sans-serif; font-size: clamp(34px, 5vw, 68px);
+      font-weight: 500; color: var(--white); line-height: 1.08; max-width: 760px; margin: 0 auto;
+    }
+    .cta-title em { font-style: italic; color: var(--gold-pale); }
+    .cta-italic {
+      font-family: 'Barlow', sans-serif; font-size: clamp(16px, 1.8vw, 22px);
+      font-style: italic; font-weight: 300; color: var(--gold-pale);
+      opacity: 0.75; display: block; margin: 24px 0 52px;
+    }
+    .cta-desc {
+      font-size: 16px; color: rgba(255,255,255,0.45); max-width: 460px;
+      margin: 0 auto 48px; line-height: 1.9;
+    }
+    .cta-promise {
+      display: inline-block; background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1); padding: 12px 36px;
+      font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 28px;
+      letter-spacing: 1px; font-style: italic;
+    }
+
+    footer {
+      background: var(--white); padding: 44px 60px;
+      display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--rule);
+    }
+    .footer-logo img { height: 34px; width: auto; }
+    .footer-tag {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 600;
+      letter-spacing: 4px; text-transform: uppercase; color: var(--gold);
+    }
+    .footer-copy { font-size: 12px; color: var(--silver); }
+
+    .wa {
+      position: fixed; bottom: 32px; right: 32px; z-index: 999;
+      width: 54px; height: 54px; background: #25D366; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 18px rgba(37,211,102,0.38);
+      transition: transform 0.2s, box-shadow 0.2s; text-decoration: none;
+    }
+    .wa:hover { transform: scale(1.1); box-shadow: 0 6px 26px rgba(37,211,102,0.55); }
+    .wa svg { width: 26px; height: 26px; }
+
+    @media (max-width: 960px) {
+      nav { padding: 0 24px; }
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+      .wrap, .wrap--narrow { padding: 0 24px; }
+      .hero { padding: 110px 24px 80px; }
+      .section { padding: 80px 0; }
+      .produtos-grid { grid-template-columns: 1fr; }
+      .sobre-grid { grid-template-columns: 1fr; gap: 56px; }
+      .sobre-right { padding-top: 0; }
+      .quem-grid { grid-template-columns: 1fr; gap: 44px; }
+      .cp-grid { grid-template-columns: 1fr; }
+      .faq-grid { grid-template-columns: 1fr; }
+      .ebook-box { grid-template-columns: 1fr; padding: 40px 32px; text-align: left; }
+      .ebook-action { text-align: left; }
+      footer { flex-direction: column; gap: 18px; text-align: center; padding: 36px 24px; }
+      .wa { bottom: 20px; right: 20px; }
+    }
+    @media (max-width: 560px) {
+      .hero-headline { font-size: clamp(36px, 10vw, 56px); }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo-text">TFAZZIO</a>
+  <div class="nav-links">
+    <a href="/" class="nav-link">Início</a>
+    <a href="/consultoria/#produtos" class="nav-link">Programas</a>
+    <a href="/consultoria/#sobre" class="nav-link">Sobre</a>
+    <a href="/consultoria/#quem" class="nav-link">Quem somos</a>
+    <a href="/consultoria/#faq" class="nav-link">FAQ</a>
+    <a href="/ponto/" class="nav-link">Ponto de Impacto</a>
+    <a href="/agenda/" class="nav-link">Agenda</a>
+    <a href="https://wa.me/5516992752758" target="_blank" class="nav-cta">Falar com a TFAZZIO</a>
+  </div>
+  <button class="nav-hamburger" aria-label="Abrir menu" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mob-menu" id="mobMenu">
+  <a href="/" class="nav-link" onclick="toggleMenu()">Início</a>
+  <a href="/consultoria/#produtos" class="nav-link" onclick="toggleMenu()">Programas</a>
+  <a href="/consultoria/#sobre" class="nav-link" onclick="toggleMenu()">Sobre</a>
+  <a href="/consultoria/#quem" class="nav-link" onclick="toggleMenu()">Quem somos</a>
+  <a href="/consultoria/#faq" class="nav-link" onclick="toggleMenu()">FAQ</a>
+  <a href="/ponto/" class="nav-link" onclick="toggleMenu()">Ponto de Impacto</a>
+  <a href="/agenda/" class="nav-link" onclick="toggleMenu()">Agenda</a>
+  <a href="https://wa.me/5516992752758" target="_blank" class="nav-cta" onclick="toggleMenu()">Falar com a TFAZZIO</a>
+</div>
+
+<section class="hero" id="home">
+  <div class="hero-content">
+    <p class="hero-eyebrow">Consultoria Estratégica Empresarial</p>
+    <h1 class="hero-headline">
+      Sua empresa sempre está<br>
+      a um limitador de alcançar<br>
+      o <em>próximo nível.</em>
+    </h1>
+    <span class="hero-rule"></span>
+    <p class="hero-subhead">A TFAZZIO identifica esse limitador e te ajuda a eliminá-lo.</p>
+    <p class="hero-body">
+      Trabalhamos com empresários que já tem um negócio rodando, mas sentem que algo invisível está segurando o crescimento. Nossa função é encontrar esse algo e construir o caminho para eliminá-lo.
+    </p>
+    <div class="hero-actions">
+      <a href="https://wa.me/5516992752758" target="_blank" class="btn btn--bordo">Conversar sobre minha empresa</a>
+      <p class="hero-friction">Sem compromisso. Vamos entender juntos qual programa faz sentido para você.</p>
+    </div>
+  </div>
+</section>
+
+<section class="produtos section" id="produtos">
+  <div class="wrap">
+    <span class="t-label">Programas TFAZZIO</span>
+    <h2 class="t-display t-display--lg">Escolha o programa<br>que faz sentido para <em>você</em></h2>
+    <div class="produtos-grid">
+      <div class="prod-card">
+        <span class="prod-tag">Intensivo de clareza · 30 dias</span>
+        <h3 class="prod-name">Intensivo<br>TFAZZIO</h3>
+        <p class="prod-headline">Diagnóstico completo da empresa em um ciclo curto e objetivo.</p>
+        <div class="prod-price">R$ 5.860</div>
+        <div class="prod-price-note">Pagamento único</div>
+        <button class="prod-expand" onclick="toggleDetails('details-intensivo', this)">Saiba mais</button>
+        <div class="prod-details" id="details-intensivo">
+          <span class="prod-detail-label">Entregas</span>
+          <ul class="prod-detail">
+            <li>Mapa Estratégico da Empresa</li>
+            <li>Estrutura atual do negócio</li>
+            <li>Estrutura financeira e de custos</li>
+            <li>Cálculo de breakeven</li>
+            <li>Principais gargalos identificados</li>
+            <li>Prioridades estratégicas</li>
+            <li>Roadmap inicial</li>
+          </ul>
+          <a href="https://wa.me/5516992752758" target="_blank" class="btn btn--bordo btn--sm btn--block">Quero o Intensivo</a>
+        </div>
+      </div>
+
+      <div class="prod-card prod-card--destaque">
+        <span class="prod-tag">Diagnóstico online · versão alpha</span>
+        <h3 class="prod-name">Ponto de<br>Impacto</h3>
+        <p class="prod-headline">Diagnóstico online para identificar o limitador principal da sua empresa.</p>
+        <div class="prod-price">R$ 489,70</div>
+        <div class="prod-price-note">Pagamento único</div>
+        <button class="prod-expand" onclick="toggleDetails('details-ponto', this)">Saiba mais</button>
+        <div class="prod-details" id="details-ponto">
+          <span class="prod-detail-label">O que é</span>
+          <p class="prod-detail-note">Um diagnóstico online estruturado que analisa os principais indicadores da sua empresa.</p>
+          <a href="/ponto/" target="_blank" class="btn btn--gold btn--sm btn--block">Acessar Ponto de Impacto</a>
+        </div>
+      </div>
+
+      <div class="prod-card">
+        <span class="prod-tag">Programa principal · 90 dias</span>
+        <h3 class="prod-name">Programa<br>Estratégico</h3>
+        <p class="prod-headline">Transforme clareza em decisões e decisões em resultados consistentes.</p>
+        <div class="prod-price">R$ 14.970</div>
+        <div class="prod-price-note">ou R$ 13.296,84 à vista</div>
+        <button class="prod-expand" onclick="toggleDetails('details-programa', this)">Saiba mais</button>
+        <div class="prod-details" id="details-programa">
+          <span class="prod-detail-label">O que está incluído</span>
+          <ul class="prod-detail">
+            <li>Acompanhamento semanal</li>
+            <li>Apoio às decisões estratégicas</li>
+            <li>Priorização contínua</li>
+            <li>Mapa de fortalezas</li>
+            <li>Oportunidades de crescimento</li>
+            <li>Indicadores de acompanhamento</li>
+            <li>Ajustes de rota</li>
+            <li>Plano estratégico completo</li>
+          </ul>
+          <a href="https://wa.me/5516992752758" target="_blank" class="btn btn--bordo btn--sm btn--block">Quero o Programa Estratégico</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="advisor section" id="advisor">
+  <div class="wrap">
+    <span class="t-label t-label--pale">Programa 03</span>
+    <h2 class="t-display t-display--lg t-display--inv advisor-title">Acompanhamento<br><em>Estratégico</em></h2>
+    <p class="advisor-desc">Programa anual para empresários que desejam manter um parceiro estratégico acompanhando as principais decisões da empresa.</p>
+    <div class="advisor-card">
+      <span class="prod-tag" style="color:rgba(212,175,55,0.85);">Relacionamento contínuo · anual</span>
+      <h3 class="prod-name" style="color:var(--white); font-size:26px;">Advisor TFAZZIO</h3>
+      <p class="prod-headline" style="color:rgba(255,255,255,0.55);">Você não precisa enfrentar sozinho as decisões mais importantes da empresa.</p>
+      <button class="prod-expand" onclick="toggleDetails('details-advisor', this)">Saiba mais</button>
+      <div class="prod-details" id="details-advisor">
+        <span class="prod-detail-label">Entregas</span>
+        <ul class="prod-detail">
+          <li>Reuniões periódicas de acompanhamento</li>
+          <li>Análise contínua das decisões da empresa</li>
+          <li>Identificação de oportunidades de melhoria</li>
+          <li>Revisão de indicadores</li>
+          <li>Apoio direto em decisões relevantes</li>
+        </ul>
+        <span class="prod-detail-label">Investimento</span>
+        <p class="prod-detail-note">Sob consulta. Acesso mediante avaliação prévia.</p>
+        <a href="https://wa.me/5516992752758" target="_blank" class="btn btn--gold btn--sm btn--block">Quero saber mais</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sobre-tfazzio section" id="sobre">
+  <div class="wrap">
+    <div class="sobre-grid">
+      <div class="sobre-left">
+        <span class="t-label">O que é a TFAZZIO</span>
+        <h2 class="t-display t-display--lg">Não é consultoria<br>de gaveta.<br><em>É clareza com direção.</em></h2>
+        <p class="t-body" style="margin-top:32px;">A TFAZZIO não entrega relatório bonito para ficar parado. Não vendemos horas, reuniões ou metodologias soltas. <strong>Vendemos clareza.</strong></p>
+        <div class="sobre-pull">
+          <p class="t-pull">"Quem está dentro da operação nem sempre consegue enxergar o que está impedindo o negócio de avançar."</p>
+        </div>
+        <p class="t-body">Entramos no negócio, identificamos o nó real e construímos o caminho junto com o empresário.</p>
+      </div>
+      <div class="sobre-right">
+        <div class="pilar">
+          <div class="pilar-verb">ORGANIZAMOS</div>
+          <p>Identificamos o que está realmente travando, separamos o urgente do importante.</p>
+        </div>
+        <div class="pilar">
+          <div class="pilar-verb">DEVOLVEMOS</div>
+          <p>Clareza e direção. O empresário volta a saber o que fazer primeiro.</p>
+        </div>
+        <div class="pilar">
+          <div class="pilar-verb">CONSTRUÍMOS</div>
+          <p>Crescimento com consistência. Resultado com estrutura real.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="quem section" id="quem">
+  <div class="wrap">
+    <div class="quem-grid">
+      <div class="quem-left">
+        <div class="quem-foto">
+          <img src="/assets/images/thiago-fazzio.jpg" alt="Thiago Fazzio"
+            onerror="this.style.display='none'; this.parentElement.querySelector('.quem-foto-placeholder').style.display='block';" />
+          <div class="quem-foto-placeholder" style="display:none;">Foto<br>Thiago Fazzio</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-n">7+</div>
+          <div class="stat-l">Anos no mercado financeiro</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-n">200+</div>
+          <div class="stat-l">Empresas acompanhadas</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-n">R$50M+</div>
+          <div class="stat-l">Em crédito estruturado para PMEs</div>
+        </div>
+        <div class="quem-bio-block">
+          <p><strong>Thiago Fazzio</strong>, economista com passagens por Sicredi, Santander, Itaú e Banco PAN. Mais de 7 anos analisando PMEs por dentro.</p>
+        </div>
+      </div>
+      <div class="quem-right">
+        <span class="t-label">Quem está por trás</span>
+        <h2 class="quem-nome">Thiago Fazzio</h2>
+        <span class="quem-cargo">Economista · Consultor Estratégico</span>
+        <p class="t-body">Passei mais de 7 anos dentro de Sicredi, Santander, Itaú e Banco PAN analisando, financiando e acompanhando empresas de todos os tamanhos.</p>
+        <div class="quem-pull-box">
+          <p class="t-pull">"Percebi um padrão que se repetia: donos dedicados, produto validado, faturamento crescendo, mas o negócio travado num teto que parecia impossível de quebrar."</p>
+        </div>
+        <p class="t-body">O problema quase nunca era falta de esforço. Era <strong>falta de estrutura, clareza e alguém de fora para enxergar o que estava dentro.</strong></p>
+        <div class="creds">
+          <span class="cred">Economista</span>
+          <span class="cred">Sicredi</span>
+          <span class="cred">Itaú Unibanco</span>
+          <span class="cred">Santander</span>
+          <span class="cred">Banco PAN</span>
+          <span class="cred">+200 Empresas</span>
+        </div>
+        <a href="https://linkedin.com/in/thiago-fazzio" target="_blank" class="li-link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+          LinkedIn
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq section" id="faq">
+  <div class="wrap">
+    <span class="t-label">Dúvidas frequentes</span>
+    <h2 class="t-display t-display--lg">Perguntas<br><em>comuns</em></h2>
+    <div class="faq-grid">
+      <div class="faq-item">
+        <p class="faq-q">Qual programa é o certo para mim?</p>
+        <p class="faq-a">Depende do seu momento. Se você precisa de clareza rápida, o Intensivo resolve em 30 dias. Se quer transformar em resultado estruturado, o Programa Estratégico é o caminho.</p>
+      </div>
+      <div class="faq-item">
+        <p class="faq-q">Quanto tempo até ver resultado?</p>
+        <p class="faq-a">No Intensivo, você já sai em 30 dias com um mapa estratégico completo. No Programa Estratégico, a implementação começa desde a primeira fase.</p>
+      </div>
+      <div class="faq-item">
+        <p class="faq-q">Funciona para o meu setor?</p>
+        <p class="faq-a">A TFAZZIO atua por estágio, não por setor. O critério é o momento da empresa: produto validado, operação rodando, sensação de que travou antes do próximo nível.</p>
+      </div>
+      <div class="faq-item">
+        <p class="faq-q">Isso não é igual a outras consultorias?</p>
+        <p class="faq-a">Não entregamos relatório bonito para ficar na gaveta. Cada programa tem entregas concretas, acompanhamento real e foco em execução.</p>
+      </div>
+      <div class="faq-item">
+        <p class="faq-q">Como funciona o pagamento?</p>
+        <p class="faq-a">O Intensivo é pagamento único de R$ 5.860. O Programa Estratégico é R$ 14.970 em entrada mais duas parcelas, ou R$ 13.296,84 à vista.</p>
+      </div>
+      <div class="faq-item">
+        <p class="faq-q">Precisa ter CNPJ ou faturamento mínimo?</p>
+        <p class="faq-a">Não exigimos formalidade específica. O critério é prático: negócio com produto ou serviço que já gera receita real e consistente.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-final" id="contato">
+  <div class="wrap--narrow">
+    <span class="t-label t-label--pale">Próximo passo</span>
+    <h2 class="cta-title">
+      Talvez você não precise<br>
+      trabalhar mais.<br>
+      <em>Talvez só precise descobrir<br>o que vem primeiro.</em>
+    </h2>
+    <span class="cta-italic">Vamos conversar sobre qual programa faz mais sentido para a sua empresa.</span>
+    <p class="cta-desc">A conversa inicial é sem custo e sem compromisso.</p>
+    <a href="https://wa.me/5516992752758" target="_blank" class="btn btn--gold">Conversar sobre qual programa faz sentido</a>
+    <div><span class="cta-promise">Sem compromisso. Sem pressão. Sem enrolação.</span></div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">
+    <span class="nav-logo-text">TFAZZIO</span>
+  </div>
+  <span class="footer-tag">Clareza para crescer.</span>
+  <span class="footer-copy">&copy; 2026 TFAZZIO. Todos os direitos reservados.</span>
+</footer>
+
+<a href="https://wa.me/5516992752758" target="_blank" class="wa" aria-label="Falar no WhatsApp">
+  <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+</a>
+
+<script>
+  function toggleMenu() {
+    document.getElementById('mobMenu').classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    const m = document.getElementById('mobMenu');
+    if (m.classList.contains('open') && !e.target.closest('nav') && !e.target.closest('#mobMenu')) {
+      m.classList.remove('open');
+    }
+  });
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const t = document.querySelector(a.getAttribute('href'));
+      if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    });
+  });
+  function toggleDetails(id, btn) {
+    const el = document.getElementById(id);
+    if (el.classList.contains('open')) {
+      el.classList.remove('open');
+      btn.textContent = 'Saiba mais';
+    } else {
+      document.querySelectorAll('.prod-details.open').forEach(d => d.classList.remove('open'));
+      el.classList.add('open');
+      btn.textContent = 'Fechar';
+    }
+  }
+</script>
+
+</body>
+</html>
