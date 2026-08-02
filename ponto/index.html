@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ponto de Impacto · TFAZZIO</title>
-  <meta name="description" content="Descubra em poucos minutos qual decisao merece sua atencao primeiro." />
+  <meta name="description" content="Descubra em poucos minutos qual decisão merece sua atenção primeiro." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -375,7 +375,6 @@
       .wa svg { width: 22px; height: 22px; }
     }
   </style>
-<base target="_blank">
 </head>
 <body>
 
@@ -407,14 +406,14 @@
         <span class="t-label">TFAZZIO</span>
         <h1 class="t-display t-display--lg">Ponto de<br><em>Impacto</em></h1>
         <p class="t-body" style="max-width:480px;margin:16px auto 32px;">
-          Em poucos minutos voce descobrira qual decisao merece sua atencao primeiro.
+          Em poucos minutos você descobrirá qual decisão merece sua atenção primeiro.
           <br><br>
-          Nao analisamos apenas numeros.<br>
+          Não analisamos apenas números.<br>
           Analisamos como sua empresa funciona.
           <br><br>
-          Ao final voce recebera gratuitamente um diagnostico estrategico.
+          Ao final você receberá gratuitamente um diagnóstico estratégico.
         </p>
-        <button class="btn btn--bordo" id="btn-start" onclick="startDiagnostico()">Comecar Diagnostico</button>
+        <button class="btn btn--bordo" id="btn-start" onclick="startDiagnostico()">Começar Diagnóstico</button>
         <p style="font-size:13px;color:var(--silver);margin-top:16px;font-style:italic;">Aprox. 5 minutos · dados confidenciais</p>
       </div>
     </div>
@@ -424,7 +423,7 @@
         <div class="spinner"></div>
         <div class="loading-text" id="loading-text">
           Analisando indicadores financeiros...
-          <span id="loading-sub">Comparando padroes de gestao...</span>
+          <span id="loading-sub">Comparando padrões de gestão...</span>
         </div>
       </div>
     </div>
@@ -433,6 +432,7 @@
     </div>
   </div>
 </section>
+
 <script>
   // Toggle menu
   function toggleMenu() {
@@ -457,51 +457,51 @@
     perguntasPipeline: [], respostasPipeline: {},
   };
 
-  // Definicao dos steps
+  // Definição dos steps
   const steps = [];
   function addStep(type, config) { steps.push({ type, ...config }); }
 
   addStep('cnpj', {});
-  addStep('field', { field: { id: 'objPrincipal', label: 'Qual e o principal objetivo da sua empresa para os proximos 12 meses?', type: 'textarea', hint: 'Descreva com suas palavras' } });
-  addStep('field', { field: { id: 'dificuldade', label: 'Qual e hoje sua maior dificuldade?', type: 'textarea', hint: 'O que mais te preocupa?' } });
+  addStep('field', { field: { id: 'objPrincipal', label: 'Qual é o principal objetivo da sua empresa para os próximos 12 meses?', type: 'textarea', hint: 'Descreva com suas palavras' } });
+  addStep('field', { field: { id: 'dificuldade', label: 'Qual é hoje sua maior dificuldade?', type: 'textarea', hint: 'O que mais te preocupa?' } });
   addStep('group', {
     title: 'Agora, alguns dados da sua empresa',
     fields: [
-      { id: 'nomeEmpresa', label: 'Nome da empresa', type: 'text', placeholder: 'Razao social ou nome fantasia' },
-      { id: 'segmento', label: 'Segmento', type: 'text', placeholder: 'Ex: varejo, industria, servicos' },
+      { id: 'nomeEmpresa', label: 'Nome da empresa', type: 'text', placeholder: 'Razão social ou nome fantasia' },
+      { id: 'segmento', label: 'Segmento', type: 'text', placeholder: 'Ex: varejo, indústria, serviços' },
       { id: 'cidade', label: 'Cidade', type: 'text', placeholder: 'Sua cidade' },
       { id: 'tempoMercado', label: 'Tempo de mercado (anos)', type: 'number', placeholder: 'Ex: 5' },
-      { id: 'numFuncionarios', label: 'Numero de funcionarios', type: 'number', placeholder: 'Quantos colaboradores' },
-      { id: 'regimeTributario', label: 'Regime tributario', type: 'select', options: ['Simples Nacional', 'Lucro Presumido', 'Lucro Real'] },
+      { id: 'numFuncionarios', label: 'Número de funcionários', type: 'number', placeholder: 'Quantos colaboradores' },
+      { id: 'regimeTributario', label: 'Regime tributário', type: 'select', options: ['Simples Nacional', 'Lucro Presumido', 'Lucro Real'] },
     ]
   });
   const finFields = [
-    { id: 'faturamento', label: 'Faturamento medio mensal (R$)', hint: 'Media dos ultimos 3 a 6 meses', type: 'number' },
+    { id: 'faturamento', label: 'Faturamento médio mensal (R$)', hint: 'Média dos últimos 3 a 6 meses', type: 'number' },
     { id: 'custosFixos', label: 'Custos fixos mensais (R$)', hint: 'Aluguel, folha, contas, softwares etc.', type: 'number' },
-    { id: 'custosVariaveisPct', label: 'Custos variaveis (%)', hint: '% do faturamento (ex: materia-prima, comissoes)', type: 'number' },
-    { id: 'aliquotaImpostos', label: 'Aliquota efetiva de impostos (%)', hint: '% do faturamento pago em impostos', type: 'number' },
-    { id: 'proLabore', label: 'Pro-labore mensal (R$)', hint: 'Remuneracao formal do(s) socio(s)', type: 'number' },
-    { id: 'ticketMedio', label: 'Ticket medio (R$)', hint: 'Valor medio por venda ou por cliente', type: 'number' },
-    { id: 'numClientesMes', label: 'Numero medio de clientes por mes', hint: 'Quantos clientes ativos por mes', type: 'number' },
+    { id: 'custosVariaveisPct', label: 'Custos variáveis (%)', hint: '% do faturamento (ex: matéria-prima, comissões)', type: 'number' },
+    { id: 'aliquotaImpostos', label: 'Alíquota efetiva de impostos (%)', hint: '% do faturamento pago em impostos', type: 'number' },
+    { id: 'proLabore', label: 'Pró-labore mensal (R$)', hint: 'Remuneração formal do(s) sócio(s)', type: 'number' },
+    { id: 'ticketMedio', label: 'Ticket médio (R$)', hint: 'Valor médio por venda ou por cliente', type: 'number' },
+    { id: 'numClientesMes', label: 'Número médio de clientes por mês', hint: 'Quantos clientes ativos por mês', type: 'number' },
   ];
   finFields.forEach(f => addStep('field', { field: f }));
-  addStep('field', { field: { id: 'taxaConversao', label: 'Taxa de conversao (%)', hint: '% de leads que viram clientes', type: 'number' } });
-  addStep('field', { field: { id: 'existeCRM', label: 'Existe CRM?', type: 'radio', options: ['Sim', 'Nao'] } });
-  addStep('field', { field: { id: 'equipeComercial', label: 'Existe equipe comercial?', type: 'radio', options: ['Sim', 'Nao'] } });
+  addStep('field', { field: { id: 'taxaConversao', label: 'Taxa de conversão (%)', hint: '% de leads que viram clientes', type: 'number' } });
+  addStep('field', { field: { id: 'existeCRM', label: 'Existe CRM?', type: 'radio', options: ['Sim', 'Não'] } });
+  addStep('field', { field: { id: 'equipeComercial', label: 'Existe equipe comercial?', type: 'radio', options: ['Sim', 'Não'] } });
   const gestaoFields = [
     { id: 'notaFinanceiro', label: 'Financeiro' },
     { id: 'notaComercial', label: 'Comercial' },
-    { id: 'notaOperacao', label: 'Operacao' },
-    { id: 'notaGestao', label: 'Gestao' },
+    { id: 'notaOperacao', label: 'Operação' },
+    { id: 'notaGestao', label: 'Gestão' },
     { id: 'notaPessoas', label: 'Pessoas' },
-    { id: 'notaEstrategia', label: 'Estrategia' },
+    { id: 'notaEstrategia', label: 'Estratégia' },
   ];
   addStep('gestao', { fields: gestaoFields });
   const pergFields = [
-    { id: 'pergFerias30', label: 'A empresa funciona sem voce por 30 dias?' },
-    { id: 'pergMargemLiquida', label: 'Voce conhece sua margem liquida?' },
+    { id: 'pergFerias30', label: 'A empresa funciona sem você por 30 dias?' },
+    { id: 'pergMargemLiquida', label: 'Você conhece sua margem líquida?' },
     { id: 'pergFluxoCaixa', label: 'Existe fluxo de caixa projetado?' },
-    { id: 'pergMetasPlano', label: 'Ha metas e plano de crescimento definidos?' },
+    { id: 'pergMetasPlano', label: 'Há metas e plano de crescimento definidos?' },
   ];
   addStep('perguntas', { fields: pergFields });
 
@@ -509,10 +509,10 @@
   const totalSteps = steps.length;
 
   const progressMessages = [
-    'Estamos construindo seu diagnostico...',
-    'Seu Indice de Clareza esta tomando forma...',
+    'Estamos construindo seu diagnóstico...',
+    'Seu Índice de Clareza está tomando forma...',
     'Faltam apenas algumas perguntas.',
-    'O diagnostico ja esta quase pronto.',
+    'O diagnóstico já está quase pronto.',
   ];
 
   function isStepComplete(step) {
@@ -520,7 +520,7 @@
     if (step.type === 'group') { return step.fields.every(f => { const v = state[f.id]; return v !== '' && v !== undefined && v !== null; }); }
     if (step.type === 'field') { const f = step.field; const v = state[f.id]; return v !== '' && v !== undefined && v !== null; }
     if (step.type === 'gestao') { return step.fields.every(f => { const v = state[f.id]; return v !== '' && v !== undefined && v !== null; }); }
-    if (step.type === 'perguntas') { return step.fields.every(f => { const v = state[f.id]; return v === 'Sim' || v === 'Nao'; }); }
+    if (step.type === 'perguntas') { return step.fields.every(f => { const v = state[f.id]; return v === 'Sim' || v === 'Não'; }); }
     return true;
   }
 
@@ -530,7 +530,7 @@
       return step.fields.filter(f => { const v = state[f.id]; return v === '' || v === undefined || v === null; }).map(f => f.label);
     }
     if (step.type === 'perguntas') {
-      return step.fields.filter(f => { const v = state[f.id]; return v !== 'Sim' && v !== 'Nao'; }).map(f => f.label);
+      return step.fields.filter(f => { const v = state[f.id]; return v !== 'Sim' && v !== 'Não'; }).map(f => f.label);
     }
     return [];
   }
@@ -547,7 +547,7 @@
 
     if (step.type === 'cnpj') {
       html += '<h2 class="step-question">Qual o <em>CNPJ</em> da empresa?</h2>';
-      html += '<div class="step-hint">Apenas numeros, sem pontos ou tracos</div>';
+      html += '<div class="step-hint">Apenas números, sem pontos ou traços</div>';
     } else if (step.type === 'group') {
       html += '<h2 class="step-question">' + step.title + '</h2>';
     } else if (step.type === 'field') {
@@ -555,10 +555,10 @@
       html += '<h2 class="step-question">' + f.label + '</h2>';
       if (f.hint) html += '<div class="step-hint">' + f.hint + '</div>';
     } else if (step.type === 'gestao') {
-      html += '<h2 class="step-question">Autoavaliacao: como voce ve sua empresa?</h2>';
-      html += '<div class="step-hint">Nota 1 (muito ruim) a 5 (excelente) para cada area</div>';
+      html += '<h2 class="step-question">Autoavaliação: como você vê sua empresa?</h2>';
+      html += '<div class="step-hint">Nota 1 (muito ruim) a 5 (excelente) para cada área</div>';
     } else if (step.type === 'perguntas') {
-      html += '<h2 class="step-question">Ultimas perguntas estrategicas</h2>';
+      html += '<h2 class="step-question">Últimas perguntas estratégicas</h2>';
       html += '<div class="step-hint">Responda com sinceridade</div>';
     }
 
@@ -571,7 +571,7 @@
       html += '<div style="margin-bottom:16px;">';
       html += '<label for="cnpjDiag">CNPJ</label>';
       html += '<input id="cnpjDiag" type="text" class="pi-input" placeholder="Ex: 12345678000101" value="' + (state.cnpj || '') + '" oninput="updateFieldCNPJ(this.value)" maxlength="14" />';
-      html += '<div style="font-size:12px;color:var(--silver);margin-top:4px;">Digite apenas numeros</div>';
+      html += '<div style="font-size:12px;color:var(--silver);margin-top:4px;">Digite apenas números</div>';
       html += '</div>';
       html += '<div id="cnpj-resultado" style="display:none;margin-top:12px;padding:12px;background:var(--off);border-left:3px solid var(--bordo);">';
       html += '<div id="cnpj-dados"></div>';
@@ -582,12 +582,12 @@
         html += '<div style="margin-bottom:16px;">';
         html += '<label for="' + f.id + '">' + f.label + '</label>';
         if (f.type === 'select') {
-          html += '<select id="' + f.id + '" class="pi-input pi-input--select" onchange="updateField('' + f.id + '', this.value)">';
+          html += '<select id="' + f.id + '" class="pi-input pi-input--select" onchange="updateField(\'' + f.id + '\', this.value)">';
           html += '<option value="">Selecione</option>';
           f.options.forEach(opt => { html += '<option value="' + opt + '" ' + (val===opt?'selected':'') + '>' + opt + '</option>'; });
           html += '</select>';
         } else {
-          html += '<input id="' + f.id + '" type="' + f.type + '" class="pi-input" placeholder="' + (f.placeholder||'') + '" value="' + val + '" oninput="updateField('' + f.id + '', this.value)" />';
+          html += '<input id="' + f.id + '" type="' + f.type + '" class="pi-input" placeholder="' + (f.placeholder||'') + '" value="' + val + '" oninput="updateField(\'' + f.id + '\', this.value)" />';
         }
         html += '</div>';
       });
@@ -598,13 +598,13 @@
         html += '<div class="pi-radio-group">';
         f.options.forEach(opt => {
           const checked = val === opt ? 'checked' : '';
-          html += '<label><input type="radio" name="' + f.id + '" value="' + opt + '" ' + checked + ' onchange="updateField('' + f.id + '', this.value)" /> ' + opt + '</label>';
+          html += '<label><input type="radio" name="' + f.id + '" value="' + opt + '" ' + checked + ' onchange="updateField(\'' + f.id + '\', this.value)" /> ' + opt + '</label>';
         });
         html += '</div>';
       } else if (f.type === 'textarea') {
-        html += '<textarea id="' + f.id + '" class="pi-input pi-input--textarea" placeholder="Digite sua resposta..." oninput="updateField('' + f.id + '', this.value)">' + val + '</textarea>';
+        html += '<textarea id="' + f.id + '" class="pi-input pi-input--textarea" placeholder="Digite sua resposta..." oninput="updateField(\'' + f.id + '\', this.value)">' + val + '</textarea>';
       } else {
-        html += '<input id="' + f.id + '" type="' + f.type + '" class="pi-input" placeholder="' + (f.placeholder||'') + '" value="' + val + '" oninput="updateField('' + f.id + '', this.value)" />';
+        html += '<input id="' + f.id + '" type="' + f.type + '" class="pi-input" placeholder="' + (f.placeholder||'') + '" value="' + val + '" oninput="updateField(\'' + f.id + '\', this.value)" />';
       }
     } else if (step.type === 'gestao') {
       html += '<div class="pi-nota-grid">';
@@ -612,7 +612,7 @@
         const val = state[f.id] || '';
         html += '<div class="pi-nota-item">';
         html += '<label for="' + f.id + '">' + f.label + '</label>';
-        html += '<select id="' + f.id + '" onchange="updateField('' + f.id + '', this.value)">';
+        html += '<select id="' + f.id + '" onchange="updateField(\'' + f.id + '\', this.value)">';
         html += '<option value="">-</option>';
         for (let i = 1; i <= 5; i++) { html += '<option value="' + i + '" ' + (val==i?'selected':'') + '>' + i + '</option>'; }
         html += '</select>';
@@ -625,9 +625,9 @@
         html += '<div style="margin-bottom:16px;">';
         html += '<label>' + f.label + '</label>';
         html += '<div class="pi-radio-group">';
-        ['Sim', 'Nao'].forEach(opt => {
+        ['Sim', 'Não'].forEach(opt => {
           const checked = val === opt ? 'checked' : '';
-          html += '<label><input type="radio" name="' + f.id + '" value="' + opt + '" ' + checked + ' onchange="updateField('' + f.id + '', this.value)" /> ' + opt + '</label>';
+          html += '<label><input type="radio" name="' + f.id + '" value="' + opt + '" ' + checked + ' onchange="updateField(\'' + f.id + '\', this.value)" /> ' + opt + '</label>';
         });
         html += '</div>';
         html += '</div>';
@@ -637,7 +637,7 @@
 
     const pct2 = Math.round(((index + 1) / totalSteps) * 100);
     html += '<div class="pi-progress">';
-    html += '<div class="pi-progress-top"><span>' + pct2 + '% concluido</span><span>Etapa ' + (index + 1) + ' de ' + totalSteps + '</span></div>';
+    html += '<div class="pi-progress-top"><span>' + pct2 + '% concluído</span><span>Etapa ' + (index + 1) + ' de ' + totalSteps + '</span></div>';
     html += '<div class="pi-progress-bar"><div class="pi-progress-fill" style="width:' + pct2 + '%;"></div></div>';
     html += '</div>';
 
@@ -646,7 +646,7 @@
     if (index > 0) { html += '<button class="btn--back" onclick="goToStep(' + (index - 1) + ')">&larr; Voltar</button>'; }
     else { html += '<span></span>'; }
     if (index < totalSteps - 1) {
-      html += '<button class="btn btn--bordo" id="pi-next-btn" ' + (complete ? '' : 'disabled') + ' onclick="nextStep()">Proximo</button>';
+      html += '<button class="btn btn--bordo" id="pi-next-btn" ' + (complete ? '' : 'disabled') + ' onclick="nextStep()">Próximo</button>';
     } else {
       html += '<button class="btn btn--gold" id="pi-next-btn" ' + (complete ? '' : 'disabled') + ' onclick="finalizar()">Ver Resultado</button>';
     }
@@ -673,13 +673,13 @@
     if (!div || !conteudo) return;
     if (dados && !dados.erro) {
       div.style.display = 'block';
-      const nome = dados.razao_social || dados.nome_fantasia || 'Empresa nao encontrada';
-      const porte = dados.porte || 'nao informado';
-      const cnae = dados.cnae_principal || 'nao informado';
+      const nome = dados.razao_social || dados.nome_fantasia || 'Empresa não encontrada';
+      const porte = dados.porte || 'não informado';
+      const cnae = dados.cnae_principal || 'não informado';
       conteudo.innerHTML = '<div class="pi-empresa-card" style="border-left-color:var(--gold);"><div class="nome">' + nome + '</div><div class="dados"><span>Porte: ' + porte + '</span><span>CNAE: ' + cnae.substring(0, 60) + (cnae.length > 60 ? '...' : '') + '</span></div></div>';
     } else {
       div.style.display = 'block';
-      conteudo.innerHTML = '<p style="color:var(--bordo);">' + (dados?.erro || 'CNPJ nao encontrado') + '</p>';
+      conteudo.innerHTML = '<p style="color:var(--bordo);">' + (dados?.erro || 'CNPJ não encontrado') + '</p>';
     }
   }
 
@@ -704,14 +704,12 @@
   console.log('startDiagnostico chamado');
   currentStep = 0;
   
-  // Esconde a tela de boas-vindas
   const welcome = document.getElementById('pi-screen-welcome');
   if (welcome) {
     welcome.style.display = 'none';
-    welcome.className = 'pi-step'; // remove a classe active
+    welcome.className = 'pi-step';
   }
   
-  // Garante que o container existe e está visível
   const container = document.getElementById('pi-step-container');
   if (container) {
     container.style.display = 'block';
@@ -764,15 +762,15 @@
     const subEl = document.getElementById('loading-sub');
     const messages = [
       'Analisando dados da empresa...',
-      'Identificando padroes de gestao...',
-      'Calculando Indice de Clareza...',
-      'Gerando diagnostico estrategico...'
+      'Identificando padrões de gestão...',
+      'Calculando Índice de Clareza...',
+      'Gerando diagnóstico estratégico...'
     ];
     let idx = 0;
     const interval = setInterval(() => {
       if (idx < messages.length) {
         if (idx === 0) { textEl.textContent = messages[idx]; subEl.textContent = 'Verificando indicadores...'; }
-        else if (idx === messages.length - 1) { textEl.textContent = messages[idx]; subEl.textContent = 'Preparando seu relatorio...'; }
+        else if (idx === messages.length - 1) { textEl.textContent = messages[idx]; subEl.textContent = 'Preparando seu relatório...'; }
         else { subEl.textContent = messages[idx]; }
         idx++;
       } else { clearInterval(interval); }
@@ -805,7 +803,7 @@
     })
     .catch(err => {
       clearInterval(interval);
-      textEl.textContent = 'Erro de conexao';
+      textEl.textContent = 'Erro de conexão';
       subEl.textContent = err.message;
     });
   }
@@ -816,8 +814,8 @@
     let html = '<div class="pi-step active">';
     html += '<div class="pi-step-header">';
     html += '<span class="step-counter">Perguntas adicionais</span>';
-    html += '<h2 class="step-question">Precisamos de <em>mais algumas informacoes</em></h2>';
-    html += '<div class="step-hint">Responda para refinar o diagnostico</div>';
+    html += '<h2 class="step-question">Precisamos de <em>mais algumas informações</em></h2>';
+    html += '<div class="step-hint">Responda para refinar o diagnóstico</div>';
     html += '</div>';
     html += '<div class="pi-input-group">';
     perguntas.forEach((p, i) => {
@@ -826,20 +824,20 @@
       const val = state.respostasPipeline[lacuna] || '';
       html += '<div style="margin-bottom:16px;background:#f9f9f9;padding:12px;border-radius:6px;border-left:3px solid var(--bordo);">';
       html += '<label style="display:block;font-weight:500;margin-bottom:6px;">' + (i+1) + '. ' + texto + '</label>';
-      html += '<select id="pergunta_pipeline_' + i + '" class="pi-input pi-input--select" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:4px;font-size:14px;" onchange="updateRespostaPipeline('' + lacuna + '', this.value)">';
-      html += '<option value="">Selecione uma opcao...</option>';
+      html += '<select id="pergunta_pipeline_' + i + '" class="pi-input pi-input--select" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:4px;font-size:14px;" onchange="updateRespostaPipeline(\'' + lacuna + '\', this.value)">';
+      html += '<option value="">Selecione uma opção...</option>';
       html += '<option value="Sim" ' + (val==='Sim'?'selected':'') + '>Sim</option>';
-      html += '<option value="Nao" ' + (val==='Nao'?'selected':'') + '>Nao</option>';
+      html += '<option value="Não" ' + (val==='Não'?'selected':'') + '>Não</option>';
       html += '<option value="Parcialmente" ' + (val==='Parcialmente'?'selected':'') + '>Parcialmente</option>';
       html += '<option value="Outro" ' + (val==='Outro'?'selected':'') + '>Outro (especificar)</option>';
       html += '</select>';
       html += '<div id="pergunta_pipeline_outro_' + i + '" style="display:' + (val==='Outro'?'block':'none') + ';margin-top:8px;">';
-      html += '<input type="text" id="pergunta_pipeline_input_' + i + '" placeholder="Especifique..." style="width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:4px;" oninput="updateRespostaPipeline('' + lacuna + '', this.value)" value="' + (val==='Outro' ? val : '') + '" />';
+      html += '<input type="text" id="pergunta_pipeline_input_' + i + '" placeholder="Especifique..." style="width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:4px;" oninput="updateRespostaPipeline(\'' + lacuna + '\', this.value)" value="' + (val==='Outro' ? val : '') + '" />';
       html += '</div>';
       html += '<input type="hidden" id="pergunta_pipeline_lacuna_' + i + '" value="' + lacuna + '">';
       html += '</div>';
     });
-    html += '<button class="btn btn--gold" onclick="enviarRespostasPipeline()" style="width:100%;padding:16px;">Enviar respostas e finalizar diagnostico</button>';
+    html += '<button class="btn btn--gold" onclick="enviarRespostasPipeline()" style="width:100%;padding:16px;">Enviar respostas e finalizar diagnóstico</button>';
     html += '</div></div>';
     container.innerHTML = html;
     document.getElementById('pi-screen-loading').style.display = 'none';
@@ -864,7 +862,7 @@
     const textEl = document.getElementById('loading-text');
     const subEl = document.getElementById('loading-sub');
     textEl.textContent = 'Processando respostas...';
-    subEl.textContent = 'Refinando o diagnostico...';
+    subEl.textContent = 'Refinando o diagnóstico...';
 
     fetch('https://motor-tfazzio.onrender.com/diagnose', {
       method: 'POST',
@@ -898,9 +896,9 @@
   function renderResultado(data) {
     const container = document.getElementById('pi-relatorio-content');
     const constraint = data.constraint_dominante || data.constraint || 'Gargalo identificado';
-    const natureza = data.natureza || 'restricao';
-    const certeza = data.certeza || 'Provavel';
-    const primeiraAcao = data.primeira_acao_recomendada || 'Diagnostico aprofundado';
+    const natureza = data.natureza || 'restrição';
+    const certeza = data.certeza || 'Provável';
+    const primeiraAcao = data.primeira_acao_recomendada || 'Diagnóstico aprofundado';
     const demaisAcoes = data.demais_acoes_do_plano || [];
     const evidencias = data.evidencias_citadas || [];
     const perguntasReflexoes = data.perguntas_e_reflexoes || [];
@@ -909,8 +907,8 @@
 
     let html = '<div class="pi-relatorio">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:24px;">';
-    html += '<span class="t-label">Diagnostico concluido</span>';
-    html += '<div class="pi-pdf-btn"><button class="btn btn--outline btn--sm" onclick="baixarPDF()">Baixar Relatorio</button></div>';
+    html += '<span class="t-label">Diagnóstico concluído</span>';
+    html += '<div class="pi-pdf-btn"><button class="btn btn--outline btn--sm" onclick="baixarPDF()">Baixar Relatório</button></div>';
     html += '</div>';
 
     html += '<div class="secao">';
@@ -928,16 +926,16 @@
     html += '<div class="rotulo" style="color:var(--gold-pale);">Principal Gargalo</div>';
     html += '<div class="valor" style="color:var(--white);font-size:36px;">' + constraint + '</div>';
     html += '<div class="nivel" style="color:var(--gold-pale);">Certeza: ' + certeza + '</div>';
-    html += '<div class="explicacao" style="color:rgba(255,255,255,0.6);">Esta e a area que mais demanda atencao para desbloquear o proximo nivel da empresa.</div>';
+    html += '<div class="explicacao" style="color:rgba(255,255,255,0.6);">Esta é a área que mais demanda atenção para desbloquear o próximo nível da empresa.</div>';
     html += '</div></div>';
 
     if (evidencias.length > 0) {
       html += '<div class="secao">';
-      html += '<span class="t-label">Evidencias que sustentam</span>';
+      html += '<span class="t-label">Evidências que sustentam</span>';
       html += '<ul class="pi-ranking">';
       evidencias.forEach(e => {
         const conteudo = e.conteudo || e;
-        const fonte = e.fonte || 'empresario';
+        const fonte = e.fonte || 'empresário';
         html += '<li><span>' + conteudo + '</span><span class="rank-detail">fonte: ' + fonte + '</span></li>';
       });
       html += '</ul></div>';
@@ -945,7 +943,7 @@
 
     if (perguntasReflexoes.length > 0) {
       html += '<div class="secao">';
-      html += '<span class="t-label">Reflexoes que guiaram o diagnostico</span>';
+      html += '<span class="t-label">Reflexões que guiaram o diagnóstico</span>';
       perguntasReflexoes.forEach(p => {
         html += '<div class="pi-diagnostico-texto" style="margin:12px 0;">';
         html += '<p><strong>Pergunta:</strong> ' + p.pergunta + '</p>';
@@ -957,21 +955,21 @@
     }
 
     html += '<div class="secao">';
-    html += '<span class="t-label">Plano de Acao</span>';
-    html += '<p class="t-body t-body--sm" style="margin-bottom:16px;">Com base no gargalo identificado, este e o caminho recomendado para os proximos 90 dias.</p>';
+    html += '<span class="t-label">Plano de Ação</span>';
+    html += '<p class="t-body t-body--sm" style="margin-bottom:16px;">Com base no gargalo identificado, este é o caminho recomendado para os próximos 90 dias.</p>';
     html += '<div class="pi-roadmap">' + plano + '</div>';
     html += '</div>';
 
     html += '<div class="secao" style="border-bottom:none;">';
     html += '<div class="pi-cta-final">';
     html += '<div class="texto-encerramento">';
-    html += 'Voce acabou de enxergar sua empresa sob uma perspectiva diferente.<br>';
-    html += 'O diagnostico mostra <em>qual e o proximo limitador</em>.<br>';
-    html += 'Agora e hora de atuar sobre ele.<br><br>';
-    html += 'Na Sessao Estrategica, aprofundamos este diagnostico, definimos prioridades e construimos um plano claro para que sua empresa cresca com mais seguranca e menos desperdicio de energia.<br><br>';
+    html += 'Você acabou de enxergar sua empresa sob uma perspectiva diferente.<br>';
+    html += 'O diagnóstico mostra <em>qual é o próximo limitador</em>.<br>';
+    html += 'Agora é hora de atuar sobre ele.<br><br>';
+    html += 'Na Sessão Estratégica, aprofundamos este diagnóstico, definimos prioridades e construímos um plano claro para que sua empresa cresça com mais segurança e menos desperdício de energia.<br><br>';
     html += '<strong>Clareza para crescer.</strong>';
     html += '</div>';
-    html += '<a href="https://wa.me/5516992752758?text=Ola!%20Vim%20pelo%20Ponto%20de%20Impacto%20e%20gostaria%20de%20agendar%20minha%20Sessao%20Estrategica." target="_blank" class="btn btn--bordo">Agendar minha Sessao Estrategica</a>';
+    html += '<a href="https://wa.me/5516992752758?text=Ola!%20Vim%20pelo%20Ponto%20de%20Impacto%20e%20gostaria%20de%20agendar%20minha%20Sessão%20Estratégica." target="_blank" class="btn btn--bordo">Agendar minha Sessão Estratégica</a>';
     html += '</div></div>';
     html += '</div>';
     container.innerHTML = html;
@@ -979,48 +977,48 @@
 
   function gerarRoadmap(gargalo) {
     const planos = {
-      'Restricao Comercial': {
-        titulo: 'Estruturacao Comercial',
+      'Restrição Comercial': {
+        titulo: 'Estruturação Comercial',
         fases: [
           ['Mapear funil de vendas atual', 'Definir metas por canal', 'Implementar CRM'],
-          ['Treinar equipe comercial', 'Criar script de vendas', 'Acompanhar indicadores de conversao'],
-          ['Automatizar prospeccao', 'Escalar canais de maior performance', 'Revisar processo de pos-venda']
+          ['Treinar equipe comercial', 'Criar script de vendas', 'Acompanhar indicadores de conversão'],
+          ['Automatizar prospecção', 'Escalar canais de maior performance', 'Revisar processo de pós-venda']
         ]
       },
-      'Restricao Financeira': {
-        titulo: 'Revisao Financeira',
+      'Restrição Financeira': {
+        titulo: 'Revisão Financeira',
         fases: [
-          ['Revisar custos fixos e variaveis', 'Calcular margem real por produto/servico', 'Melhorar fluxo de caixa'],
-          ['Revisar precificacao', 'Negociar fornecedores', 'Implementar controle de custos'],
+          ['Revisar custos fixos e variáveis', 'Calcular margem real por produto/serviço', 'Melhorar fluxo de caixa'],
+          ['Revisar precificação', 'Negociar fornecedores', 'Implementar controle de custos'],
           ['Consolidar indicadores financeiros', 'Planejar investimentos', 'Revisar estrutura de capital']
         ]
       },
-      'Restricao Operacional': {
-        titulo: 'Eficiencia Operacional',
+      'Restrição Operacional': {
+        titulo: 'Eficiência Operacional',
         fases: [
-          ['Mapear processos criticos', 'Identificar gargalos de producao', 'Padronizar entregas'],
+          ['Mapear processos críticos', 'Identificar gargalos de produção', 'Padronizar entregas'],
           ['Documentar processos', 'Treinar equipe em novos fluxos', 'Implementar indicadores de produtividade'],
-          ['Automatizar tarefas repetitivas', 'Escalar sem aumentar caos', 'Revisar qualidade e padroes']
+          ['Automatizar tarefas repetitivas', 'Escalar sem aumentar caos', 'Revisar qualidade e padrões']
         ]
       },
-      'Restricao de Pessoas': {
+      'Restrição de Pessoas': {
         titulo: 'Desenvolvimento de Pessoas',
         fases: [
-          ['Avaliar competencias da equipe', 'Identificar lacunas de habilidade', 'Revisar estrutura organizacional'],
-          ['Criar plano de desenvolvimento', 'Implementar feedback continuo', 'Revisar remuneracao e beneficios'],
-          ['Planos de sucessao', 'Cultura de alta performance', 'Retencao de talentos']
+          ['Avaliar competências da equipe', 'Identificar lacunas de habilidade', 'Revisar estrutura organizacional'],
+          ['Criar plano de desenvolvimento', 'Implementar feedback contínuo', 'Revisar remuneração e benefícios'],
+          ['Planos de sucessão', 'Cultura de alta performance', 'Retenção de talentos']
         ]
       },
-      'Restricao Estrategica': {
-        titulo: 'Direcao Estrategica',
+      'Restrição Estratégica': {
+        titulo: 'Direção Estratégica',
         fases: [
-          ['Revisar missao, visao e valores', 'Analisar posicionamento de mercado', 'Mapear concorrentes'],
-          ['Definir objetivos estrategicos', 'Criar plano de acao detalhado', 'Alinhar equipe com direcao'],
-          ['Monitorar indicadores estrategicos', 'Ajustar rota conforme mercado', 'Planejar proximos ciclos']
+          ['Revisar missão, visão e valores', 'Analisar posicionamento de mercado', 'Mapear concorrentes'],
+          ['Definir objetivos estratégicos', 'Criar plano de ação detalhado', 'Alinhar equipe com direção'],
+          ['Monitorar indicadores estratégicos', 'Ajustar rota conforme mercado', 'Planejar próximos ciclos']
         ]
       }
     };
-    const plano = planos[gargalo] || planos['Restricao Estrategica'];
+    const plano = planos[gargalo] || planos['Restrição Estratégica'];
     let html = '';
     const phases = ['FASE 1', 'FASE 2', 'FASE 3'];
     plano.fases.forEach((fase, i) => {
