@@ -213,10 +213,15 @@ def executar_pipeline_completo(dados_publicos, dados_usuario):
     respostas = dados_usuario.get("respostas", {})
     try:
         investigacao_concluida, novas_hipoteses = pipeline.investigacao(conn, caso_id, respostas)
-        if not investigacao_concluida:
+if not investigacao_concluida:
     pendentes = conn.execute(
         "SELECT * FROM pergunta WHERE caso_id=? AND estado='pendente'", (caso_id,)
     ).fetchall()
+    conn.close()
+    return {
+        "status": "perguntas_pendentes",
+        "perguntas": [{"texto": p["texto"], "lacuna": p["lacuna"]} for p in pendentes]
+    }
     conn.close()
     return {
         "status": "perguntas_pendentes",
