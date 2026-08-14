@@ -6,6 +6,7 @@ from flask_cors import CORS
 
 # --- INICIALIZAÇÃO DO BANCO DE DADOS ---
 from engine import db
+from engine import kb_seed
 from enriquecimento_automatico import enriquecer_cnpj
 
 # Se a variável RESET_DB estiver ativa, apaga o banco existente
@@ -16,8 +17,6 @@ if os.environ.get('RESET_DB') == 'true':
     if os.path.exists(db_path):
         os.remove(db_path)
         print(f">>> Banco {db_path} removido (RESET_DB=true)")
-    # Opcional: desativar após o reset para não apagar sempre
-    # os.environ['RESET_DB'] = 'false'
 
 DB_PATH = os.environ.get('DATABASE_URL', 'tfazzio.db')
 if DB_PATH.startswith('sqlite:///'):
@@ -30,10 +29,8 @@ def get_conn():
 
 # --- FUNÇÃO QUE SEMPRE GARANTE AS HIPÓTESES CORINGAS ---
 def garantir_hipoteses(conn):
-    """Insere ou substitui as hipóteses coringas com lacunas no formato correto (lista de dicionários)."""
     print(">>> Garantindo hipóteses coringas na KB...")
     
-    # 1. Hipótese Restrição Comercial
     conn.execute("""
         INSERT OR REPLACE INTO kb_hypothesis_template
         (id, nome, natureza, tipo, condition_of_applicability,
@@ -47,7 +44,6 @@ def garantir_hipoteses(conn):
         'padrao',
         '{}',
         '[{"tipo": "confirma", "peso": "alto", "descricao": "Dificuldade em vender mais", "fecha_por": "empresario"}]',
-        # --- LACUNAS CORRIGIDAS (lista de dicionários) ---
         '[' 
         '{"nome": "falta_processo_comercial", "classe": "pergunta", "pergunta_canonica": "Você tem um processo comercial documentado e seguido por toda a equipe?"}, '
         '{"nome": "equipe_comercial_pequena", "classe": "pergunta", "pergunta_canonica": "Sua equipe comercial tem o tamanho adequado para o volume de oportunidades que você gera?"}'
@@ -58,7 +54,6 @@ def garantir_hipoteses(conn):
         None
     ))
 
-    # 2. Hipótese Oportunidade de Crescimento
     conn.execute("""
         INSERT OR REPLACE INTO kb_hypothesis_template
         (id, nome, natureza, tipo, condition_of_applicability,
@@ -72,8 +67,7 @@ def garantir_hipoteses(conn):
         'padrao',
         '{}',
         '[{"tipo": "confirma", "peso": "medio", "descricao": "Faturamento consistente", "fecha_por": "empresario"}]',
-        # --- LACUNAS CORRIGIDAS ---
-        '['
+        '[' 
         '{"nome": "planejamento_estrategico_ausente", "classe": "pergunta", "pergunta_canonica": "Você tem um planejamento estratégico formal para os próximos 12 meses?"}, '
         '{"nome": "falta_indicadores", "classe": "pergunta", "pergunta_canonica": "Você acompanha regularmente indicadores de desempenho (ex: margem, conversão, ticket médio)?"}'
         ']',
@@ -83,7 +77,6 @@ def garantir_hipoteses(conn):
         None
     ))
 
-    # Padrões de Decisão
     conn.execute("""
         INSERT OR REPLACE INTO kb_decision_pattern (id, nome, descricao, exceptions)
         VALUES (?, ?, ?, ?)
@@ -94,7 +87,6 @@ def garantir_hipoteses(conn):
         VALUES (?, ?, ?, ?)
     """, ('dp_002', 'Planejamento Estratégico', 'Estruturar o planejamento de médio e longo prazo', '[]'))
 
-    # Ações Recomendadas
     acoes = [
         ('ap_001', 'dp_001', 1, 'Diagnóstico do funil de vendas atual'),
         ('ap_002', 'dp_001', 2, 'Definir processo comercial padronizado'),
@@ -111,17 +103,25 @@ def garantir_hipoteses(conn):
 
     conn.commit()
     print(">>> Hipóteses coringas garantidas com sucesso.")
+
 # --- INICIALIZAÇÃO PRINCIPAL ---
 print(">>> Inicializando banco de dados...")
 try:
     conn = get_conn()
     db.init_db(conn)
-    garantir_hipoteses(conn)   # <-- sempre executa, garantindo que existam
+    garantir_hipoteses(conn)
+
+    try:
+        kb_seed.seed(conn)
+        kb_seed.seed_extensoes_prototipo(conn)
+        print(">>> KB seed carregada com sucesso.")
+    except Exception as kb_err:
+        print(f">>> KB seed não recarregada (provavelmente já existia): {kb_err}")
+
     conn.close()
     print(">>> Banco e KB inicializados.")
 except Exception as e:
     print(f">>> ERRO na inicialização: {e}")
-    # Fallback: executa schema.sql manualmente
     try:
         conn = get_conn()
         schema_path = os.path.join(os.path.dirname(__file__), 'engine', 'schema.sql')
@@ -150,128 +150,6 @@ OBJETIVOS_CANONICOS = {
     "vender_a_empresa",
     "profissionalizar_gestao"
 }
-
-# --------------------------------------------------------------
-# Função que orquestra o pipeline completo
-# --------------------------------------------------------------
-def executar_pipeline_completo(dados_publicos, dados_usuario):
-    conn = get_conn()
-    
-    objetivo = dados_usuario.get("desafio_atual", "crescer_faturamento")
-    if objetivo not in OBJETIVOS_CANONICOS:
-        print(f"Objetivo '{objetivo}' não reconhecido. Usando 'crescer_faturamento'.")
-        objetivo = "crescer_faturamento"
-
-    modelo_receita = dados_publicos.get("modelo_receita_publico", "Prestacao de servicos")
-
-    try:
-        caso_id = pipeline.entrada(
-            conn,
-            cnpj=dados_publicos.get("cnpj"),
-            modelo_receita_percebido=modelo_receita,
-            objetivo_empresarial=objetivo
-        )
-    except Exception as e:
-        conn.close()
-        return {"erro": f"Erro na entrada: {str(e)}"}
-
-    objetivo_claro = pipeline.verificar_objetivo(conn, caso_id)
-    if not objetivo_claro:
-        conn.close()
-        return {"status": "objetivo_pouco_claro", "mensagem": "O objetivo declarado é amplo demais."}
-
-    try:
-        resultado_enriquecimento = pipeline.enriquecimento(conn, caso_id, dados_publicos)
-        if not resultado_enriquecimento.get("congruente", True):
-            conn.close()
-            return {"status": "calibracao_necessaria", "mensagem": "Divergência no modelo de receita."}
-    except Exception as e:
-        conn.close()
-        return {"erro": f"Erro no enriquecimento: {str(e)}"}
-
-    try:
-        pipeline.normalizacao(conn, caso_id)
-    except Exception as e:
-        conn.close()
-        return {"erro": f"Erro na normalização: {str(e)}"}
-
-    try:
-        pipeline.contextualizacao(conn, caso_id)
-    except Exception as e:
-        conn.close()
-        return {"erro": f"Erro na contextualização: {str(e)}"}
-
-    try:
-        hipoteses_selecionadas = pipeline.selecao_hipoteses(conn, caso_id)
-        if not hipoteses_selecionadas:
-            conn.close()
-            return {"status": "sem_hipotese_aplicavel", "mensagem": "Nenhuma hipótese aplicável foi encontrada."}
-    except Exception as e:
-        conn.close()
-        return {"erro": f"Erro na seleção de hipóteses: {str(e)}"}
-
-    respostas = dados_usuario.get("respostas", {})
-    try:
-        investigacao_concluida, novas_hipoteses = pipeline.investigacao(conn, caso_id, respostas)
-if not investigacao_concluida:
-    pendentes = conn.execute(
-        "SELECT * FROM pergunta WHERE caso_id=? AND estado='pendente'", (caso_id,)
-    ).fetchall()
-    conn.close()
-    return {
-        "status": "perguntas_pendentes",
-        "perguntas": [{"texto": p["texto"], "lacuna": p["lacuna"]} for p in pendentes]
-    }
-    conn.close()
-    return {
-        "status": "perguntas_pendentes",
-        "perguntas": [{"texto": p["texto"], "lacuna": p["lacuna"]} for p in pendentes]
-    }
-    except Exception as e:
-        conn.close()
-        return {"erro": f"Erro na investigação: {str(e)}"}
-
-    try:
-        certeza_suficiente = pipeline.calculo_certeza(conn, caso_id)
-        if not certeza_suficiente:
-            conn.close()
-            return {"status": "certeza_insuficiente", "mensagem": "Nenhuma hipótese atingiu certeza suficiente."}
-    except Exception as e:
-        conn.close()
-        return {"erro": f"Erro no cálculo de certeza: {str(e)}"}
-
-    try:
-        pma_id = pipeline.priorizacao(conn, caso_id)
-        if not pma_id:
-            conn.close()
-            return {"status": "nenhuma_hipotese_priorizavel", "mensagem": "Nenhuma hipótese sobreviveu à priorização."}
-    except Exception as e:
-        conn.close()
-        return {"erro": f"Erro na priorização: {str(e)}"}
-
-    try:
-        dec_id = pipeline.decisao(conn, caso_id)
-        if not dec_id:
-            conn.close()
-            return {"status": "sem_padrao_de_decisao", "mensagem": "A hipótese vencedora não possui padrão de decisão."}
-    except Exception as e:
-        conn.close()
-        return {"erro": f"Erro na decisão: {str(e)}"}
-
-    try:
-        pipeline.plano_acao(conn, caso_id)
-    except Exception as e:
-        conn.close()
-        return {"erro": f"Erro no plano de ação: {str(e)}"}
-
-    try:
-        resultado = pipeline.saida(conn, caso_id)
-    except Exception as e:
-        conn.close()
-        return {"erro": f"Erro na saída: {str(e)}"}
-
-    conn.close()
-    return resultado
 
 # --------------------------------------------------------------
 # Rotas
@@ -323,8 +201,50 @@ def diagnose():
     }
 
     try:
-        diagnostico = executar_pipeline_completo(dados_publicos, dados_usuario)
-        return jsonify(diagnostico)
+        conn = get_conn()
+        objetivo = dados_usuario.get("desafio_atual", "crescer_faturamento")
+        if objetivo not in OBJETIVOS_CANONICOS:
+            objetivo = "crescer_faturamento"
+
+        modelo_receita = dados_publicos.get("modelo_receita_publico", "Prestacao de servicos")
+
+        caso_id = pipeline.entrada(
+            conn,
+            cnpj=dados_publicos.get("cnpj"),
+            modelo_receita_percebido=modelo_receita,
+            objetivo_empresarial=objetivo
+        )
+
+        pipeline.enriquecimento(conn, caso_id, dados_publicos)
+        pipeline.normalizacao(conn, caso_id)
+        pipeline.contextualizacao(conn, caso_id)
+        pipeline.selecao_hipoteses(conn, caso_id)
+
+        investigacao_concluida, _ = pipeline.investigacao(
+            conn, 
+            caso_id, 
+            dados_usuario.get('respostas', {})
+        )
+
+        if not investigacao_concluida:
+            pendentes = conn.execute(
+                "SELECT * FROM pergunta WHERE caso_id=? AND estado='pendente'", (caso_id,)
+            ).fetchall()
+            conn.close()
+            return jsonify({
+                "status": "perguntas_pendentes",
+                "perguntas": [{"texto": p["texto"], "lacuna": p["lacuna"]} for p in pendentes]
+            })
+
+        pipeline.calculo_certeza(conn, caso_id)
+        pipeline.priorizacao(conn, caso_id)
+        pipeline.decisao(conn, caso_id)
+        pipeline.plano_acao(conn, caso_id)
+        resultado = pipeline.saida(conn, caso_id)
+
+        conn.close()
+        return jsonify(resultado)
+
     except Exception as e:
         return jsonify({"erro": f"Erro no pipeline: {str(e)}"}), 500
 
