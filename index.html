@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TFAZZIO | Clareza para Crescer</title>
-  <meta name="description" content="Consultoria estratégica para PMEs. Diagnóstico Ponto de Impacto, planejamento e execução para empresas que querem crescer com clareza." />
+  <title>TFAZZIO | Consultoria Estratégica para PMEs</title>
+  <meta name="description" content="Consultoria estratégica para PMEs. Planejamento, execução e diagnóstico para empresas que querem crescer com clareza." />
   <link rel="icon" type="image/png" href="assets/images/logo-tfazzio.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <style>
@@ -28,7 +28,7 @@
     }
 
     .container {
-      max-width: 820px;
+      max-width: 900px;
       width: 100%;
       text-align: center;
     }
@@ -36,7 +36,7 @@
     .logo {
       width: 120px;
       height: auto;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
 
     .badge {
@@ -50,7 +50,7 @@
       padding: 0.3rem 1rem;
       border-radius: 100px;
       border: 1px solid #D4AF37;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.2rem;
     }
 
     h1 {
@@ -59,7 +59,7 @@
       line-height: 1.1;
       letter-spacing: -0.02em;
       color: #1A1A1A;
-      margin-bottom: 1.2rem;
+      margin-bottom: 0.5rem;
     }
 
     .highlight {
@@ -69,7 +69,7 @@
     .subtitle {
       font-size: 1.1rem;
       color: #5A6270;
-      max-width: 560px;
+      max-width: 600px;
       margin: 0 auto 2.5rem auto;
     }
 
@@ -109,6 +109,24 @@
       background: #F9F7F3;
     }
 
+    .btn-outline {
+      display: inline-block;
+      background: transparent;
+      color: #6B0F1A;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.6rem 1.5rem;
+      border-radius: 60px;
+      border: 1.5px solid #6B0F1A;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .btn-outline:hover {
+      background: #6B0F1A;
+      color: #fff;
+    }
+
     .actions {
       display: flex;
       flex-wrap: wrap;
@@ -125,9 +143,9 @@
 
     .features {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 1.5rem;
-      margin-top: 3rem;
+      margin-top: 2.5rem;
       text-align: left;
       border-top: 1px solid #E8E2D8;
       padding-top: 2.5rem;
@@ -144,6 +162,22 @@
       font-size: 0.85rem;
       color: #5A6270;
       margin: 0;
+    }
+
+    .tool-link {
+      display: inline-block;
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #6B0F1A;
+      text-decoration: none;
+      border-bottom: 2px solid #D4AF37;
+      padding-bottom: 0.2rem;
+      transition: border-color 0.2s;
+    }
+
+    .tool-link:hover {
+      border-color: #6B0F1A;
     }
 
     .footer-note {
@@ -165,7 +199,6 @@
       text-decoration: underline;
     }
 
-    /* responsivo */
     @media (max-width: 480px) {
       .actions {
         flex-direction: column;
@@ -199,34 +232,41 @@
 
     <!-- Subtítulo -->
     <p class="subtitle">
-      Diagnóstico, planejamento e execução para empresas que querem dar o próximo passo com segurança e inteligência.
+      Planejamento, execução e diagnóstico para empresas que querem dar o próximo passo com segurança e inteligência.
     </p>
 
     <!-- Botões principais -->
     <div class="actions">
-      <a href="https://ponto.tfazzio.com.br" class="btn-primary">
-        Fazer o Diagnóstico Ponto de Impacto
+      <a href="/consultoria/" class="btn-primary">
+        Conhecer a Consultoria TFAZZIO
       </a>
       <span class="divider">ou</span>
-      <a href="/consultoria/" class="btn-secondary">
-        Conhecer a Consultoria
+      <a href="https://ponto.tfazzio.com.br" class="btn-secondary">
+        Fazer o Diagnóstico Ponto de Impacto
       </a>
     </div>
 
-    <!-- Features (diferenciais) -->
+    <!-- Diferenciais -->
     <div class="features">
       <div class="feature-item">
-        <h4>📊 Diagnóstico Estratégico</h4>
-        <p>Mapeie gargalos e oportunidades com o método TFAZZIO.</p>
+        <h4>🎯 Planejamento Estratégico</h4>
+        <p>Metas claras e planos de ação para acelerar seu crescimento.</p>
       </div>
       <div class="feature-item">
-        <h4>🎯 Plano de Ação 90 Dias</h4>
-        <p>Transforme diagnóstico em execução com metas claras.</p>
+        <h4>📊 Diagnóstico Ponto de Impacto</h4>
+        <p>Mapeie gargalos e oportunidades com IA e dados do seu CNPJ.</p>
       </div>
       <div class="feature-item">
-        <h4>🧠 Inteligência de Dados</h4>
-        <p>Decisões baseadas em dados do CNPJ, mercado e IA.</p>
+        <h4>🚀 Execução com Acompanhamento</h4>
+        <p>Transformamos diagnóstico em ação, com métricas e ajustes contínuos.</p>
       </div>
+    </div>
+
+    <!-- Link direto para o Ponto (opcional) -->
+    <div style="margin-top: 1.5rem;">
+      <a href="https://ponto.tfazzio.com.br" class="tool-link">
+        🔍 Quer começar pelo diagnóstico? Acesse o Ponto de Impacto →
+      </a>
     </div>
 
     <!-- Rodapé -->
