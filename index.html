@@ -33,11 +33,16 @@
       text-align: center;
     }
 
+    .logo-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
     .logo {
       width: 120px;
       height: auto;
       display: block;
-      margin: 0 auto 1.5rem auto;
     }
 
     .badge {
@@ -220,7 +225,9 @@
 
   <div class="container">
     <!-- Logo -->
-    <img src="assets/images/logo-tfazzio.png" alt="TFAZZIO" class="logo" />
+    <div class="logo-wrapper">
+      <img src="assets/images/logo-tfazzio.png" alt="TFAZZIO" class="logo" />
+    </div>
 
     <!-- Badge -->
     <span class="badge">Consultoria Estratégica para PMEs</span>
