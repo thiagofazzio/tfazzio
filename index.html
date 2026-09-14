@@ -6,6 +6,14 @@
   <title>TFAZZIO | Consultoria Estratégica para PMEs</title>
   <meta name="description" content="A TFAZZIO identifica o limitador da sua empresa e te ajuda a eliminá-lo. Consultoria estratégica e diagnóstico Ponto de Impacto para PMEs que querem crescer com clareza." />
   <link rel="icon" type="image/png" href="assets/images/logo-tfazzio.png" />
+  <!-- Open Graph / previews em anúncios e compartilhamento -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://tfazzio.com.br/" />
+  <meta property="og:title" content="TFAZZIO | Consultoria Estratégica para PMEs" />
+  <meta property="og:description" content="Descubra o limitador que está travando o crescimento da sua empresa. Diagnóstico Ponto de Impacto com 40% OFF de lançamento." />
+  <meta property="og:image" content="https://tfazzio.com.br/assets/images/logo-tfazzio.png" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta name="twitter:card" content="summary" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -59,17 +67,24 @@
     /* Faixa de lançamento — Ponto de Impacto */
     .promo-bar {
       position: sticky; top: 68px; left: 0; right: 0; z-index: 190;
-      background: var(--bordo); color: var(--white); text-align: center;
-      padding: 12px 24px; font-family: 'Barlow Condensed', sans-serif;
-      font-size: 13px; font-weight: 600; letter-spacing: 0.5px;
+      background: linear-gradient(90deg, var(--bordo-dark), var(--bordo) 50%, var(--bordo-dark));
+      color: var(--white); text-align: center;
+      padding: 15px 24px; font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px; font-weight: 600; letter-spacing: 0.4px;
+      border-bottom: 2px solid var(--gold);
     }
-    .promo-bar strong { color: var(--gold-pale); }
+    .promo-bar strong { color: var(--gold-pale); font-weight: 700; }
     .promo-bar del { opacity: 0.55; font-weight: 400; margin: 0 4px; }
-    .promo-bar a {
-      color: var(--white); text-decoration: none; border-bottom: 1.5px solid var(--gold-pale);
-      padding-bottom: 1px; margin-left: 10px; white-space: nowrap;
+    .promo-bar .promo-count {
+      display: inline-block; color: var(--bordo-dark); background: var(--gold);
+      font-weight: 700; font-size: 12px; padding: 2px 10px; border-radius: 3px; margin: 0 2px;
     }
-    .promo-bar a:hover { border-color: var(--white); }
+    .promo-bar a {
+      display: inline-block; color: var(--bordo-dark); background: var(--gold-pale);
+      text-decoration: none; padding: 5px 16px; border-radius: 3px;
+      margin-left: 14px; white-space: nowrap; font-weight: 700; transition: background 0.2s;
+    }
+    .promo-bar a:hover { background: var(--white); }
 
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 200; height: 68px;
@@ -137,6 +152,7 @@
       display: flex; flex-direction: column; align-items: flex-start; gap: 16px;
       opacity: 0; animation: fu 0.8s ease forwards 1.1s;
     }
+    .hero-btn-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
     .hero-friction { font-size: 13px; color: var(--silver); font-style: italic; line-height: 1.6; }
     @keyframes fu { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes revUp { from { opacity: 0; transform: translateY(40px); filter: blur(4px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
@@ -426,8 +442,9 @@
 
 <!-- Faixa de lançamento — atualizar/remover quando a campanha de Black Friday substituir esta promoção -->
 <div class="promo-bar">
-  🔥 Lançamento do <strong>Ponto de Impacto</strong>: <del>R$ 489,70</del> por <strong>R$ 293,82</strong> (40% OFF) até 31 de outubro
-  <a href="https://ponto.tfazzio.com.br" target="_blank">Fazer o diagnóstico →</a>
+  🔥 Lançamento do <strong>Ponto de Impacto</strong>: <del>R$ 489,70</del> por <strong>R$ 293,82</strong> (40% OFF) —
+  <span class="promo-count" id="promoContagem">termina em breve</span>
+  <a href="https://ponto.tfazzio.com.br" target="_blank">Fazer o diagnóstico grátis →</a>
 </div>
 
 <section class="hero" id="home">
@@ -444,8 +461,11 @@
       Trabalhamos com empresários que já tem um negócio rodando, mas sentem que algo invisível está segurando o crescimento. Nossa função é encontrar esse algo e construir o caminho para eliminá-lo.
     </p>
     <div class="hero-actions">
-      <a href="https://wa.me/5516992752758" target="_blank" class="btn btn--bordo">Conversar sobre minha empresa</a>
-      <p class="hero-friction">Sem compromisso. Vamos entender juntos qual programa faz sentido para você.</p>
+      <div class="hero-btn-row">
+        <a href="https://ponto.tfazzio.com.br" target="_blank" class="btn btn--gold">Fazer o Diagnóstico Grátis</a>
+        <a href="https://wa.me/5516992752758" target="_blank" class="btn btn--bordo">Conversar sobre minha empresa</a>
+      </div>
+      <p class="hero-friction">Diagnóstico online em 10 minutos, ou converse direto com a gente — sem compromisso.</p>
     </div>
   </div>
 </section>
@@ -690,6 +710,16 @@
 </a>
 
 <script>
+  // Contagem regressiva da faixa de lançamento — mesma data-limite do
+  // desconto no app (src/utils/pricing.ts em ponto-de-impacto).
+  (function () {
+    const fim = new Date('2026-10-31T23:59:59-03:00');
+    const el = document.getElementById('promoContagem');
+    if (!el) return;
+    const dias = Math.ceil((fim - new Date()) / 86400000);
+    el.textContent = dias > 1 ? `faltam ${dias} dias` : dias === 1 ? 'último dia' : 'termina hoje';
+  })();
+
   function toggleMenu() {
     document.getElementById('mobMenu').classList.toggle('open');
   }
