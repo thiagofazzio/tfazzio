@@ -33,6 +33,7 @@
     body {
       background: var(--white); color: var(--graphite); font-family: 'Barlow', sans-serif;
       font-weight: 300; line-height: 1.75; overflow-x: hidden; -webkit-font-smoothing: antialiased;
+      overflow-wrap: break-word;
     }
     .t-label {
       font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 600;
@@ -41,6 +42,7 @@
     .t-label--pale { color: rgba(212,175,55,0.75); }
     .t-display {
       font-family: 'Barlow Condensed', sans-serif; font-weight: 500; line-height: 1.08; color: var(--graphite);
+      text-wrap: balance;
     }
     .t-display em { font-style: italic; color: var(--bordo); }
     .t-display--lg { font-size: clamp(32px, 4.5vw, 64px); }
@@ -136,6 +138,7 @@
     .hero-headline {
       font-family: 'Barlow Condensed', sans-serif; font-weight: 500;
       font-size: clamp(40px, 6vw, 84px); line-height: 1.05; color: var(--graphite);
+      text-wrap: balance;
       opacity: 0; animation: revUp 1.2s cubic-bezier(0.16,1,0.3,1) forwards 0.25s;
     }
     .hero-headline em { font-style: italic; color: var(--bordo); }
@@ -157,7 +160,7 @@
       opacity: 0; animation: fu 0.8s ease forwards 1.1s;
     }
     .hero-btn-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
-    .hero-friction { font-size: 13px; color: var(--silver); font-style: italic; line-height: 1.6; }
+    .hero-friction { font-size: 14px; color: var(--silver); font-style: italic; line-height: 1.6; }
     @keyframes fu { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes revUp { from { opacity: 0; transform: translateY(40px); filter: blur(4px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
 
@@ -193,10 +196,10 @@
     }
     .prod-name {
       font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 500;
-      color: var(--graphite); line-height: 1.15; margin-bottom: 12px;
+      color: var(--graphite); line-height: 1.15; margin-bottom: 12px; text-wrap: balance;
     }
     .prod-headline {
-      font-size: 14px; color: var(--muted); line-height: 1.75; margin-bottom: 28px; flex-grow: 1;
+      font-size: 15px; color: var(--muted); line-height: 1.75; margin-bottom: 28px; flex-grow: 1;
     }
     .prod-price-de {
       font-size: 14px; color: var(--silver); text-decoration: line-through; margin-bottom: 2px;
@@ -225,12 +228,17 @@
     }
     .prod-detail { list-style: none; margin-bottom: 24px; }
     .prod-detail li {
-      font-size: 14px; color: var(--muted); padding: 10px 0; border-bottom: 1px solid var(--cream-mid);
+      font-size: 15px; color: var(--muted); padding: 10px 0; border-bottom: 1px solid var(--cream-mid);
       display: flex; gap: 10px; line-height: 1.6;
     }
     .prod-detail li:last-child { border-bottom: none; }
     .prod-detail li::before { content: '->'; color: var(--gold); flex-shrink: 0; font-size: 12px; }
-    .prod-detail-note { font-size: 13px; color: var(--silver); line-height: 1.7; margin-bottom: 20px; }
+    .prod-detail-note { font-size: 14px; color: var(--silver); line-height: 1.7; margin-bottom: 20px; }
+    .prod-numero {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700;
+      letter-spacing: 2.5px; text-transform: uppercase; color: var(--bordo); display: block; margin-bottom: 10px;
+    }
+    .prod-card--destaque .prod-numero { color: var(--gold-pale); }
 
     .advisor { background: var(--graphite); }
     .advisor .t-label { margin-bottom: 28px; }
@@ -255,13 +263,22 @@
     .sobre-left p { margin-top: 28px; }
     .sobre-pull { border-left: 2px solid var(--gold); padding-left: 28px; margin: 44px 0; }
     .sobre-right { padding-top: 72px; }
-    .pilar { padding: 36px 0; border-bottom: 1px solid var(--rule); }
-    .pilar:first-child { border-top: 1px solid var(--rule); }
-    .pilar-verb {
-      font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 700;
-      letter-spacing: 4px; color: var(--bordo); margin-bottom: 8px;
+    /* Pirâmide ORGANIZAMOS / DEVOLVEMOS / CONSTRUÍMOS — 3 degraus que vão
+       estreitando, pra ler como fundação -> refinamento -> resultado em vez
+       de uma lista plana de 3 itens iguais. */
+    .piramide { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+    .piramide-item {
+      width: 100%; box-sizing: border-box; border-radius: 12px; padding: 26px 30px;
+      background: linear-gradient(135deg, var(--bordo), var(--bordo-mid));
+      box-shadow: 0 14px 28px rgba(107,15,26,0.16); text-align: center;
     }
-    .pilar p { font-size: 14px; color: var(--muted); line-height: 1.85; }
+    .piramide-item:nth-child(2) { width: 84%; }
+    .piramide-item:nth-child(3) { width: 68%; }
+    .piramide-verb {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700;
+      letter-spacing: 4px; color: var(--gold-pale); margin-bottom: 10px;
+    }
+    .piramide-item p { font-size: 14px; color: rgba(255,255,255,0.82); line-height: 1.7; }
 
     .quem { background: var(--off); }
     .quem-grid { display: grid; grid-template-columns: 2fr 3fr; gap: 80px; align-items: start; }
@@ -271,22 +288,25 @@
       display: flex; align-items: center; justify-content: center; margin-bottom: 2px; overflow: hidden;
     }
     .quem-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .stat-block { background: var(--white); padding: 36px 32px; }
+    /* 3 especificações lado a lado em vez de empilhadas — lê como uma
+       barra de credenciais, não como 3 cards soltos. */
+    .stat-row { display: flex; gap: 2px; }
+    .stat-block { background: var(--white); padding: 24px 10px; flex: 1; text-align: center; }
     .stat-n {
-      font-family: 'Barlow Condensed', sans-serif; font-size: 52px; font-weight: 700;
-      color: var(--bordo); line-height: 1; margin-bottom: 4px;
+      font-family: 'Barlow Condensed', sans-serif; font-size: clamp(26px, 3.6vw, 40px); font-weight: 700;
+      color: var(--bordo); line-height: 1; margin-bottom: 6px;
     }
     .stat-l {
       font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 600;
-      letter-spacing: 3px; text-transform: uppercase; color: var(--silver);
+      letter-spacing: 1.5px; text-transform: uppercase; color: var(--silver); line-height: 1.4;
     }
     .quem-bio-block { background: var(--bordo); padding: 32px; }
-    .quem-bio-block p { font-size: 13px; color: rgba(255,255,255,0.78); line-height: 1.85; }
+    .quem-bio-block p { font-size: 14px; color: rgba(255,255,255,0.78); line-height: 1.85; }
     .quem-bio-block strong { color: var(--white); }
     .quem-right .t-label { margin-bottom: 28px; }
     .quem-nome {
       font-family: 'Barlow Condensed', sans-serif; font-size: clamp(34px, 4.5vw, 60px);
-      font-weight: 500; color: var(--graphite); line-height: 1; margin-bottom: 6px;
+      font-weight: 500; color: var(--graphite); line-height: 1; margin-bottom: 6px; text-wrap: balance;
     }
     .quem-cargo {
       font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 600;
@@ -296,7 +316,7 @@
     .quem-pull-box { border-left: 2px solid var(--bordo); padding-left: 28px; margin: 36px 0; }
     .creds { display: flex; flex-wrap: wrap; gap: 8px; margin: 28px 0 20px; }
     .cred {
-      font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 600;
       letter-spacing: 1.5px; color: var(--muted); background: var(--white);
       padding: 6px 14px; border: 1px solid var(--cream-mid);
     }
@@ -329,14 +349,14 @@
     }
     .cp-qs { list-style: none; border-top: 1px solid var(--cream-mid); padding-top: 22px; }
     .cp-qs li {
-      font-size: 14px; color: var(--muted); padding: 9px 0; border-bottom: 1px solid var(--cream);
+      font-size: 15px; color: var(--muted); padding: 9px 0; border-bottom: 1px solid var(--cream);
       display: flex; gap: 12px; line-height: 1.6;
     }
     .cp-qs li:last-child { border-bottom: none; }
     .cp-qs li::before { content: '->'; color: var(--gold); flex-shrink: 0; margin-top: 1px; }
     .cp-end {
       margin-top: 22px; padding: 14px 18px; background: var(--white);
-      border-left: 2px solid var(--bordo); font-size: 13px; color: var(--mid);
+      border-left: 2px solid var(--bordo); font-size: 14px; color: var(--mid);
       font-style: italic; line-height: 1.7;
     }
 
@@ -344,8 +364,8 @@
     .faq .t-label { margin-bottom: 28px; }
     .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-top: 60px; }
     .faq-item { background: var(--off); padding: 36px 40px; }
-    .faq-q { font-size: 15px; font-weight: 500; color: var(--graphite); margin-bottom: 14px; line-height: 1.4; }
-    .faq-a { font-size: 14px; color: var(--muted); line-height: 1.85; }
+    .faq-q { font-size: 16px; font-weight: 500; color: var(--graphite); margin-bottom: 14px; line-height: 1.4; }
+    .faq-a { font-size: 15px; color: var(--muted); line-height: 1.85; }
 
     .cta-final {
       background: var(--bordo-dark); padding: 140px 0; text-align: center;
@@ -355,6 +375,7 @@
     .cta-title {
       font-family: 'Barlow Condensed', sans-serif; font-size: clamp(34px, 5vw, 68px);
       font-weight: 500; color: var(--white); line-height: 1.08; max-width: 760px; margin: 0 auto;
+      text-wrap: balance;
     }
     .cta-title em { font-style: italic; color: var(--gold-pale); }
     .cta-italic {
@@ -482,7 +503,31 @@
     <span class="t-label">Programas TFAZZIO</span>
     <h2 class="t-display t-display--lg">Escolha o programa<br>que faz sentido para <em>você</em></h2>
     <div class="produtos-grid">
+      <div class="prod-card prod-card--destaque">
+        <span class="prod-badge">Lançamento · 40% OFF até 31/10</span>
+        <span class="prod-tag">Diagnóstico online · versão alpha</span>
+        <h3 class="prod-name">Ponto de<br>Impacto</h3>
+        <p class="prod-headline">Diagnóstico online para identificar o limitador principal da sua empresa — em menos de 10 minutos, com plano de ação de 90 dias.</p>
+        <div class="prod-price-de">R$ 489,70</div>
+        <div class="prod-price">R$ 293,82</div>
+        <div class="prod-price-note">Pagamento único · garantia de 30 dias</div>
+        <button class="prod-expand" onclick="toggleDetails('details-ponto', this)">Saiba mais</button>
+        <div class="prod-details" id="details-ponto">
+          <span class="prod-detail-label">Entregas</span>
+          <ul class="prod-detail">
+            <li>Índice de Clareza da empresa</li>
+            <li>Gargalo principal, com ação imediata</li>
+            <li>Ponto de equilíbrio e margem de contribuição</li>
+            <li>Lucro líquido estimado</li>
+            <li>Plano de ação de 90 dias</li>
+            <li>Relatório executivo em PDF</li>
+          </ul>
+          <a href="https://ponto.tfazzio.com.br" target="_blank" class="btn btn--gold btn--sm btn--block">Acessar Ponto de Impacto</a>
+        </div>
+      </div>
+
       <div class="prod-card">
+        <span class="prod-numero">Programa 01</span>
         <span class="prod-tag">Intensivo de clareza · 30 dias</span>
         <h3 class="prod-name">Intensivo<br>TFAZZIO</h3>
         <p class="prod-headline">Diagnóstico completo da empresa em um ciclo curto e objetivo.</p>
@@ -504,23 +549,8 @@
         </div>
       </div>
 
-      <div class="prod-card prod-card--destaque">
-        <span class="prod-badge">Lançamento · 40% OFF até 31/10</span>
-        <span class="prod-tag">Diagnóstico online · versão alpha</span>
-        <h3 class="prod-name">Ponto de<br>Impacto</h3>
-        <p class="prod-headline">Diagnóstico online para identificar o limitador principal da sua empresa — em menos de 10 minutos, com plano de ação de 90 dias.</p>
-        <div class="prod-price-de">R$ 489,70</div>
-        <div class="prod-price">R$ 293,82</div>
-        <div class="prod-price-note">Pagamento único · garantia de 30 dias</div>
-        <button class="prod-expand" onclick="toggleDetails('details-ponto', this)">Saiba mais</button>
-        <div class="prod-details" id="details-ponto">
-          <span class="prod-detail-label">O que é</span>
-          <p class="prod-detail-note">Um diagnóstico online estruturado que analisa os principais indicadores da sua empresa e entrega o Índice de Clareza, o ponto de equilíbrio e um plano de 90 dias.</p>
-          <a href="https://ponto.tfazzio.com.br" target="_blank" class="btn btn--gold btn--sm btn--block">Acessar Ponto de Impacto</a>
-        </div>
-      </div>
-
       <div class="prod-card">
+        <span class="prod-numero">Programa 02</span>
         <span class="prod-tag">Programa principal · 90 dias</span>
         <h3 class="prod-name">Programa<br>Estratégico</h3>
         <p class="prod-headline">Transforme clareza em decisões e decisões em resultados consistentes.</p>
@@ -586,17 +616,19 @@
         <p class="t-body">Entramos no negócio, identificamos o nó real e construímos o caminho junto com o empresário.</p>
       </div>
       <div class="sobre-right">
-        <div class="pilar">
-          <div class="pilar-verb">ORGANIZAMOS</div>
-          <p>Identificamos o que está realmente travando, separamos o urgente do importante.</p>
-        </div>
-        <div class="pilar">
-          <div class="pilar-verb">DEVOLVEMOS</div>
-          <p>Clareza e direção. O empresário volta a saber o que fazer primeiro.</p>
-        </div>
-        <div class="pilar">
-          <div class="pilar-verb">CONSTRUÍMOS</div>
-          <p>Crescimento com consistência. Resultado com estrutura real.</p>
+        <div class="piramide">
+          <div class="piramide-item">
+            <div class="piramide-verb">ORGANIZAMOS</div>
+            <p>Identificamos o que está realmente travando, separamos o urgente do importante.</p>
+          </div>
+          <div class="piramide-item">
+            <div class="piramide-verb">DEVOLVEMOS</div>
+            <p>Clareza e direção. O empresário volta a saber o que fazer primeiro.</p>
+          </div>
+          <div class="piramide-item">
+            <div class="piramide-verb">CONSTRUÍMOS</div>
+            <p>Crescimento com consistência. Resultado com estrutura real.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -612,27 +644,29 @@
             onerror="this.style.display='none'; this.parentElement.querySelector('.quem-foto-placeholder').style.display='block';" />
           <div class="quem-foto-placeholder" style="display:none;">Foto<br>Thiago Fazzio</div>
         </div>
-        <div class="stat-block">
-          <div class="stat-n">7+</div>
-          <div class="stat-l">Anos no mercado financeiro</div>
-        </div>
-        <div class="stat-block">
-          <div class="stat-n">200+</div>
-          <div class="stat-l">Empresas acompanhadas</div>
-        </div>
-        <div class="stat-block">
-          <div class="stat-n">R$50M+</div>
-          <div class="stat-l">Em crédito estruturado para PMEs</div>
+        <div class="stat-row">
+          <div class="stat-block">
+            <div class="stat-n">7+</div>
+            <div class="stat-l">Anos no mercado financeiro</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-n">200+</div>
+            <div class="stat-l">Empresas acompanhadas</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-n">R$50M+</div>
+            <div class="stat-l">Em crédito estruturado</div>
+          </div>
         </div>
         <div class="quem-bio-block">
-          <p><strong>Thiago Fazzio</strong>, economista com passagens por Sicredi, Santander, Itaú e Banco PAN. Mais de 7 anos analisando PMEs por dentro.</p>
+          <p><strong>Thiago Fazzio</strong>, economista com passagens por Sicredi, Santander, Itaú e Banco PAN — quase uma década de experiência em grandes instituições financeiras, analisando PMEs por dentro.</p>
         </div>
       </div>
       <div class="quem-right">
         <span class="t-label">Quem está por trás</span>
         <h2 class="quem-nome">Thiago Fazzio</h2>
         <span class="quem-cargo">Economista · Consultor Estratégico</span>
-        <p class="t-body">Passei mais de 7 anos dentro de Sicredi, Santander, Itaú e Banco PAN analisando, financiando e acompanhando empresas de todos os tamanhos.</p>
+        <p class="t-body">Passei quase uma década dentro de grandes instituições financeiras brasileiras — Sicredi, Santander, Itaú e Banco PAN — analisando, financiando e acompanhando empresas de todos os tamanhos.</p>
         <div class="quem-pull-box">
           <p class="t-pull">"Percebi um padrão que se repetia: donos dedicados, produto validado, faturamento crescendo, mas o negócio travado num teto que parecia impossível de quebrar."</p>
         </div>
